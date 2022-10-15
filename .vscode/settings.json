@@ -1,12 +1,7 @@
 {
     "files.associations": {
-        "lv_demos.h": "c",
-        "lv_demo_keypad_encoder.h": "c",
-        "lv_demo_widgets.h": "c",
-        "lvgl.h": "c",
-        "lv_test_main.h": "c",
-        "lv_test.h": "c",
-        "stdio.h": "c",
-        "simple_test.h": "c"
+        "lv_100ask_pinyin_ime.h": "c",
+        "chrono": "c",
+        "system_error": "c"
     }
 }

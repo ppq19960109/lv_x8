@@ -428,7 +428,7 @@ static void lv_page_back_event_cb(lv_event_t * e)
     }
     else if(code == LV_EVENT_PRESSING)
     {
-        lv_obj_t * obj = lv_event_get_target(e);
+        // lv_obj_t * obj = lv_event_get_target(e);
 
         lv_indev_t * indev = lv_indev_get_act();
         if(indev == NULL)  return;

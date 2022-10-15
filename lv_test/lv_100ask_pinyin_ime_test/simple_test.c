@@ -58,7 +58,7 @@ static void ta_event_cb(lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
-        printf("%s,code:%d\n",__func__,code);
+        LV_LOG_USER("%s,code:%d\n",__func__,code);
         if(code == LV_EVENT_CANCEL)
         lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_state(ta, LV_STATE_FOCUSED);
