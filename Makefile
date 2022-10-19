@@ -49,5 +49,5 @@ distclean:
 	make clean
 	rm -f libvglfont.so
 lib:
-	$(CC) -fPIC -shared -O3 $(LIBSRCS) -o libvglfont.so
+	$(CC) -fPIC -shared -O3 -g0 $(LIBSRCS) -o libvglfont.so
 	$(STRIP) libvglfont.so

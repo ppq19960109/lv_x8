@@ -18,21 +18,21 @@ int main(void)
     lv_init();
 
     /*Linux frame buffer device init*/
-    // fbdev_init();
-    drm_init();
+    fbdev_init();
+    // drm_init();
 
     /*A small buffer for LittlevGL to draw the screen's content*/
     static lv_color_t buf[DISP_BUF_SIZE];
-
+    static lv_color_t buf2[DISP_BUF_SIZE];
     /*Initialize a descriptor for the buffer*/
     static lv_disp_draw_buf_t disp_buf;
-    lv_disp_draw_buf_init(&disp_buf, buf, NULL, DISP_BUF_SIZE);
+    lv_disp_draw_buf_init(&disp_buf, buf, buf2, DISP_BUF_SIZE);
 
     /*Initialize and register a display driver*/
     static lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
     disp_drv.draw_buf  = &disp_buf;
-    disp_drv.flush_cb  = drm_flush; // fbdev_flush;
+    disp_drv.flush_cb  = fbdev_flush; // fbdev_flush drm_flush
     disp_drv.hor_res   = 400;
     disp_drv.ver_res   = 1280;
     disp_drv.sw_rotate = 1;
@@ -64,7 +64,7 @@ int main(void)
     /*Handle LitlevGL tasks (tickless mode)*/
     while(1) {
         lv_timer_handler();
-        usleep(4000);
+        usleep(6000);
     }
 
     return 0;
@@ -73,17 +73,15 @@ int main(void)
 /*Set in lv_conf.h as `LV_TICK_CUSTOM_SYS_TIME_EXPR`*/
 uint32_t custom_tick_get(void)
 {
+    struct timeval tv_now;
     static uint64_t start_ms = 0;
     if(start_ms == 0) {
-        struct timeval tv_start;
-        gettimeofday(&tv_start, NULL);
-        start_ms = (tv_start.tv_sec * 1000000 + tv_start.tv_usec) / 1000;
+        gettimeofday(&tv_now, NULL);
+        start_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) * 0.001;
     }
-
-    static struct timeval tv_now;
     gettimeofday(&tv_now, NULL);
     static uint64_t now_ms;
-    now_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) / 1000;
+    now_ms = tv_now.tv_sec * 1000 + tv_now.tv_usec * 0.001;
     // uint32_t time_ms = now_ms - start_ms;
     return now_ms - start_ms;
 }

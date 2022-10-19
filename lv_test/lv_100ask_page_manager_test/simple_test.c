@@ -54,8 +54,9 @@ void lv_100ask_page_manager_simple_test(void)
 {
     lv_obj_t * page_manager = lv_100ask_page_manager_create(lv_scr_act());
 
-    lv_obj_t * main_page = lv_100ask_page_manager_page_create(page_manager, "Main_page");
     lv_obj_t * page1 = lv_100ask_page_manager_page_create(page_manager, "Page1");
+    lv_obj_t * main_page = lv_100ask_page_manager_page_create(page_manager, "Main_page");
+    
     lv_obj_t * page2 = lv_100ask_page_manager_page_create(page_manager, "Page2");
     lv_obj_t * page3 = lv_100ask_page_manager_page_create(page_manager, "Page3");
     lv_obj_t * page4 = lv_100ask_page_manager_page_create(page_manager, "Page4");
@@ -89,6 +90,7 @@ void lv_100ask_page_manager_simple_test(void)
 
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "Main_page");
+    // lv_obj_move_background(main_page);
 }
 
 

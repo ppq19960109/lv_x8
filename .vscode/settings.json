@@ -2,6 +2,10 @@
     "files.associations": {
         "lv_100ask_pinyin_ime.h": "c",
         "chrono": "c",
-        "system_error": "c"
+        "system_error": "c",
+        "lv_test_main.h": "c",
+        "typeinfo": "c",
+        "memory": "c",
+        "*.tcc": "c"
     }
 }

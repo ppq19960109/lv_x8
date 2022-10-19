@@ -94,7 +94,9 @@ void lv_100ask_page_manager_set_load_page_event(lv_obj_t * obj, lv_obj_t * page,
 void lv_100ask_page_manager_set_open_page_anim(lv_obj_t * obj, void (*open_anim)(lv_obj_t  * obj));
 
 void lv_100ask_page_manager_set_close_page_anim(lv_obj_t * obj, void (*close_anim)(lv_obj_t  * obj));
-
+void lv_page_back_previous_page(void);
+void lv_page_back_top_page(void);
+void lv_page_back_replace_page(lv_obj_t * obj, char * name);
 /*=====================
  * Getter functions
  *====================*/
