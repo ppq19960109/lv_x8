@@ -14,7 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_test.h"
-
+#include "cmd_run.h"
+#include "commonFunc.h"
+#include "networkFunc.h"
+#include "signalQuit.h"
+#include "POSIXTimer.h"
 /*********************
  *      DEFINES
  *********************/
@@ -28,6 +32,20 @@ LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_30);
 LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_34);
 LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_40);
 LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_50);
+
+typedef struct
+{
+    char imgUrl[128];
+    char ingredients[960];
+    char dishName[80];
+    char cookSteps[180];
+    char ** details;
+    unsigned char details_count;
+    int recipeid;
+    int recipeType;
+    int cookPos;
+} recipe_t;
+extern recipe_t g_recipes[40];
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -39,6 +57,7 @@ lv_obj_t * lv_page_top_bar_init(lv_obj_t * parent, const int index);
 lv_obj_t * lv_rotate_anim(lv_obj_t * obj, const int run);
 void lv_page_hood_init(lv_obj_t * page);
 void lv_page_steamoven_init(lv_obj_t * page);
+void lv_page_smartrecipes_init(lv_obj_t * page);
 /**********************
  *      MACROS
  **********************/

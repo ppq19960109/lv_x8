@@ -13,6 +13,8 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
+recipe_t g_recipes[40];
+
 #if LV_100ASK_PAGE_MANAGER_COSTOM_ANIMARION
 /*open page anim*/
 static void open_page_anim(lv_obj_t * obj)
@@ -106,7 +108,52 @@ static void init_main_page(lv_obj_t * page)
     lv_label_set_text(label_title3, "智慧菜谱");
     lv_obj_set_style_text_color(label_title3, lv_color_hex(0xffffff), 0);
     lv_obj_align(label_title3, LV_ALIGN_TOP_MID, 0, 45);
+    lv_100ask_page_manager_set_load_page_event(home_smartrecipes, NULL, "page_smartrecipes");
 }
+static void * recipes_parse_json(void * input, const char * str) //启动时解析
+{
+    cJSON * root = cJSON_Parse(str);
+    if(root == NULL) {
+        return NULL;
+    }
+
+    cJSON * recipes = cJSON_GetObjectItem(root, "recipes");
+    if(recipes == NULL) {
+        LV_LOG_USER("recipes is NULL\n");
+        goto fail;
+    }
+    cJSON * arraySub;
+    int arraySize = cJSON_GetArraySize(recipes);
+    for(int i = 0; i < arraySize; ++i) {
+        arraySub = cJSON_GetArrayItem(recipes, i);
+        if(arraySub == NULL) continue;
+        cJSON * imgUrl      = cJSON_GetObjectItem(arraySub, "imgUrl");
+        cJSON * ingredients = cJSON_GetObjectItem(arraySub, "ingredients");
+        cJSON * details     = cJSON_GetObjectItem(arraySub, "details");
+        cJSON * recipeid    = cJSON_GetObjectItem(arraySub, "recipeid");
+        cJSON * dishName    = cJSON_GetObjectItem(arraySub, "dishName");
+        cJSON * cookSteps   = cJSON_GetObjectItem(arraySub, "cookSteps");
+        cJSON * recipeType  = cJSON_GetObjectItem(arraySub, "recipeType");
+        cJSON * cookPos     = cJSON_GetObjectItem(arraySub, "cookPos");
+
+        strncpy(g_recipes[i].imgUrl, imgUrl->valuestring, sizeof(g_recipes[i].imgUrl) - 1);
+        strncpy(g_recipes[i].ingredients, ingredients->valuestring, sizeof(g_recipes[i].ingredients) - 1);
+        strncpy(g_recipes[i].cookSteps, cookSteps->valuestring, sizeof(g_recipes[i].cookSteps) - 1);
+        strncpy(g_recipes[i].dishName, dishName->valuestring, sizeof(g_recipes[i].dishName) - 1);
+        g_recipes[i].recipeid   = recipeid->valueint;
+        g_recipes[i].recipeType = recipeType->valueint;
+        g_recipes[i].cookPos    = cookPos->valueint;
+    }
+fail:
+    cJSON_Delete(root);
+    return NULL;
+}
+static void lv_reclpes_init()
+{
+    get_dev_profile(".", NULL, "RecipesDetails.json", recipes_parse_json);
+}
+static void lv_reclpes_deinit()
+{}
 void lv_test_widgets(void)
 {
     LV_LOG_USER("lv_test_widgets...");
@@ -114,7 +161,7 @@ void lv_test_widgets(void)
     // lv_100ask_page_manager_simple_test();
     // lv_100ask_demo_layer();
     // return 0;
-
+    lv_reclpes_init();
     lv_obj_t * win_bg = lv_img_create(lv_scr_act());
     lv_img_set_src(win_bg, themesImagesPath "window-background.png");
 
@@ -179,20 +226,24 @@ void lv_test_widgets(void)
     //****************************************************
     lv_obj_t * page_manager = lv_100ask_page_manager_create(home);
 
-    lv_obj_t * main_page = lv_100ask_page_manager_page_create(page_manager, "main_page");
-    lv_obj_t * page_hood = lv_100ask_page_manager_page_create(page_manager, "page_hood");
-    lv_obj_t * page_steamoven = lv_100ask_page_manager_page_create(page_manager, "page_steamoven");
+    lv_obj_t * main_page         = lv_100ask_page_manager_page_create(page_manager, "main_page");
+    lv_obj_t * page_hood         = lv_100ask_page_manager_page_create(page_manager, "page_hood");
+    lv_obj_t * page_steamoven    = lv_100ask_page_manager_page_create(page_manager, "page_steamoven");
+    lv_obj_t * page_smartrecipes = lv_100ask_page_manager_page_create(page_manager, "page_smartrecipes");
 
     lv_100ask_page_manager_set_page_init(main_page, init_main_page);
     lv_100ask_page_manager_set_page_init(page_hood, lv_page_hood_init);
     lv_100ask_page_manager_set_page_init(page_steamoven, lv_page_steamoven_init);
+    lv_100ask_page_manager_set_page_init(page_smartrecipes, lv_page_smartrecipes_init);
 #if LV_100ASK_PAGE_MANAGER_COSTOM_ANIMARION
     lv_100ask_page_manager_set_open_page_anim(main_page, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(main_page, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_hood, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_hood, close_page_anim);
-        lv_100ask_page_manager_set_open_page_anim(page_steamoven, open_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_steamoven, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_steamoven, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_smartrecipes, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_smartrecipes, close_page_anim);
 #endif
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");

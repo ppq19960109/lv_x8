@@ -11,7 +11,16 @@ CFLAGS ?= -O3 -g0 -I$(LVGL_DIR)/ -Wall -Wshadow -Wundef -Wmissing-prototypes -Wn
 LDFLAGS ?= -lm -ldrm
 BIN = app_lvgl
 
-
+LINKTOOL_PATH:=liblinktool
+CFLAGS += -I$(LINKTOOL_PATH)/include
+CFLAGS += -I$(LINKTOOL_PATH)/include/base64
+CFLAGS += -I$(LINKTOOL_PATH)/include/cJSON
+CFLAGS += -I$(LINKTOOL_PATH)/include/klib
+CFLAGS += -I$(LINKTOOL_PATH)/include/tcp
+CFLAGS += -I$(LINKTOOL_PATH)/include/signal
+CFLAGS += -I$(LINKTOOL_PATH)/include/timer
+CFLAGS += -I$(LINKTOOL_PATH)/include/md5
+LDFLAGS += -L$(LINKTOOL_PATH)/lib
 #Collect the files to compile
 MAINSRC = ./main.c
 
@@ -42,7 +51,7 @@ all: default
 	@echo "CC $<"
 
 default: $(AOBJS) $(COBJS) $(MAINOBJ)
-	$(CC) -o $(BIN) $(MAINOBJ) $(AOBJS) $(COBJS) $(LDFLAGS) -L. -lvglfont
+	$(CC) -o $(BIN) $(MAINOBJ) $(AOBJS) $(COBJS) $(LDFLAGS) -L. -lvglfont -llinktool
 clean: 
 	rm -f $(BIN) $(AOBJS) $(COBJS) $(MAINOBJ) obj/*
 distclean: 

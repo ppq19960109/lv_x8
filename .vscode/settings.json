@@ -6,6 +6,8 @@
         "lv_test_main.h": "c",
         "typeinfo": "c",
         "memory": "c",
-        "*.tcc": "c"
+        "*.tcc": "c",
+        "lv_test.h": "c",
+        "lv_100ask_page_manager.h": "c"
     }
 }

@@ -18,10 +18,10 @@ static void event_cb(lv_event_t * e)
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
     lv_obj_t * target = lv_event_get_current_target(e); // lv_event_get_target(e);
 
-    // static int run=1;
-    // lv_obj_t * child = lv_obj_get_child(target, -1);
-    // run=!run;
-    // lv_rotate_anim(child, run);
+    static int run=1;
+    lv_obj_t * child = lv_obj_get_child(target, -1);
+    run=!run;
+    lv_rotate_anim(child, run);
 }
 static void hood_speed_event_cb(lv_event_t * e)
 {
