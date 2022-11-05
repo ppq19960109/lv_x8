@@ -298,7 +298,8 @@ static void lv_100ask_page_manager_page_constructor(const lv_obj_class_t * class
     page->close_page = defaule_close_page;
     page->close_page(obj);
 #endif
-
+    page->page_property_change_cb = NULL;
+    page->page_update_cb = NULL;
 }
 
 static void lv_100ask_page_manager_page_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)

@@ -31,12 +31,12 @@ int main(void)
     /*Initialize and register a display driver*/
     static lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
-    disp_drv.draw_buf  = &disp_buf;
-    disp_drv.flush_cb  = fbdev_flush; // fbdev_flush drm_flush
-    disp_drv.hor_res   = 400;
-    disp_drv.ver_res   = 1280;
+    disp_drv.draw_buf = &disp_buf;
+    disp_drv.flush_cb = fbdev_flush; // fbdev_flush drm_flush
+    disp_drv.hor_res = 400;
+    disp_drv.ver_res = 1280;
     disp_drv.sw_rotate = 1;
-    disp_drv.rotated   = LV_DISP_ROT_270;
+    disp_drv.rotated = LV_DISP_ROT_270;
     lv_disp_drv_register(&disp_drv);
 
     evdev_init();
@@ -45,8 +45,8 @@ int main(void)
     indev_drv_1.type = LV_INDEV_TYPE_POINTER;
 
     /*This function will be called periodically (by the library) to get the mouse position and state*/
-    indev_drv_1.read_cb      = evdev_read;
-    lv_indev_t * mouse_indev = lv_indev_drv_register(&indev_drv_1);
+    indev_drv_1.read_cb = evdev_read;
+    lv_indev_t *mouse_indev = lv_indev_drv_register(&indev_drv_1);
 
     /*Set a cursor for the mouse*/
     // LV_IMG_DECLARE(mouse_cursor_icon)
@@ -62,9 +62,16 @@ int main(void)
     // lv_demo_keypad_encoder();
     lv_test_widgets();
     /*Handle LitlevGL tasks (tickless mode)*/
-    while(1) {
+    static char tcp_recv_count = 0;
+    while (1)
+    {
         lv_timer_handler();
-        usleep(6000);
+        if (++tcp_recv_count > 2)
+        {
+            tcp_recv_count = 0;
+            uds_client_task();
+        }
+        usleep(5000);
     }
 
     return 0;
@@ -75,7 +82,8 @@ uint32_t custom_tick_get(void)
 {
     struct timeval tv_now;
     static uint64_t start_ms = 0;
-    if(start_ms == 0) {
+    if (start_ms == 0)
+    {
         gettimeofday(&tv_now, NULL);
         start_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) * 0.001;
     }

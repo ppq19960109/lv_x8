@@ -9,7 +9,7 @@ LVGL_DIR_NAME ?= lvgl
 LVGL_DIR ?= ${shell pwd}
 CFLAGS ?= -O3 -g0 -I$(LVGL_DIR)/ -Wall -Wshadow -Wundef -Wmissing-prototypes -Wno-discarded-qualifiers -Wall -Wextra -Wno-unused-function -Wno-error=strict-prototypes -Wpointer-arith -fno-strict-aliasing -Wno-error=cpp -Wuninitialized -Wmaybe-uninitialized -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security -Wno-ignored-qualifiers -Wno-error=pedantic -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated -Wempty-body -Wtype-limits -Wshift-negative-value -Wstack-usage=2048 -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers -Wuninitialized -Wmaybe-uninitialized -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wpointer-arith -Wno-cast-qual -Wmissing-prototypes -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wno-discarded-qualifiers -Wformat-security -Wno-ignored-qualifiers -Wno-sign-compare -I/home/ppq/rk3308sdk/rk3308_linux_v1.00_220210/buildroot/output/rockchip_rk3308_bs_release/host/aarch64-rockchip-linux-gnu/sysroot/usr/include/libdrm/
 LDFLAGS ?= -lm -ldrm
-BIN = app_lvgl
+BIN = lv_X8app
 
 LINKTOOL_PATH:=liblinktool
 CFLAGS += -I$(LINKTOOL_PATH)/include
@@ -21,14 +21,16 @@ CFLAGS += -I$(LINKTOOL_PATH)/include/signal
 CFLAGS += -I$(LINKTOOL_PATH)/include/timer
 CFLAGS += -I$(LINKTOOL_PATH)/include/md5
 LDFLAGS += -L$(LINKTOOL_PATH)/lib
+
+LDFLAGS += -L. -lvglfont -llinktool -lzlog -ldl -lm -lpthread -lrt
 #Collect the files to compile
 MAINSRC = ./main.c
 
-include $(LVGL_DIR)/lvgl/lvgl.mk
-include $(LVGL_DIR)/lv_drivers/lv_drivers.mk
 include $(LVGL_DIR)/lv_test/lv_test.mk
 include $(LVGL_DIR)/lv_100ask_page_manager/lv_page_manager.mk
 include $(LVGL_DIR)/lv_100ask_pinyin_ime/lv_pinyin_ime.mk
+include $(LVGL_DIR)/lvgl/lvgl.mk
+include $(LVGL_DIR)/lv_drivers/lv_drivers.mk
 
 CSRCS +=$(LVGL_DIR)/mouse_cursor_icon.c
 LIBSRCS :=$(wildcard lv_font_SiYuanHeiTi_Normal_*.c) 
@@ -47,11 +49,11 @@ OBJS = $(AOBJS) $(COBJS)
 all: default
 
 %.o: %.c
-	@$(CC)  $(CFLAGS) -g -c $< -o $@
 	@echo "CC $<"
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 default: $(AOBJS) $(COBJS) $(MAINOBJ)
-	$(CC) -o $(BIN) $(MAINOBJ) $(AOBJS) $(COBJS) $(LDFLAGS) -L. -lvglfont -llinktool
+	$(CC) -o $(BIN) $(MAINOBJ) $(AOBJS) $(COBJS) $(LDFLAGS)
 clean: 
 	rm -f $(BIN) $(AOBJS) $(COBJS) $(MAINOBJ) obj/*
 distclean: 

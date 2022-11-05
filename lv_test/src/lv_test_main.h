@@ -14,11 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_test.h"
-#include "cmd_run.h"
-#include "commonFunc.h"
-#include "networkFunc.h"
-#include "signalQuit.h"
-#include "POSIXTimer.h"
+#include "main.h"
+#include "lv_backlight.h"
+#include "lv_dev_state.h"
+#include "uds_protocol.h"
+#include "lv_dev_state.h"
 /*********************
  *      DEFINES
  *********************/
@@ -33,22 +33,10 @@ LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_34);
 LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_40);
 LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_50);
 
-typedef struct
-{
-    char imgUrl[128];
-    char ingredients[960];
-    char dishName[80];
-    char cookSteps[180];
-    char ** details;
-    unsigned char details_count;
-    int recipeid;
-    int recipeType;
-    int cookPos;
-} recipe_t;
-extern recipe_t g_recipes[40];
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void register_page_property_change_cb(void (*cb)(const char *key, void *value));
 void lv_test_widgets(void);
 lv_obj_t * lv_custom_image_button_create(lv_obj_t * parent, const void * img_src, lv_coord_t width, lv_coord_t height,
                                          lv_coord_t x, lv_coord_t y);

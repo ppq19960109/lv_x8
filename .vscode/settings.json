@@ -8,6 +8,19 @@
         "memory": "c",
         "*.tcc": "c",
         "lv_test.h": "c",
-        "lv_100ask_page_manager.h": "c"
+        "lv_100ask_page_manager.h": "c",
+        "stdio.h": "c",
+        "time.h": "c",
+        "stat.h": "c",
+        "reboot.h": "c",
+        "lv_backlight.h": "c",
+        "networkfunc.h": "c",
+        "inet.h": "c",
+        "uds_protocol.h": "c",
+        "lv_dev_state.h": "c",
+        "simple_test.h": "c",
+        "thread2client.h": "c",
+        "main.h": "c",
+        "uds_client_task.h": "c"
     }
 }
