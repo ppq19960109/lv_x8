@@ -59,21 +59,26 @@ static void set_angle(void *img, int32_t v)
 }
 lv_obj_t *lv_rotate_anim(lv_obj_t *obj, const int run)
 {
-    // LV_LOG_USER("%s,run:%d\n", __func__, run);
+    lv_anim_t *anim = lv_anim_get(obj, NULL);
+    LV_LOG_USER("%s,run:%d anim:%p\n", __func__, run, anim);
     if (run)
     {
-        lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_var(&a, obj);
-        lv_anim_set_exec_cb(&a, set_angle);
-        lv_anim_set_values(&a, 0, 3600);
-        lv_anim_set_time(&a, 6000);
-        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-        lv_anim_start(&a);
+        if (anim == NULL)
+        {
+            lv_anim_t a;
+            lv_anim_init(&a);
+            lv_anim_set_var(&a, obj);
+            lv_anim_set_exec_cb(&a, set_angle);
+            lv_anim_set_values(&a, 0, 3600);
+            lv_anim_set_time(&a, 6000);
+            lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+            lv_anim_start(&a);
+        }
     }
     else
     {
-        lv_anim_del(obj, set_angle);
+        if (anim != NULL)
+            lv_anim_del(obj, set_angle);
     }
     return NULL;
 }
@@ -200,11 +205,15 @@ void lv_test_widgets(void)
     lv_obj_t *page_hood = lv_100ask_page_manager_page_create(page_manager, "page_hood");
     lv_obj_t *page_steamoven = lv_100ask_page_manager_page_create(page_manager, "page_steamoven");
     lv_obj_t *page_smartrecipes = lv_100ask_page_manager_page_create(page_manager, "page_smartrecipes");
+    lv_obj_t *page_steaming = lv_100ask_page_manager_page_create(page_manager, "page_steaming");
+    lv_obj_t *page_steam_left = lv_100ask_page_manager_page_create(page_manager, "page_steam_left");
 
     lv_100ask_page_manager_set_page_init(main_page, init_main_page);
     lv_100ask_page_manager_set_page_init(page_hood, lv_page_hood_init);
     lv_100ask_page_manager_set_page_init(page_steamoven, lv_page_steamoven_init);
     lv_100ask_page_manager_set_page_init(page_smartrecipes, lv_page_smartrecipes_init);
+    lv_100ask_page_manager_set_page_init(page_steaming, lv_page_steaming_init);
+    lv_100ask_page_manager_set_page_init(page_steam_left, lv_page_steam_left_init);
 #if LV_100ASK_PAGE_MANAGER_COSTOM_ANIMARION
     lv_100ask_page_manager_set_open_page_anim(main_page, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(main_page, close_page_anim);
@@ -214,6 +223,10 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_close_page_anim(page_steamoven, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_smartrecipes, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_smartrecipes, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_steam_left, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_steam_left, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_steaming, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_steaming, close_page_anim);
 #endif
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");

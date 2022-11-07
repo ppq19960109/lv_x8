@@ -46,6 +46,8 @@ lv_obj_t * lv_rotate_anim(lv_obj_t * obj, const int run);
 void lv_page_hood_init(lv_obj_t * page);
 void lv_page_steamoven_init(lv_obj_t * page);
 void lv_page_smartrecipes_init(lv_obj_t * page);
+void lv_page_steaming_init(lv_obj_t *page);
+void lv_page_steam_left_init(lv_obj_t *page);
 /**********************
  *      MACROS
  **********************/

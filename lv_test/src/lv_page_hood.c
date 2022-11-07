@@ -10,10 +10,29 @@
  *      DEFINES
  *********************/
 static lv_obj_t *hood_speed_obj[3];
+static lv_obj_t *stir_fried_rotate;
 
+static lv_obj_t *smart_smoke_rotate;
 /**********************
  *  STATIC VARIABLES
  **********************/
+static void page_update_SmartSmokeSwitch(void)
+{
+    int value = get_attr_value_int("SmartSmokeSwitch");
+    lv_obj_t *parent = lv_obj_get_parent(smart_smoke_rotate);
+    if (value)
+    {
+        lv_obj_add_state(parent, LV_STATE_CHECKED);
+        lv_obj_clear_flag(smart_smoke_rotate, LV_OBJ_FLAG_HIDDEN);
+        lv_rotate_anim(smart_smoke_rotate, 1);
+    }
+    else
+    {
+        lv_obj_clear_state(parent, LV_STATE_CHECKED);
+        lv_obj_add_flag(smart_smoke_rotate, LV_OBJ_FLAG_HIDDEN);
+        lv_rotate_anim(smart_smoke_rotate, 0);
+    }
+}
 static void page_update_HoodSpeed(void)
 {
     int speed = get_attr_value_int("HoodSpeed");
@@ -33,46 +52,71 @@ static void page_update_HoodSpeed(void)
             lv_obj_add_state(lv_obj_get_child(hood_speed_obj[i], 0), LV_STATE_CHECKED);
         }
     }
+
+    lv_obj_t *parent = lv_obj_get_parent(stir_fried_rotate);
+    if (speed == 4)
+    {
+        lv_obj_add_state(parent, LV_STATE_CHECKED);
+        lv_obj_clear_flag(stir_fried_rotate, LV_OBJ_FLAG_HIDDEN);
+        lv_rotate_anim(stir_fried_rotate, 1);
+    }
+    else
+    {
+        lv_obj_clear_state(parent, LV_STATE_CHECKED);
+        lv_obj_add_flag(stir_fried_rotate, LV_OBJ_FLAG_HIDDEN);
+        lv_rotate_anim(stir_fried_rotate, 0);
+    }
 }
 static void property_change_cb(const char *key, void *value)
 {
     LV_LOG_USER("key:%s\n", key);
-    if (strcmp("HoodSpeed", key) == 0)
+    if (strcmp("SmartSmokeSwitch", key) == 0)
+    {
+        page_update_SmartSmokeSwitch();
+    }
+    else if (strcmp("HoodSpeed", key) == 0)
     {
         page_update_HoodSpeed();
     }
 }
 static void page_update_cb(void)
 {
+    page_update_SmartSmokeSwitch();
     page_update_HoodSpeed();
 }
 static void event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_current_target(e); // lv_event_get_target(e);
+    lv_obj_t *target = lv_event_get_target(e); // lv_event_get_target(e);
+    int user_data = (int)lv_event_get_user_data(e);
 
-    static int run = 1;
-    lv_obj_t *child = lv_obj_get_child(target, -1);
-    run = !run;
-    lv_rotate_anim(child, run);
+    switch (user_data)
+    {
+    case 0:
+    {
+        int value = get_attr_value_int("SmartSmokeSwitch");
+        set_num_toServer("SmartSmokeSwitch", !value);
+    }
+    break;
+    case 1:
+        break;
+    case 2:
+        break;
+    }
 }
 static void hood_speed_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
+    lv_obj_t *target = lv_event_get_target(e);
     int user_data = (int)lv_event_get_user_data(e);
-    set_num_toServer("HoodSpeed", user_data);
+    if (lv_obj_has_state(target, LV_STATE_CHECKED))
+        set_num_toServer("HoodSpeed", 0);
+    else
+        set_num_toServer("HoodSpeed", user_data);
 }
 static lv_obj_t *lv_hood_item_create(lv_obj_t *parent, const void *img_src, const void *name, lv_obj_t **img_out)
 {
-    // static lv_style_t style_bg;
-    // lv_style_init(&style_bg);
-    // lv_style_set_bg_color(&style_bg, lv_color_hex(0x000));
-    // lv_style_set_border_color(&style_bg, lv_color_hex(0x858585));
-    // lv_style_set_border_width(&style_bg, 1);
-    // lv_style_set_bg_opa(&style_bg, LV_OPA_100);
-
     lv_obj_t *item = lv_custom_image_button_create(parent, img_src, 200, LV_PCT(100), 0, 18);
-    // lv_obj_add_style(item, &style_bg, 0);
     lv_obj_set_style_bg_color(item, lv_color_hex(0x000), 0);
     lv_obj_set_style_bg_opa(item, LV_OPA_100, 0);
     lv_obj_set_style_border_color(item, lv_color_hex(0x858585), 0);
@@ -83,8 +127,6 @@ static lv_obj_t *lv_hood_item_create(lv_obj_t *parent, const void *img_src, cons
     lv_obj_set_style_text_color(label_title, lv_color_hex(0xffffff), 0);
     lv_label_set_text(label_title, name);
     lv_obj_align(label_title, LV_ALIGN_TOP_MID, 0, 26);
-
-    lv_obj_add_event_cb(item, event_cb, LV_EVENT_CLICKED, NULL);
 
     *img_out = lv_img_create(item);
     lv_obj_t *img = *img_out;
@@ -127,15 +169,13 @@ void lv_page_hood_init(lv_obj_t *obj)
     lv_obj_set_flex_flow(cont_row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(cont_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    lv_obj_t *smart_smoke_rotate;
     lv_obj_t *smart_smoke =
         lv_hood_item_create(cont_row, themesImagesPath "smart_smoke_background.png", "智能排烟", &smart_smoke_rotate);
-    lv_rotate_anim(smart_smoke_rotate, 1);
+    lv_obj_add_event_cb(smart_smoke, event_cb, LV_EVENT_CLICKED, 0);
 
-    lv_obj_t *stir_fried_rotate;
     lv_obj_t *stir_fried =
         lv_hood_item_create(cont_row, themesImagesPath "stir_fried_background.png", "爆炒", &stir_fried_rotate);
-    lv_rotate_anim(stir_fried_rotate, 1);
+    lv_obj_add_event_cb(stir_fried, hood_speed_event_cb, LV_EVENT_CLICKED, 4);
 
     lv_obj_t *hood_speed = lv_obj_create(cont_row);
     lv_obj_set_size(hood_speed, 200, LV_PCT(100));
