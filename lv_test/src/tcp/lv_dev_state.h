@@ -13,7 +13,26 @@ enum LINK_VALUE_TYPE
     LINK_VALUE_TYPE_STRUCT,
     LINK_VALUE_TYPE_ARRAY,
 };
-
+enum COOK_POS_ENUM
+{
+    COOK_POS_LEFT = 0x00,
+    COOK_POS_RIGHT,
+    COOK_POS_ALL,
+};
+enum MULTI_MODE_ENUM
+{
+    MULTI_MODE_NONE = 0x00,
+    MULTI_MODE_RECIPE,
+    MULTI_MODE_MULTISTAGE,
+};
+enum WORK_OPERATION_ENUM
+{
+    WORK_OPERATION_START = 0x00,
+    WORK_OPERATION_PAUSE,
+    WORK_OPERATION_CANCEL,
+    WORK_OPERATION_CONFIRM,
+    WORK_OPERATION_RUN_NOW,
+};
 typedef struct
 {
     char key[28];
@@ -27,6 +46,35 @@ typedef struct
     dev_attr_t *attr;
     int attr_len;
 } dev_state_t;
+
+typedef struct
+{
+    unsigned char mode;
+    unsigned short temp;
+    unsigned short time;
+} steamoven_attr_t;
+
+typedef struct
+{
+    unsigned char cookPos;
+    unsigned short orderTime;
+    int cookId;
+    char cookName[64];
+    steamoven_attr_t attr[3];
+    int attr_len;
+} steamoven_t;
+
+typedef struct
+{
+    unsigned char mode_index;
+    unsigned char mode;
+    unsigned short temp;
+    unsigned short mintemp;
+    unsigned short maxtemp;
+    unsigned short time;
+    unsigned short maxtime;
+    char name[32];
+} steamoven_mode_t;
 
 typedef struct
 {
@@ -53,4 +101,5 @@ const char *get_attr_value_string(const char *name);
 void register_property_change_cb(void (*cb)(const char *key, void *value));
 
 void set_num_toServer(const char *key, int value);
+void set_cook_toServer(steamoven_t *steamoven);
 #endif

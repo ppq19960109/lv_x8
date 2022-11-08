@@ -104,6 +104,83 @@ void set_num_toServer(const char *key, int value)
     send_set_uds(root);
 }
 
+void set_cook_toServer(steamoven_t *steamoven)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (steamoven->attr_len == 0)
+    {
+        if (steamoven->cookPos == COOK_POS_LEFT)
+        {
+            cJSON_AddNumberToObject(root, "LMultiMode", MULTI_MODE_NONE);
+            cJSON_AddNumberToObject(root, "LStOvMode", steamoven->attr[0].mode);
+            cJSON_AddNumberToObject(root, "LStOvSetTimer", steamoven->attr[0].time);
+            cJSON_AddNumberToObject(root, "LStOvSetTemp", steamoven->attr[0].temp);
+            if (steamoven->orderTime > 0)
+                cJSON_AddNumberToObject(root, "LStOvOrderTimer", steamoven->orderTime);
+            cJSON_AddNumberToObject(root, "LStOvOperation", WORK_OPERATION_START);
+        }
+        else
+        {
+            cJSON_AddNumberToObject(root, "RMultiMode", MULTI_MODE_NONE);
+            cJSON_AddNumberToObject(root, "RStOvMode", steamoven->attr[0].mode);
+            cJSON_AddNumberToObject(root, "RStOvSetTimer", steamoven->attr[0].time);
+            cJSON_AddNumberToObject(root, "RStOvSetTemp", steamoven->attr[0].temp);
+            if (steamoven->orderTime > 0)
+                cJSON_AddNumberToObject(root, "RStOvOrderTimer", steamoven->orderTime);
+            cJSON_AddNumberToObject(root, "RStOvOperation", WORK_OPERATION_START);
+        }
+    }
+    else
+    {
+        cJSON *array = cJSON_CreateArray();
+        for (int i = 0; i < steamoven->attr_len; ++i)
+        {
+            cJSON *arraySub = cJSON_CreateObject();
+            cJSON_AddNumberToObject(arraySub, "Mode", steamoven->attr[i].mode);
+            cJSON_AddNumberToObject(arraySub, "Timer", steamoven->attr[i].time);
+            cJSON_AddNumberToObject(arraySub, "Temp", steamoven->attr[i].temp);
+            cJSON_AddItemToArray(array, arraySub);
+        }
+        if (steamoven->cookPos == COOK_POS_LEFT)
+        {
+            if (steamoven->cookId == 0)
+            {
+                cJSON_AddNumberToObject(root, "LMultiMode", MULTI_MODE_MULTISTAGE);
+                cJSON_AddItemToObject(root, "LMultiStageContent", array);
+            }
+            else
+            {
+                cJSON_AddNumberToObject(root, "LMultiMode", MULTI_MODE_RECIPE);
+                cJSON_AddItemToObject(root, "LCookbookParam", array);
+                cJSON_AddNumberToObject(root, "LCookbookID", steamoven->cookId);
+                cJSON_AddStringToObject(root, "LCookbookName", steamoven->cookName);
+            }
+            if (steamoven->orderTime > 0)
+                cJSON_AddNumberToObject(root, "LStOvOrderTimer", steamoven->orderTime);
+            cJSON_AddNumberToObject(root, "LStOvOperation", WORK_OPERATION_START);
+        }
+        else
+        {
+            if (steamoven->cookId == 0)
+            {
+                cJSON_AddNumberToObject(root, "RMultiMode", MULTI_MODE_MULTISTAGE);
+                cJSON_AddItemToObject(root, "RMultiStageContent", array);
+            }
+            else
+            {
+                cJSON_AddNumberToObject(root, "RMultiMode", MULTI_MODE_RECIPE);
+                cJSON_AddItemToObject(root, "RCookbookParam", array);
+                cJSON_AddNumberToObject(root, "RCookbookID", steamoven->cookId);
+                cJSON_AddStringToObject(root, "RCookbookName", steamoven->cookName);
+            }
+            if (steamoven->orderTime > 0)
+                cJSON_AddNumberToObject(root, "RStOvOrderTimer", steamoven->orderTime);
+            cJSON_AddNumberToObject(root, "RStOvOperation", WORK_OPERATION_START);
+        }
+    }
+    send_set_uds(root);
+}
+
 static void *profile_parse_json(void *input, const char *str) //启动时解析转换配置文件
 {
     cJSON *root = cJSON_Parse(str);

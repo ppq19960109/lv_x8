@@ -160,6 +160,10 @@ static lv_obj_t *lv_text_btn_create(lv_obj_t *parent, const char *text, const vo
 void lv_page_hood_init(lv_obj_t *obj)
 {
     LV_LOG_USER("%s...", __func__);
+    lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)obj;
+    page->page_property_change_cb = property_change_cb;
+    page->page_update_cb = page_update_cb;
+
     lv_obj_t *back_bar = lv_page_back_bar_init(obj, "烟机灶具", NULL);
     lv_page_top_bar_init(obj, 0);
 
@@ -208,8 +212,4 @@ void lv_page_hood_init(lv_obj_t *obj)
     lv_obj_t *intelligent_cooking = lv_hood_item_create(cont_row, themesImagesPath "intelligent_cooking.png", "智慧烹",
                                                         &intelligent_cooking_rotate);
     lv_rotate_anim(intelligent_cooking_rotate, 1);
-
-    lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)obj;
-    page->page_property_change_cb = property_change_cb;
-    page->page_update_cb = page_update_cb;
 }

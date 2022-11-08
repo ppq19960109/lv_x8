@@ -53,6 +53,21 @@ lv_obj_t *lv_custom_image_button_create(lv_obj_t *parent, const void *img_src, l
     lv_obj_align(img, LV_ALIGN_CENTER, x, y);
     return image_button;
 }
+lv_obj_t *lv_custom_text_btn_create(lv_obj_t *parent, const char *text)
+{
+    lv_obj_t *btn = lv_btn_create(parent);
+    lv_obj_set_size(btn, 140, 50);
+    lv_obj_set_style_bg_color(btn, lv_color_hex(themesTextColor2), 0);
+    lv_obj_set_style_bg_opa(btn, LV_OPA_100, 0);
+    lv_obj_set_style_radius(btn, 25, 0);
+
+    lv_obj_t *label = lv_label_create(btn);
+    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_30, 0);
+    lv_obj_set_style_text_color(label, lv_color_hex(0x000000), 0);
+    lv_label_set_text(label, text);
+    lv_obj_center(label);
+    return btn;
+}
 static void set_angle(void *img, int32_t v)
 {
     lv_img_set_angle(img, v);

@@ -43,6 +43,7 @@ lv_obj_t * lv_custom_image_button_create(lv_obj_t * parent, const void * img_src
 lv_obj_t * lv_page_back_bar_init(lv_obj_t * parent, const char * name, const char * title);
 lv_obj_t * lv_page_top_bar_init(lv_obj_t * parent, const int index);
 lv_obj_t * lv_rotate_anim(lv_obj_t * obj, const int run);
+lv_obj_t *lv_custom_text_btn_create(lv_obj_t *parent, const char *text);
 void lv_page_hood_init(lv_obj_t * page);
 void lv_page_steamoven_init(lv_obj_t * page);
 void lv_page_smartrecipes_init(lv_obj_t * page);
