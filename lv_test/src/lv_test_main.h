@@ -19,6 +19,7 @@ extern "C" {
 #include "lv_dev_state.h"
 #include "uds_protocol.h"
 #include "lv_dev_state.h"
+#include "lv_custom_item.h"
 /*********************
  *      DEFINES
  *********************/
@@ -32,7 +33,7 @@ LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_30);
 LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_34);
 LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_40);
 LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_50);
-
+extern lv_style_t roller_style_unselected, roller_style_selected;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

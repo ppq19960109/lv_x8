@@ -9,7 +9,7 @@
 /*********************
  *      DEFINES
  *********************/
-
+lv_style_t roller_style_unselected, roller_style_selected;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -41,62 +41,6 @@ static void close_page_anim(lv_obj_t *obj)
     lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
 }
 #endif
-
-lv_obj_t *lv_custom_image_button_create(lv_obj_t *parent, const void *img_src, lv_coord_t width, lv_coord_t height,
-                                        lv_coord_t x, lv_coord_t y)
-{
-    lv_obj_t *image_button = lv_obj_create(parent);
-    lv_obj_set_size(image_button, width, height);
-
-    lv_obj_t *img = lv_img_create(image_button);
-    lv_img_set_src(img, img_src);
-    lv_obj_align(img, LV_ALIGN_CENTER, x, y);
-    return image_button;
-}
-lv_obj_t *lv_custom_text_btn_create(lv_obj_t *parent, const char *text)
-{
-    lv_obj_t *btn = lv_btn_create(parent);
-    lv_obj_set_size(btn, 140, 50);
-    lv_obj_set_style_bg_color(btn, lv_color_hex(themesTextColor2), 0);
-    lv_obj_set_style_bg_opa(btn, LV_OPA_100, 0);
-    lv_obj_set_style_radius(btn, 25, 0);
-
-    lv_obj_t *label = lv_label_create(btn);
-    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_30, 0);
-    lv_obj_set_style_text_color(label, lv_color_hex(0x000000), 0);
-    lv_label_set_text(label, text);
-    lv_obj_center(label);
-    return btn;
-}
-static void set_angle(void *img, int32_t v)
-{
-    lv_img_set_angle(img, v);
-}
-lv_obj_t *lv_rotate_anim(lv_obj_t *obj, const int run)
-{
-    lv_anim_t *anim = lv_anim_get(obj, NULL);
-    LV_LOG_USER("%s,run:%d anim:%p\n", __func__, run, anim);
-    if (run)
-    {
-        if (anim == NULL)
-        {
-            lv_anim_t a;
-            lv_anim_init(&a);
-            lv_anim_set_var(&a, obj);
-            lv_anim_set_exec_cb(&a, set_angle);
-            lv_anim_set_values(&a, 0, 3600);
-            lv_anim_set_time(&a, 6000);
-            lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-            lv_anim_start(&a);
-        }
-    }
-    else
-    {
-        if (anim != NULL)
-            lv_anim_del(obj, set_angle);
-    }
-    return NULL;
-}
 //-------------------------------------------------
 static void property_change_cb(const char *key, void *value)
 {
@@ -143,6 +87,18 @@ static void init_main_page(lv_obj_t *page)
     register_property_change_cb(property_change_cb);
 }
 //-------------------------------------------------
+static void init_style()
+{
+    lv_style_set_text_font(&roller_style_unselected, &lv_font_SiYuanHeiTi_Normal_30);
+    lv_style_set_text_color(&roller_style_unselected, lv_color_hex(0xffffff));
+    lv_style_set_text_align(&roller_style_unselected, LV_TEXT_ALIGN_CENTER);
+    lv_style_set_text_line_space(&roller_style_unselected, 16);
+
+    lv_style_set_text_font(&roller_style_selected, &lv_font_SiYuanHeiTi_Normal_34);
+    lv_style_set_text_color(&roller_style_selected, lv_color_hex(themesTextColor));
+    lv_style_set_text_align(&roller_style_selected, LV_TEXT_ALIGN_CENTER);
+    lv_style_set_text_line_space(&roller_style_selected, 16);
+}
 void lv_test_widgets(void)
 {
     LV_LOG_USER("lv_test_widgets...");
@@ -151,6 +107,7 @@ void lv_test_widgets(void)
     // lv_100ask_demo_layer();
     // return 0;
     lv_dev_init();
+    init_style();
 
     lv_obj_t *win_bg = lv_img_create(lv_scr_act());
     lv_img_set_src(win_bg, themesImagesPath "window-background.png");

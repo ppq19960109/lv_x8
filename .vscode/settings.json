@@ -21,6 +21,7 @@
         "simple_test.h": "c",
         "thread2client.h": "c",
         "main.h": "c",
-        "uds_client_task.h": "c"
+        "uds_client_task.h": "c",
+        "lv_custom_item.h": "c"
     }
 }
