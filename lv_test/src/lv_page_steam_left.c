@@ -124,7 +124,6 @@ static void dialog_event_cb(lv_event_t *e)
     {
     case 0:
     case 1:
-        lv_obj_clean(lv_layer_top());
         break;
     case 2:
     {
@@ -132,6 +131,7 @@ static void dialog_event_cb(lv_event_t *e)
     }
     break;
     }
+    lv_obj_clean(lv_layer_top());
 }
 static void reserve_dialog_event_cb(lv_event_t *e)
 {
@@ -142,7 +142,6 @@ static void reserve_dialog_event_cb(lv_event_t *e)
     {
     case 0:
     case 1:
-        lv_obj_clean(lv_layer_top());
         break;
     case 2:
     {
@@ -153,6 +152,7 @@ static void reserve_dialog_event_cb(lv_event_t *e)
     }
     break;
     }
+    lv_obj_clean(lv_layer_top());
 }
 
 static void btn_array_event_cb(lv_event_t *e)

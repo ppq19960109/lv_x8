@@ -157,17 +157,17 @@ static lv_obj_t *lv_text_btn_create(lv_obj_t *parent, const char *text, const vo
     return btn1;
 }
 
-void lv_page_hood_init(lv_obj_t *obj)
+void lv_page_hood_init(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
-    lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)obj;
-    page->page_property_change_cb = property_change_cb;
-    page->page_update_cb = page_update_cb;
+    lv_100ask_page_manager_page_t *manager_page = (lv_100ask_page_manager_page_t *)page;
+    manager_page->page_property_change_cb = property_change_cb;
+    manager_page->page_update_cb = page_update_cb;
 
-    lv_obj_t *back_bar = lv_page_back_bar_init(obj, "烟机灶具", NULL);
-    lv_page_top_bar_init(obj, 0);
+    lv_obj_t *back_bar = lv_page_back_bar_init(page, "烟机灶具", NULL);
+    lv_page_top_bar_init(page, 0);
 
-    lv_obj_t *cont_row = lv_obj_create(obj);
+    lv_obj_t *cont_row = lv_obj_create(page);
     lv_obj_set_size(cont_row, 200 * 5 + 20 * 4, 260);
     lv_obj_align_to(cont_row, back_bar, LV_ALIGN_OUT_BOTTOM_MID, 0, 25);
     lv_obj_set_flex_flow(cont_row, LV_FLEX_FLOW_ROW);

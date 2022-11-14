@@ -6,6 +6,52 @@
 recipe_t g_recipes[40];
 static pthread_mutex_t mutex;
 static dev_state_t *g_dev_state = NULL;
+const char *workStateChineseEnum[] = {"停止", "预约中", "预热中", "运行中", "烹饪完成", "暂停中", "预约暂停中"};
+const char *workModeEnum[] = {"未设定", "经典蒸", "鲜嫩蒸", "高温蒸", "热风烧烤", "上下加热", "立体热风", "蒸汽嫩烤", "空气速炸", "解冻", "发酵", "保温"};
+const char *workModeName(const char mode)
+{
+    char *name;
+    switch (mode)
+    {
+    case 1:
+        name = workModeEnum[1];
+        break;
+    case 3:
+        name = workModeEnum[2];
+        break;
+    case 4:
+        name = workModeEnum[3];
+        break;
+    case 35:
+        name = workModeEnum[4];
+        break;
+    case 36:
+        name = workModeEnum[5];
+        break;
+    case 38:
+        name = workModeEnum[6];
+        break;
+    case 40:
+        name = workModeEnum[7];
+        break;
+    case 42:
+        name = workModeEnum[8];
+        break;
+    case 65:
+        name = workModeEnum[9];
+        break;
+    case 66:
+        name = workModeEnum[10];
+        break;
+    case 68:
+        name = workModeEnum[11];
+        break;
+    default:
+        name = workModeEnum[0];
+        break;
+    }
+    return name;
+}
 
 void (*property_change_cb)(const char *key, void *value);
 void register_property_change_cb(void (*cb)(const char *key, void *value))
@@ -33,6 +79,15 @@ dev_attr_t *get_attr_ptr(const char *name)
     return NULL;
 }
 
+int get_value_int(dev_attr_t *attr)
+{
+    int val = 0;
+    for (int i = attr->value_len - 1; i >= 0; --i)
+    {
+        val = (val << 8) + attr->value[i];
+    }
+    return val;
+}
 int get_attr_value_int(const char *name)
 {
     dev_attr_t *attr = get_attr_ptr(name);
@@ -41,14 +96,12 @@ int get_attr_value_int(const char *name)
         dzlog_error("%s,attr name:%s not exits", __func__, name);
         return -1;
     }
-    int val = 0;
-    for (int i = 0; i < attr->value_len; ++i)
-    {
-        val = (val << 8) + attr->value[i];
-    }
-    return val;
+    return get_value_int(attr);
 }
-
+const char *get_value_string(dev_attr_t *attr)
+{
+    return attr->value;
+}
 const char *get_attr_value_string(const char *name)
 {
     dev_attr_t *attr = get_attr_ptr(name);
@@ -90,7 +143,7 @@ static int lv_dev_recv_event(cJSON *Data)
             {
             }
             if (property_change_cb != NULL)
-                property_change_cb(ptr->key, ptr->value);
+                property_change_cb(ptr->key, ptr);
         }
     }
     return 0;

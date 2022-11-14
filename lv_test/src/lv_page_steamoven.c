@@ -22,11 +22,13 @@ static void page_update_LStOvState(void)
     {
         lv_obj_clear_flag(left_steam_oven_rotate, LV_OBJ_FLAG_HIDDEN);
         lv_rotate_anim(left_steam_oven_rotate, 1);
+        lv_100ask_page_manager_set_load_page_event(parent, NULL, "page_steaming");
     }
     else
     {
         lv_obj_add_flag(left_steam_oven_rotate, LV_OBJ_FLAG_HIDDEN);
         lv_rotate_anim(left_steam_oven_rotate, 0);
+        lv_100ask_page_manager_set_load_page_event(parent, NULL, "page_steam_left");
     }
 }
 static void page_update_RStOvState(void)
@@ -126,7 +128,6 @@ void lv_page_steamoven_init(lv_obj_t *page)
         lv_steamoven_item_create(cont_row, themesImagesPath "left_steam_oven_background.png",
                                  themesImagesPath "left_steam_oven_text.png", &left_steam_oven_rotate);
     lv_rotate_anim(left_steam_oven_rotate, 1);
-    lv_100ask_page_manager_set_load_page_event(left_steam_oven, NULL, "page_steaming");//page_steaming page_steam_left
 
     lv_obj_t *right_steam = lv_steamoven_item_create(cont_row, themesImagesPath "right_steam_background.png",
                                                      themesImagesPath "right_steam_text.png", &right_steam_rotate);

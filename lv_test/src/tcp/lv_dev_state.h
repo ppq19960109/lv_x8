@@ -33,6 +33,16 @@ enum WORK_OPERATION_ENUM
     WORK_OPERATION_CONFIRM,
     WORK_OPERATION_RUN_NOW,
 };
+enum WORK_STATE_ENUM
+{
+    WORK_STATE_STOP = 0x00,
+    WORK_STATE_RESERVE,
+    WORK_STATE_PREHEAT,
+    WORK_STATE_RUN,
+    WORK_STATE_FINISH,
+    WORK_STATE_PAUSE,
+    WORK_STATE_PAUSE_RESERVE,
+};
 typedef struct
 {
     char key[28];
@@ -90,13 +100,17 @@ typedef struct
 } recipe_t;
 
 extern recipe_t g_recipes[40];
+extern const char *workStateChineseEnum[];
 
 int lv_dev_init(void);
 void lv_dev_deinit(void);
 dev_state_t *get_dev_state(void);
 dev_attr_t *get_attr_ptr(const char *name);
 int get_attr_value_int(const char *name);
+int get_value_int(dev_attr_t *attr);
 const char *get_attr_value_string(const char *name);
+const char *get_value_string(dev_attr_t *attr);
+const char *workModeName(const char mode);
 
 void register_property_change_cb(void (*cb)(const char *key, void *value));
 
