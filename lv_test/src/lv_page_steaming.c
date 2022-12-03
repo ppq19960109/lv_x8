@@ -318,6 +318,14 @@ static void property_change_cb(const char *key, void *value)
     {
         page_update_StOvMode(1, value);
     }
+    else if (strcmp("LStOvSetTemp", key) == 0 || strcmp("LStOvSetTimer", key) == 0)
+    {
+        page_update_StOvSetTemp_StOvSetTimer(0, NULL);
+    }
+    else if (strcmp("RStOvSetTemp", key) == 0 || strcmp("RStOvSetTimer", key) == 0)
+    {
+        page_update_StOvSetTemp_StOvSetTimer(1, NULL);
+    }
 }
 static void page_update_cb(void)
 {
@@ -452,6 +460,20 @@ static lv_obj_t *lv_steam_item_create(lv_obj_t *parent, const char index)
     lv_obj_center(label_finish_btn_text);
     return obj;
 }
+static void left_dialog2_event_cb(lv_event_t *e)
+{
+    int user_data = (int)lv_event_get_user_data(e);
+    switch (user_data)
+    {
+    case 0:
+    case 1:
+        break;
+    case 2:
+        set_num_toServer("LStOvOperation", WORK_OPERATION_CANCEL);
+        break;
+    }
+    lv_obj_clean(lv_layer_top());
+}
 static void left_btn_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
@@ -478,7 +500,7 @@ static void left_btn_event_cb(lv_event_t *e)
         }
         else
         {
-            set_num_toServer("LStOvOperation", WORK_OPERATION_CANCEL);
+            lv_custom_dialog2("是否取消左腔烹饪？", "否", "是",left_dialog2_event_cb);
         }
         break;
     case 2:
@@ -555,6 +577,13 @@ static lv_obj_t *lv_btn_array_create(lv_obj_t *parent, const char count, lv_even
     }
     return cont;
 }
+static void back_bar_event_cb(lv_event_t *e)
+{
+    if (lv_page_exist_page("page_steamoven"))
+        lv_page_back_page("page_steamoven");
+    else
+        lv_page_back_top_page();
+}
 void lv_page_steaming_init(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
@@ -562,7 +591,7 @@ void lv_page_steaming_init(lv_obj_t *page)
     manager_page->page_property_change_cb = property_change_cb;
     manager_page->page_update_cb = page_update_cb;
 
-    lv_obj_t *back_bar = lv_page_back_bar_init(page, "蒸烤箱", NULL);
+    lv_obj_t *back_bar = lv_page_back_bar_init(page, "蒸烤箱", NULL, back_bar_event_cb);
 
     lv_obj_t *cont_row = lv_obj_create(page);
     lv_obj_set_size(cont_row, 290 * 2 + 112, 290);

@@ -484,6 +484,52 @@ int lv_page_exist_page(const char* name)
     }
     return 0;
 }
+int lv_page_current_exist_page(const char* name)
+{
+    lv_100ask_page_manager_t * page_manager = (lv_100ask_page_manager_t *)(g_obj_page_manager);
+    lv_ll_t * history_ll = &(page_manager->history_ll);
+
+    /* The current page */
+    lv_100ask_page_manager_history_t * act_hist = _lv_ll_get_head(history_ll);
+    lv_100ask_page_manager_page_t * page;
+
+    page=(lv_100ask_page_manager_page_t *)act_hist->page;
+    if(strcmp(page->name,name) == 0)
+        return 1;
+
+    return 0;
+}
+int lv_page_back_page(const char* name)
+{
+    lv_100ask_page_manager_t * page_manager = (lv_100ask_page_manager_t *)(g_obj_page_manager);
+    lv_ll_t * history_ll = &(page_manager->history_ll);
+
+    /* The current page */
+    lv_100ask_page_manager_history_t * act_hist = _lv_ll_get_head(history_ll);
+    lv_100ask_page_manager_page_t * page;
+    while(act_hist != NULL){
+        /* Previous page exists */
+        page=(lv_100ask_page_manager_page_t *)act_hist->page;
+        if(strcmp(page->name,name) == 0)
+        {
+            if(page->open_page)
+                page->open_page(act_hist->page);
+            return 1;
+        }
+            
+        lv_100ask_page_manager_set_close_page(act_hist->page, NULL);
+        /* Previous page exists */
+        /* Delete the current item from the history */
+        _lv_ll_remove(history_ll, act_hist);
+        lv_mem_free(act_hist);
+        page_manager->cur_depth--;
+        /* Create the previous page.
+        *  Remove it from the history because `lv_100ask_page_manager_set_open_page` will add it again */
+
+        act_hist = _lv_ll_get_next(history_ll,act_hist);
+    }
+    return 0;
+}
 static void lv_page_back_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);

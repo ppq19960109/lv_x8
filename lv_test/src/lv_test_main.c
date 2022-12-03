@@ -42,9 +42,54 @@ static void close_page_anim(lv_obj_t *obj)
 }
 #endif
 //-------------------------------------------------
+static void steamInterfaceChange(int state)
+{
+    if (state == 0)
+    {
+        if (lv_page_exist_page("page_steaming") > 0)
+        {
+            if (lv_page_exist_page("page_steamoven"))
+                lv_page_back_page("page_steamoven");
+            else
+                lv_page_back_top_page();
+        }
+    }
+    else
+    {
+        if (lv_page_exist_page("page_steaming") == 0)
+        {
+            if (lv_page_current_exist_page("page_steam_left") || lv_page_current_exist_page("PageMultistage"))
+                lv_100ask_page_manager_set_open_page(NULL, "page_steaming");
+            else if (lv_page_current_exist_page("PageSmartRecipes") || lv_page_current_exist_page("PageCookDetails"))
+            {
+                lv_100ask_page_manager_set_open_page(NULL, "page_steaming");
+            }
+        }
+    }
+}
 static void property_change_cb(const char *key, void *value)
 {
     LV_LOG_USER("key:%s value:%p\n", key, value);
+
+    if (strcmp("LStOvState", key) == 0)
+    {
+        int LStOvState = get_attr_value_int("LStOvState");
+        int RStOvState = get_attr_value_int("RStOvState");
+        if (LStOvState == WORK_STATE_STOP)
+        {
+            if (RStOvState == WORK_STATE_STOP)
+            {
+                steamInterfaceChange(0);
+            }
+        }
+        else
+        {
+            steamInterfaceChange(1);
+        }
+    }
+    else if (strcmp("RStOvState", key) == 0)
+    {
+    }
     if (page_property_change_cb != NULL)
         page_property_change_cb(key, value);
 }
@@ -179,6 +224,7 @@ void lv_test_widgets(void)
     lv_obj_t *page_smartrecipes = lv_100ask_page_manager_page_create(page_manager, "page_smartrecipes");
     lv_obj_t *page_steaming = lv_100ask_page_manager_page_create(page_manager, "page_steaming");
     lv_obj_t *page_steam_left = lv_100ask_page_manager_page_create(page_manager, "page_steam_left");
+    lv_obj_t *page_set = lv_100ask_page_manager_page_create(page_manager, "page_set");
 
     lv_100ask_page_manager_set_page_init(main_page, init_main_page);
     lv_100ask_page_manager_set_page_init(page_hood, lv_page_hood_init);
@@ -186,6 +232,7 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_page_init(page_smartrecipes, lv_page_smartrecipes_init);
     lv_100ask_page_manager_set_page_init(page_steaming, lv_page_steaming_init);
     lv_100ask_page_manager_set_page_init(page_steam_left, lv_page_steam_left_init);
+    lv_100ask_page_manager_set_page_init(page_set, lv_page_set_init);
 #if LV_100ASK_PAGE_MANAGER_COSTOM_ANIMARION
     lv_100ask_page_manager_set_open_page_anim(main_page, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(main_page, close_page_anim);
@@ -199,7 +246,11 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_close_page_anim(page_steam_left, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_steaming, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_steaming, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_set, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_set, close_page_anim);
 #endif
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");
+
+    lv_100ask_page_manager_set_load_page_event(icon_set, NULL, "page_set");
 }

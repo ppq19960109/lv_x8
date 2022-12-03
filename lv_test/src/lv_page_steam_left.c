@@ -11,7 +11,7 @@
  *********************/
 lv_obj_t *roller1, *roller2, *roller3;
 
-steamoven_mode_t left_steamoven_mode[] = {
+static steamoven_mode_t left_steamoven_mode[] = {
     {
         mode_index : 0,
         mode : 40,
@@ -99,7 +99,7 @@ static void left_cook_start(const int reserve_time)
     steamoven.orderTime = reserve_time;
     set_cook_toServer(&steamoven);
 }
-void mode_change(char mode_index)
+static void mode_change(char mode_index)
 {
     steamoven_mode_t *steamoven_mode = get_steamoven_mode(mode_index);
     const char *options = temp_roller_options(steamoven_mode->mintemp, steamoven_mode->maxtemp);
@@ -193,7 +193,7 @@ static void scroll_event_cb(lv_event_t *e)
 void lv_page_steam_left_init(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
-    lv_obj_t *back_bar = lv_page_back_bar_init(page, "左腔蒸烤", NULL);
+    lv_obj_t *back_bar = lv_page_back_bar_init(page, "左腔蒸烤", NULL, NULL);
 
     lv_obj_t *cont_row = lv_obj_create(page);
     lv_obj_set_size(cont_row, 291 + 226 * 2 + 20 * 2, 281);

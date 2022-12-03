@@ -12,6 +12,31 @@ static char roller_options[1024] = {0};
 /**********************
  *  STATIC VARIABLES
  **********************/
+int lv_custom_isSteam(steamoven_t *steamoven)
+{
+    steamoven_attr_t *step;
+    if (steamoven->attr_len == 0)
+    {
+        step = &steamoven->attr[0];
+        if (step->mode == 1 || step->mode == 3 || step->mode == 4 || step->mode == 65 || step->mode == 66 || step->mode == 68)
+        {
+            return 1;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < steamoven->attr_len; ++i)
+        {
+            step = &steamoven->attr[i];
+            if (step->mode == 1 || step->mode == 3 || step->mode == 4 || step->mode == 65 || step->mode == 66 || step->mode == 68)
+            {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 lv_obj_t *lv_custom_image_button_create(lv_obj_t *parent, const void *img_src, lv_coord_t width, lv_coord_t height,
                                         lv_coord_t x, lv_coord_t y)
 {
@@ -118,6 +143,7 @@ lv_obj_t *radiobutton_create(lv_obj_t *parent, const char *txt)
     lv_obj_set_style_bg_color(obj, lv_color_hex(themesTextColor), LV_PART_INDICATOR);
     lv_obj_set_style_border_color(obj, lv_color_hex(themesTextColor), LV_PART_INDICATOR);
     lv_obj_set_style_border_width(obj, 2, LV_PART_INDICATOR);
+    lv_obj_set_style_pad_column(obj, 20, 0);
     return obj;
 }
 lv_obj_t *lv_custom_btn_array_create(lv_obj_t *parent, const char *text[], const char count, lv_event_cb_t event_cb)
@@ -182,6 +208,44 @@ lv_obj_t *lv_custom_cook_dialog(const char *content, lv_event_cb_t event_cb)
 
     lv_obj_t *radio_btn = radiobutton_create(obj, "下次不再提示");
     lv_obj_align(radio_btn, LV_ALIGN_TOP_MID, 0, 212);
+    return obj;
+}
+lv_obj_t *lv_custom_dialog2(const char *content, const char *cancel, const char *confirm, lv_event_cb_t event_cb)
+{
+    lv_obj_t *obj = lv_obj_create(lv_layer_top());
+    lv_obj_set_size(obj, 730, 350);
+    lv_obj_center(obj);
+
+    lv_obj_set_style_bg_opa(obj, LV_OPA_100, 0);
+    lv_obj_set_style_bg_color(obj, lv_color_hex(themesPopupWindowColor), 0);
+    lv_obj_set_style_radius(obj, 10, 0);
+
+    lv_obj_t *close_obj = lv_obj_create(obj);
+    lv_obj_set_size(close_obj, 80, 80);
+    lv_obj_align(close_obj, LV_ALIGN_TOP_RIGHT, 0, 0);
+    lv_obj_add_event_cb(close_obj, event_cb, LV_EVENT_CLICKED, (void *)0);
+    lv_obj_t *close_img = lv_img_create(close_obj);
+    lv_obj_align(close_img, LV_ALIGN_CENTER, 0, 0);
+    lv_img_set_src(close_img, themesImagesPath "icon_window_close.png");
+
+    lv_obj_t *icon_img = lv_img_create(obj);
+    lv_obj_align(icon_img, LV_ALIGN_TOP_MID, 0, 55);
+    lv_img_set_src(icon_img, themesImagesPath "icon_warn.png");
+
+    lv_obj_t *label_content = lv_label_create(obj);
+    lv_obj_set_style_text_font(label_content, &lv_font_SiYuanHeiTi_Normal_30, 0);
+    lv_obj_set_style_text_color(label_content, lv_color_hex(0xffffff), 0);
+    lv_label_set_text(label_content, content);
+    lv_obj_align(label_content, LV_ALIGN_CENTER, 0, 0);
+
+    lv_obj_t *btn1 = lv_custom_text_btn_create(obj, cancel);
+    lv_obj_add_event_cb(btn1, event_cb, LV_EVENT_CLICKED, (void *)1);
+    lv_obj_align(btn1, LV_ALIGN_BOTTOM_MID, -130, -25);
+
+    lv_obj_t *btn2 = lv_custom_text_btn_create(obj, confirm);
+    lv_obj_add_event_cb(btn2, event_cb, LV_EVENT_CLICKED, (void *)2);
+    lv_obj_align(btn2, LV_ALIGN_BOTTOM_MID, 130, -25);
+
     return obj;
 }
 static void scroll_event_cb(lv_event_t *e)

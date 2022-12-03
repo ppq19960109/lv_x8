@@ -99,6 +99,8 @@ void lv_page_back_previous_page(void);
 void lv_page_back_top_page(void);
 void lv_page_back_replace_page(lv_obj_t * obj, char * name);
 int lv_page_exist_page(const char* name);
+int lv_page_current_exist_page(const char* name);
+int lv_page_back_page(const char* name);
 /*=====================
  * Getter functions
  *====================*/

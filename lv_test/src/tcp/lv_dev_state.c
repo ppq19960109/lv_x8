@@ -119,19 +119,29 @@ static int lv_dev_recv_event(cJSON *Data)
     dev_attr_t *attr = dev_state->attr;
     dev_attr_t *ptr;
     cJSON *value;
+    char change;
     for (int i = 0; i < dev_state->attr_len; ++i)
     {
         ptr = &attr[i];
         if (cJSON_HasObjectItem(Data, ptr->key))
         {
+            change = 0;
             value = cJSON_GetObjectItem(Data, ptr->key);
             if (LINK_VALUE_TYPE_NUM == ptr->value_type)
             {
-                memcpy(ptr->value, &value->valueint, ptr->value_len);
+                if (memcmp(ptr->value, &value->valueint, ptr->value_len))
+                {
+                    memcpy(ptr->value, &value->valueint, ptr->value_len);
+                    change = 1;
+                }
             }
             else if (LINK_VALUE_TYPE_STRING == ptr->value_type)
             {
-                memcpy(ptr->value, &value->valuestring, ptr->value_len);
+                if (memcmp(ptr->value, value->valuestring, ptr->value_len))
+                {
+                    memcpy(ptr->value, value->valuestring, ptr->value_len);
+                    change = 1;
+                }
             }
             else if (LINK_VALUE_TYPE_STRUCT == ptr->value_type)
             {
@@ -142,7 +152,7 @@ static int lv_dev_recv_event(cJSON *Data)
             else
             {
             }
-            if (property_change_cb != NULL)
+            if (property_change_cb != NULL && change > 0)
                 property_change_cb(ptr->key, ptr);
         }
     }

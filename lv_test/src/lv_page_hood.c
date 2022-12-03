@@ -164,7 +164,7 @@ void lv_page_hood_init(lv_obj_t *page)
     manager_page->page_property_change_cb = property_change_cb;
     manager_page->page_update_cb = page_update_cb;
 
-    lv_obj_t *back_bar = lv_page_back_bar_init(page, "烟机灶具", NULL);
+    lv_obj_t *back_bar = lv_page_back_bar_init(page, "烟机灶具", NULL, NULL);
     lv_page_top_bar_init(page, 0);
 
     lv_obj_t *cont_row = lv_obj_create(page);

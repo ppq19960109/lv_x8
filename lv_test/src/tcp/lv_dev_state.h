@@ -49,6 +49,11 @@ typedef struct
     enum LINK_VALUE_TYPE value_type;
     unsigned char value_len;
     char *value;
+    // union
+    // {
+    //     char *p;
+    //     int n;
+    // } value;
 } dev_attr_t;
 
 typedef struct
