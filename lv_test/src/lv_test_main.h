@@ -21,6 +21,7 @@ extern "C"
 #include "uds_protocol.h"
 #include "lv_dev_state.h"
 #include "lv_custom_item.h"
+#include "wifi_list.h"
     /*********************
      *      DEFINES
      *********************/
@@ -53,7 +54,12 @@ extern "C"
     void lv_page_steaming_init(lv_obj_t *page);
     void lv_page_steam_left_init(lv_obj_t *page);
     void lv_page_set_init(lv_obj_t *page);
+
     void lv_page_wifi_create(lv_obj_t *page);
+    void lv_page_wifi_visible(const int visible);
+    lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const char *flags);
+    void lv_wifi_list_clean(void);
+
     /**********************
      *      MACROS
      **********************/

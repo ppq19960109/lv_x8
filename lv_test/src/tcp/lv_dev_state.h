@@ -120,5 +120,6 @@ const char *workModeName(const char mode);
 void register_property_change_cb(void (*cb)(const char *key, void *value));
 
 void set_num_toServer(const char *key, int value);
+void get_toServer(const char *key);
 void set_cook_toServer(steamoven_t *steamoven);
 #endif

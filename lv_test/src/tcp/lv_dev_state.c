@@ -163,8 +163,18 @@ void set_num_toServer(const char *key, int value)
 {
     dzlog_info("%s,key:%s value:%d", __func__, key, value);
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, key, value);
+    if (value < 0)
+        cJSON_AddNullToObject(root, key);
+    else
+        cJSON_AddNumberToObject(root, key, value);
     send_set_uds(root);
+}
+void get_toServer(const char *key)
+{
+    dzlog_info("%s,key:%s", __func__, key);
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddNullToObject(root, key);
+    send_get_uds(root);
 }
 
 void set_cook_toServer(steamoven_t *steamoven)
@@ -244,7 +254,7 @@ void set_cook_toServer(steamoven_t *steamoven)
     send_set_uds(root);
 }
 
-static void *profile_parse_json(void *input, const char *str) //启动时解析转换配置文件
+static void *profile_parse_json(void *input, const char *str) // 启动时解析转换配置文件
 {
     cJSON *root = cJSON_Parse(str);
     if (root == NULL)
@@ -323,7 +333,7 @@ fail:
     return NULL;
 }
 
-static void *recipes_parse_json(void *input, const char *str) //启动时解析
+static void *recipes_parse_json(void *input, const char *str) // 启动时解析
 {
     cJSON *root = cJSON_Parse(str);
     if (root == NULL)
@@ -366,7 +376,7 @@ fail:
     return NULL;
 }
 
-int lv_dev_init(void) //初始化
+int lv_dev_init(void) // 初始化
 {
     pthread_mutex_init(&mutex, NULL);
 
@@ -395,7 +405,7 @@ int lv_dev_init(void) //初始化
     return 0;
 }
 
-void lv_dev_deinit(void) //反初始化
+void lv_dev_deinit(void) // 反初始化
 {
     for (int i = 0; i < g_dev_state->attr_len; ++i)
     {

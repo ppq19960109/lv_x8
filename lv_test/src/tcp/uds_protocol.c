@@ -25,7 +25,7 @@ int cJSON_Object_isNull(cJSON *object) // cJSON判断Object是否为空
     return 0;
 }
 
-unsigned char CheckSum(unsigned char *buf, int len) //和校验算法
+unsigned char CheckSum(unsigned char *buf, int len) // 和校验算法
 {
     int i;
     unsigned char ret = 0;
@@ -78,7 +78,7 @@ static int send_to_uds(cJSON *root)
     }
 
     cJSON_free(json);
-
+    cJSON_Delete(root);
     pthread_mutex_unlock(&mutex);
     return 0;
 }
@@ -94,14 +94,20 @@ int send_set_uds(cJSON *send)
 
     cJSON *root = cJSON_CreateObject();
     cJSON_AddStringToObject(root, TYPE, TYPE_SET);
-
     cJSON_AddItemToObject(root, DATA, send);
 
     send_to_uds(root);
-    cJSON_Delete(root);
     return 0;
 }
+int send_get_uds(cJSON *send)
+{
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, TYPE, TYPE_GET);
+    cJSON_AddItemToObject(root, DATA, send);
 
+    send_to_uds(root);
+    return 0;
+}
 int send_getall_uds()
 {
     cJSON *root = cJSON_CreateObject();
@@ -109,7 +115,6 @@ int send_getall_uds()
     cJSON_AddNullToObject(root, DATA);
 
     send_to_uds(root);
-    cJSON_Delete(root);
     return 0;
 }
 

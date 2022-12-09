@@ -90,6 +90,34 @@ static void property_change_cb(const char *key, void *value)
     else if (strcmp("RStOvState", key) == 0)
     {
     }
+    else if (strcmp("WifiScanR", key) == 0)
+    {
+        cJSON *root = cJSON_Parse(value);
+
+        wifi_list_clear();
+
+        int arraySize = cJSON_GetArraySize(root);
+        cJSON *arraySub, *ssid, *rssi, *bssid, *flags;
+        for (int i = 0; i < arraySize; i++)
+        {
+            arraySub = cJSON_GetArrayItem(root, i);
+            if (arraySub == NULL)
+                continue;
+            ssid = cJSON_GetObjectItem(arraySub, "ssid");
+            rssi = cJSON_GetObjectItem(arraySub, "rssi");
+            bssid = cJSON_GetObjectItem(arraySub, "bssid");
+            flags = cJSON_GetObjectItem(arraySub, "flags");
+            wifi_node_t *cur = malloc(sizeof(wifi_node_t));
+            memset(cur, 0, sizeof(wifi_node_t));
+            strncpy(cur->ssid, ssid->valuestring, sizeof(cur->ssid));
+            strncpy(cur->bssid, bssid->valuestring, sizeof(cur->bssid));
+            strncpy(cur->flags, flags->valuestring, sizeof(cur->flags));
+            cur->rssi=rssi->valueint;
+
+            wifi_list_add(cur);
+        }
+        cJSON_Delete(root);
+    }
     if (page_property_change_cb != NULL)
         page_property_change_cb(key, value);
 }

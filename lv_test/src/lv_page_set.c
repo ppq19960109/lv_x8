@@ -13,15 +13,43 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-
+static void property_change_cb(const char *key, void *value)
+{
+    LV_LOG_USER("key:%s\n", key);
+    if (strcmp("WifiScanR", key) == 0)
+    {
+        lv_wifi_list_clean();
+    }
+}
+static void page_update_cb(void)
+{
+    LV_LOG_USER("%s\n", __func__);
+}
+static void tabview_event_cb(lv_event_t *e)
+{
+    LV_LOG_USER("%s,code:%d\n", __func__, e->code);
+    lv_obj_t *target = lv_event_get_target(e);
+    lv_obj_t *current_target = lv_event_get_current_target(e);
+    unsigned short index = lv_tabview_get_tab_act(current_target);
+    LV_LOG_USER("%s,index:%d\n", __func__, index);
+    if (index == 1)
+        lv_page_wifi_visible(1);
+    else
+        lv_page_wifi_visible(0);
+}
 void lv_page_set_init(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
+    lv_100ask_page_manager_page_t *manager_page = (lv_100ask_page_manager_page_t *)page;
+    manager_page->page_property_change_cb = property_change_cb;
+    manager_page->page_update_cb = page_update_cb;
+
     lv_obj_t *back_bar = lv_page_back_bar_init(page, "设置", NULL, NULL);
 
     lv_obj_t *tabview = lv_tabview_create(page, LV_DIR_LEFT, 180);
     lv_obj_set_size(tabview, LV_PCT(100), 340);
     lv_obj_align_to(tabview, back_bar, LV_ALIGN_OUT_BOTTOM_MID, 0, 5);
+    lv_obj_add_event_cb(tabview, tabview_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
     lv_obj_t *tab_btns = lv_tabview_get_tab_btns(tabview);
     lv_obj_set_style_bg_img_src(tab_btns, themesImagesPath "menulist_item_background.png", LV_PART_ITEMS | LV_STATE_CHECKED);

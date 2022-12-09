@@ -5,14 +5,23 @@
  *********************/
 #include <stdio.h>
 #include "lv_test_main.h"
-
 /*********************
  *      DEFINES
  *********************/
-
+static timer_t wifi_timer;
+static lv_obj_t *wifi_list;
 /**********************
  *  STATIC VARIABLES
  **********************/
+static void POSIXTimer_cb(union sigval val)
+{
+    LV_LOG_USER("%s sival_int:%d", __func__, val.sival_int);
+    if (val.sival_int == 0)
+    {
+        set_num_toServer("WifiScan", -1);
+        get_toServer("WifiScanR");
+    }
+}
 static void switch_event_handler(lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
@@ -43,29 +52,13 @@ static lv_obj_t *lv_divider_create(lv_obj_t *parent)
     lv_obj_set_style_bg_color(divider, lv_color_hex(0xE7E7E7), 0);
     return divider;
 }
-int signalLevel(int rssi)
+void lv_wifi_list_clean(void)
 {
-    if (rssi <= -100)
-        return 0;
-    else if (rssi < -75)
-        return 1;
-    else if (rssi < -55)
-        return 2;
-    else
-        return 3;
+    lv_obj_clean(wifi_list);
 }
-int encrypType(const char *flags)
+lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const char *flags)
 {
-    if (strstr(flags, "WPA") != NULL)
-        return 1;
-    else if (strstr(flags, "WEP") != NULL)
-        return 2;
-    else
-        return 0;
-}
-static lv_obj_t *lv_wifi_create(lv_obj_t *parent, const char *ssid, const int rssi)
-{
-    lv_obj_t *obj = lv_obj_create(parent);
+    lv_obj_t *obj = lv_obj_create(wifi_list);
     lv_obj_set_size(obj, LV_PCT(100), 70);
 
     lv_obj_t *divider = lv_divider_create(obj);
@@ -81,8 +74,7 @@ static lv_obj_t *lv_wifi_create(lv_obj_t *parent, const char *ssid, const int rs
     lv_obj_t *img_signal = lv_img_create(obj);
     lv_obj_align(img_signal, LV_ALIGN_TOP_RIGHT, -40, 35);
     lv_img_set_src(img_signal, themesImagesPath "wifi/wifi1.png");
-    switch (signal
-    )
+    switch (signal)
     {
     case 0:
 
@@ -94,10 +86,21 @@ static lv_obj_t *lv_wifi_create(lv_obj_t *parent, const char *ssid, const int rs
     }
     return obj;
 }
-
+void lv_page_wifi_visible(const int visible)
+{
+    if (visible)
+    {
+        POSIXTimerSet(wifi_timer, 0, 5);
+    }
+    else
+    {
+        POSIXTimerSet(wifi_timer, 0, 0);
+    }
+}
 void lv_page_wifi_create(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
+    wifi_timer = POSIXTimerCreate(0, POSIXTimer_cb);
 
     lv_obj_t *head = lv_obj_create(page);
     lv_obj_set_size(head, LV_PCT(100), 140);
@@ -136,8 +139,8 @@ void lv_page_wifi_create(lv_obj_t *page)
 
     lv_obj_add_event_cb(sw, switch_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
 
-    lv_obj_t *list = lv_list_create(content);
+    wifi_list = lv_list_create(content);
 
-    lv_obj_set_size(list, LV_PCT(100), LV_SIZE_CONTENT);
-    lv_obj_align(list, LV_ALIGN_TOP_MID, 0, 0);
+    lv_obj_set_size(wifi_list, LV_PCT(100), LV_SIZE_CONTENT);
+    lv_obj_align(wifi_list, LV_ALIGN_TOP_MID, 0, 0);
 }
