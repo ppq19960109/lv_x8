@@ -319,6 +319,26 @@
             "cloudKey": "RMovePotLowHeatSwitch",
             "valueType": 0,
             "uartByteLen": 1
+        },
+        {
+            "cloudKey": "WifiScanR",
+            "valueType": 2,
+            "uartByteLen": 0
+        },
+        {
+            "cloudKey": "WifiCurConnected",
+            "valueType": 3,
+            "uartByteLen": 0
+        },
+        {
+            "cloudKey": "ssid",
+            "valueType": 2,
+            "uartByteLen": 0
+        },
+        {
+            "cloudKey": "bssid",
+            "valueType": 2,
+            "uartByteLen": 0
         }
     ],
     "event": [],

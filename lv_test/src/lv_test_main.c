@@ -26,8 +26,11 @@ static void open_page_anim(lv_obj_t *obj)
     lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)obj;
     if (page->page_update_cb != NULL)
         page->page_update_cb();
+
     if (page->page_property_change_cb != NULL)
         page_property_change_cb = page->page_property_change_cb;
+    else
+        LV_LOG_USER("page name:%s,page_property_change_cb is null", page->name);
     LV_LOG_USER("open page anim. name:%s", page->name);
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_HIDDEN);
@@ -92,8 +95,10 @@ static void property_change_cb(const char *key, void *value)
     }
     else if (strcmp("WifiScanR", key) == 0)
     {
-        cJSON *root = cJSON_Parse(value);
-
+        cJSON *root = cJSON_Parse(get_value_string(value));
+        char *json = cJSON_PrintUnformatted(root);
+        LV_LOG_USER("%s,json:%s\n", __func__, json);
+        free(json);
         wifi_list_clear();
 
         int arraySize = cJSON_GetArraySize(root);
@@ -104,6 +109,8 @@ static void property_change_cb(const char *key, void *value)
             if (arraySub == NULL)
                 continue;
             ssid = cJSON_GetObjectItem(arraySub, "ssid");
+            if (strcmp(ssid->valuestring, "") == 0)
+                continue;
             rssi = cJSON_GetObjectItem(arraySub, "rssi");
             bssid = cJSON_GetObjectItem(arraySub, "bssid");
             flags = cJSON_GetObjectItem(arraySub, "flags");
@@ -111,11 +118,12 @@ static void property_change_cb(const char *key, void *value)
             memset(cur, 0, sizeof(wifi_node_t));
             strncpy(cur->ssid, ssid->valuestring, sizeof(cur->ssid));
             strncpy(cur->bssid, bssid->valuestring, sizeof(cur->bssid));
-            strncpy(cur->flags, flags->valuestring, sizeof(cur->flags));
-            cur->rssi=rssi->valueint;
+            cur->flags = encrypType(flags->valuestring);
+            cur->rssi = rssi->valueint;
 
             wifi_list_add(cur);
         }
+        wifi_list_each(NULL);
         cJSON_Delete(root);
     }
     if (page_property_change_cb != NULL)

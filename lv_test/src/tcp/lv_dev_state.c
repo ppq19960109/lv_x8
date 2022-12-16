@@ -81,12 +81,13 @@ dev_attr_t *get_attr_ptr(const char *name)
 
 int get_value_int(dev_attr_t *attr)
 {
-    int val = 0;
-    for (int i = attr->value_len - 1; i >= 0; --i)
-    {
-        val = (val << 8) + attr->value[i];
-    }
-    return val;
+    // int val = 0;
+    // for (int i = attr->value_len - 1; i >= 0; --i)
+    // {
+    //     val = (val << 8) + attr->value[i];
+    // }
+    // return val;
+    return attr->value.n;
 }
 int get_attr_value_int(const char *name)
 {
@@ -100,7 +101,8 @@ int get_attr_value_int(const char *name)
 }
 const char *get_value_string(dev_attr_t *attr)
 {
-    return attr->value;
+    // return attr->value;
+    return attr->value.p;
 }
 const char *get_attr_value_string(const char *name)
 {
@@ -110,50 +112,87 @@ const char *get_attr_value_string(const char *name)
         dzlog_error("%s,attr name:%s not exits", __func__, name);
         return NULL;
     }
-    return attr->value;
+    // return attr->value;
+    return get_value_string(attr);
 }
-
+static void lv_dev_set_value(cJSON *Data, dev_attr_t *ptr)
+{
+    cJSON *value;
+    char change;
+    change = 0;
+    value = cJSON_GetObjectItem(Data, ptr->key);
+    if (value == NULL || ptr == NULL)
+    {
+        dzlog_error("%s,null", __func__);
+        return;
+    }
+    if (LINK_VALUE_TYPE_NUM == ptr->value_type)
+    {
+        // if (memcmp(ptr->value, &value->valueint, ptr->value_len))
+        // {
+        //     memcpy(ptr->value, &value->valueint, ptr->value_len);
+        //     change = 1;
+        // }
+        if (ptr->value.n != value->valueint)
+        {
+            ptr->value.n = value->valueint;
+            change = 1;
+        }
+    }
+    else if (LINK_VALUE_TYPE_STRING == ptr->value_type)
+    {
+        // if (memcmp(ptr->value, value->valuestring, ptr->value_len))
+        // {
+        //     memcpy(ptr->value, value->valuestring, ptr->value_len);
+        //     change = 1;
+        // }
+        if (ptr->value.p == NULL)
+        {
+            ptr->value.p = malloc(strlen(value->valuestring) + 1);
+            strcpy(ptr->value.p, value->valuestring);
+            change = 1;
+        }
+        else
+        {
+            if (strcmp(ptr->value.p, value->valuestring))
+            {
+                free(ptr->value.p);
+                ptr->value.p = malloc(strlen(value->valuestring) + 1);
+                strcpy(ptr->value.p, value->valuestring);
+                change = 1;
+            }
+        }
+    }
+    else if (LINK_VALUE_TYPE_STRUCT == ptr->value_type)
+    {
+        if (strcmp("WifiCurConnected", ptr->key) == 0)
+        {
+            dev_attr_t *attr_ssid = get_attr_ptr("ssid");
+            lv_dev_set_value(value, attr_ssid);
+            dev_attr_t *attr_bssid = get_attr_ptr("bssid");
+            lv_dev_set_value(value, attr_bssid);
+        }
+    }
+    else if (LINK_VALUE_TYPE_ARRAY == ptr->value_type)
+    {
+    }
+    else
+    {
+    }
+    if (property_change_cb != NULL && change > 0)
+        property_change_cb(ptr->key, ptr);
+}
 static int lv_dev_recv_event(cJSON *Data)
 {
     dev_state_t *dev_state = g_dev_state;
     dev_attr_t *attr = dev_state->attr;
     dev_attr_t *ptr;
-    cJSON *value;
-    char change;
     for (int i = 0; i < dev_state->attr_len; ++i)
     {
         ptr = &attr[i];
         if (cJSON_HasObjectItem(Data, ptr->key))
         {
-            change = 0;
-            value = cJSON_GetObjectItem(Data, ptr->key);
-            if (LINK_VALUE_TYPE_NUM == ptr->value_type)
-            {
-                if (memcmp(ptr->value, &value->valueint, ptr->value_len))
-                {
-                    memcpy(ptr->value, &value->valueint, ptr->value_len);
-                    change = 1;
-                }
-            }
-            else if (LINK_VALUE_TYPE_STRING == ptr->value_type)
-            {
-                if (memcmp(ptr->value, value->valuestring, ptr->value_len))
-                {
-                    memcpy(ptr->value, value->valuestring, ptr->value_len);
-                    change = 1;
-                }
-            }
-            else if (LINK_VALUE_TYPE_STRUCT == ptr->value_type)
-            {
-            }
-            else if (LINK_VALUE_TYPE_ARRAY == ptr->value_type)
-            {
-            }
-            else
-            {
-            }
-            if (property_change_cb != NULL && change > 0)
-                property_change_cb(ptr->key, ptr);
+            lv_dev_set_value(Data, ptr);
         }
     }
     return 0;
@@ -310,21 +349,22 @@ static void *profile_parse_json(void *input, const char *str) // 启动时解析
         }
         valueType = cJSON_GetObjectItem(arraySub, "valueType");
         dev_state->attr[i].value_type = valueType->valueint;
-        if (cJSON_HasObjectItem(arraySub, "uartByteLen"))
-        {
-            uartByteLen = cJSON_GetObjectItem(arraySub, "uartByteLen");
-            dev_state->attr[i].value_len = uartByteLen->valueint;
-        }
-        if (dev_state->attr[i].value_len > 0)
-        {
-            dev_state->attr[i].value = (char *)malloc(dev_state->attr[i].value_len);
-            if (dev_state->attr[i].value == NULL)
-            {
-                dzlog_error("malloc error\n");
-                goto fail;
-            }
-            memset(dev_state->attr[i].value, 0, dev_state->attr[i].value_len);
-        }
+
+        // if (cJSON_HasObjectItem(arraySub, "uartByteLen"))
+        // {
+        //     uartByteLen = cJSON_GetObjectItem(arraySub, "uartByteLen");
+        //     dev_state->attr[i].value_len = uartByteLen->valueint;
+        // }
+        // if (dev_state->attr[i].value_len > 0)
+        // {
+        //     dev_state->attr[i].value = (char *)malloc(dev_state->attr[i].value_len);
+        //     if (dev_state->attr[i].value == NULL)
+        //     {
+        //         dzlog_error("malloc error\n");
+        //         goto fail;
+        //     }
+        //     memset(dev_state->attr[i].value, 0, dev_state->attr[i].value_len);
+        // }
     }
     cJSON_Delete(root);
     return dev_state;
@@ -409,8 +449,10 @@ void lv_dev_deinit(void) // 反初始化
 {
     for (int i = 0; i < g_dev_state->attr_len; ++i)
     {
-        if (g_dev_state->attr[i].value_len > 0)
-            free(g_dev_state->attr[i].value);
+        // if (g_dev_state->attr[i].value_len > 0)
+        //     free(g_dev_state->attr[i].value);
+        if (g_dev_state->attr[i].value.p != NULL)
+            free(g_dev_state->attr[i].value.p);
     }
     free(g_dev_state->attr);
     free(g_dev_state);

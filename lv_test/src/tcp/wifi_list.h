@@ -8,7 +8,7 @@ typedef struct
 {
     char ssid[33];
     char bssid[33];
-    char flags[33];
+    int flags;
     char connected;
     int rssi;
     struct list_head node;
@@ -18,4 +18,5 @@ int encrypType(const char *flags);
 void wifi_list_add(wifi_node_t *cur);
 void wifi_list_clear(void);
 void wifi_list_each(int (*cb)(void *));
+void get_wifi_list_flags(const char *ssid);
 #endif

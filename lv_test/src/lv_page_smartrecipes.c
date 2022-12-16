@@ -187,6 +187,7 @@ void lv_page_smartrecipes_init(lv_obj_t *page)
 
     lv_obj_t *left_content = lv_obj_create(page);
     lv_obj_t *right_content = lv_obj_create(page);
+    lv_obj_clear_flag(right_content, LV_OBJ_FLAG_SCROLL_ELASTIC);
 
     lv_obj_set_size(left_content, 156, 345);
     lv_obj_align_to(left_content, back_bar, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
@@ -195,7 +196,7 @@ void lv_page_smartrecipes_init(lv_obj_t *page)
     lv_img_set_src(menulist, themesImagesPath "menulist_background.png");
 
     lv_obj_t *list = lv_list_create(left_content);
-
+    
     lv_obj_set_size(list, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_align(list, LV_ALIGN_TOP_MID, 0, 15);
     lv_obj_t *first_btn = lv_text_img_btn_create(list, "蔬菜杂粮", right_content);
