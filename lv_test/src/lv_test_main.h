@@ -57,8 +57,7 @@ extern "C"
 
     void lv_page_wifi_create(lv_obj_t *page);
     void lv_page_wifi_visible(const int visible);
-    lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const int flags);
-    void lv_wifi_list_clean(void);
+    void lv_wifi_property_change_cb(const char *key, void *value);
 
     /**********************
      *      MACROS

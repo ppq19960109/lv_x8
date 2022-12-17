@@ -9,37 +9,14 @@
 /*********************
  *      DEFINES
  *********************/
-static char *bssid;
+
 /**********************
  *  STATIC VARIABLES
  **********************/
-static int wifi_list_item(void *arg)
-{
-    wifi_node_t *ptr = arg;
-    LV_LOG_USER("%s,ssid:%s,rssi:%d,flags:%d\n", __func__, ptr->ssid, ptr->rssi, ptr->flags);
-    lv_obj_t *obj = lv_wifi_list_create(ptr->ssid, ptr->rssi, ptr->flags);
-    if (bssid == NULL)
-        LV_LOG_USER("%s,bssid,null\n", __func__);
-    else
-    {
-        if (strcmp(bssid, ptr->bssid) == 0)
-        {
-            lv_obj_move_to_index(obj, 0);
-            lv_obj_add_state(lv_obj_get_child(obj, 0), LV_STATE_CHECKED);
-        }
-    }
-    return 0;
-}
 static void property_change_cb(const char *key, void *value)
 {
     LV_LOG_USER("lv_page_set,key:%s\n", key);
-    if (strcmp("WifiScanR", key) == 0)
-    {
-        bssid = get_attr_value_string("bssid");
-        lv_wifi_list_clean();
-        wifi_list_each(wifi_list_item);
-        // lv_wifi_list_create("ASDF", -46, "WPA-PSK-CCMP+TKIP");
-    }
+    lv_wifi_property_change_cb(key,value);
 }
 static void page_update_cb(void)
 {

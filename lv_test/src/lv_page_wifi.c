@@ -15,17 +15,70 @@ typedef struct
 } wifi_info_t;
 static timer_t wifi_timer;
 static lv_obj_t *wifi_list;
+
+static char *bssid;
+static char scan_count, scan_min_num = 2;
+static lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const int flags);
+static void lv_wifi_list_clean(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static int wifi_list_item(void *arg)
+{
+    wifi_node_t *ptr = arg;
+    // LV_LOG_USER("%s,ssid:%s,rssi:%d,flags:%d\n", __func__, ptr->ssid, ptr->rssi, ptr->flags);
+    lv_obj_t *obj = lv_wifi_list_create(ptr->ssid, ptr->rssi, ptr->flags);
+    if (bssid == NULL)
+        LV_LOG_USER("%s,bssid,null\n", __func__);
+    else
+    {
+        if (strcmp(bssid, ptr->bssid) == 0)
+        {
+            lv_obj_move_to_index(obj, 0);
+            lv_obj_add_state(lv_obj_get_child(obj, 0), LV_STATE_CHECKED);
+        }
+    }
+    return 0;
+}
+void lv_wifi_property_change_cb(const char *key, void *value)
+{
+    LV_LOG_USER("%s,key:%s\n", __func__, key);
+    if (strcmp("WifiScanR", key) == 0)
+    {
+        bssid = get_attr_value_string("bssid");
+        lv_wifi_list_clean();
+        wifi_list_each(wifi_list_item);
+        // lv_wifi_list_create("ASDF", -46, "WPA-PSK-CCMP+TKIP");
+    }
+}
+
 static void POSIXTimer_cb(union sigval val)
 {
     LV_LOG_USER("%s sival_int:%d", __func__, val.sival_int);
     if (val.sival_int == 0)
     {
-        set_num_toServer("WifiScan", -1);
-        get_toServer("WifiCurConnected");
-        get_toServer("WifiScanR");
+        ++scan_count;
+        if (scan_count <= scan_min_num)
+        {
+            if (scan_count == 1)
+            {
+                get_toServer("WifiCurConnected");
+                set_num_toServer("WifiScan", -1);
+            }
+            else if (scan_count == scan_min_num)
+            {
+                POSIXTimerSet(wifi_timer, 9, 9);
+            }
+            get_toServer("WifiScanR");
+        }
+        else
+        {
+            get_toServer("WifiCurConnected");
+            if (scan_count % 2 == 0)
+                set_num_toServer("WifiScan", -1);
+            else
+                get_toServer("WifiScanR");
+        }
     }
 }
 static void switch_event_handler(lv_event_t *e)
@@ -95,7 +148,7 @@ static lv_obj_t *lv_wifi_input_dialog(const char *ssid, const int flags)
     lv_label_set_text(label_cancel, "取消");
     lv_obj_set_style_text_color(label_cancel, lv_color_hex(themesTextColor2), 0);
     lv_obj_align(label_cancel, LV_ALIGN_LEFT_MID, 40, 0);
-    lv_obj_add_flag(label_cancel,LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(label_cancel, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(label_cancel, wifi_input_event_handler, LV_EVENT_CLICKED, (void *)0);
 
     lv_obj_t *label_title = lv_label_create(back_bar);
@@ -134,7 +187,7 @@ lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const int flags)
     lv_obj_t *divider = lv_divider_create(obj);
     lv_obj_align(divider, LV_ALIGN_BOTTOM_MID, 0, 0);
 
-    int signal=signalLevel(rssi);
+    int signal = signalLevel(rssi);
     lv_obj_t *img_signal = lv_img_create(obj);
     lv_obj_align(img_signal, LV_ALIGN_TOP_RIGHT, -40, 30);
     switch (signal)
@@ -155,7 +208,7 @@ lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const int flags)
     {
         lv_obj_t *img_encryp = lv_img_create(obj);
         lv_obj_align(img_encryp, LV_ALIGN_TOP_RIGHT, -40, 30);
-        lv_img_set_src(img_signal, themesImagesPath "wifi/wifi_lock.png");
+        lv_img_set_src(img_encryp, themesImagesPath "wifi/wifi_lock.png");
     }
 
     lv_obj_add_event_cb(obj, wifi_event_handler, LV_EVENT_CLICKED, ssid);
@@ -165,7 +218,9 @@ void lv_page_wifi_visible(const int visible)
 {
     if (visible)
     {
-        POSIXTimerSet(wifi_timer, 0, 1);
+        scan_count = 0;
+        POSIXTimerSet(wifi_timer, 2, 2);
+        get_toServer("WifiScanR");
     }
     else
     {
