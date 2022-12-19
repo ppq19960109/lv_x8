@@ -9,7 +9,9 @@
 /*********************
  *      DEFINES
  *********************/
+int g_wifi_state = 0;
 lv_style_t roller_style_unselected, roller_style_selected;
+static lv_obj_t *icon_wifi;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -126,6 +128,23 @@ static void property_change_cb(const char *key, void *value)
         wifi_list_each(NULL);
         cJSON_Delete(root);
     }
+    else if (strcmp("WifiState", key) == 0)
+    {
+        g_wifi_state = get_value_int(value);
+        
+        if (g_wifi_state == RK_WIFI_State_CONNECTED)
+        {
+            lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_half_connect.png");
+        }
+        else if (g_wifi_state == RK_WIFI_State_LINK_CONNECTED)
+        {
+            lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_connected.png");
+        }
+        else
+        {
+            lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_disconnect.png");
+        }
+    }
     if (page_property_change_cb != NULL)
         page_property_change_cb(key, value);
 }
@@ -211,8 +230,8 @@ void lv_test_widgets(void)
     lv_img_set_src(icon_newline1, themesImagesPath "icon_newline.png");
     lv_obj_set_size(icon_newline1, LV_SIZE_CONTENT, 2);
     lv_obj_align(icon_newline1, LV_ALIGN_TOP_MID, 0, 54);
-    lv_obj_t *icon_wifi = lv_img_create(home_bar);
-    lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_connected.png");
+    icon_wifi = lv_img_create(home_bar);
+    lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_disconnect.png");
     lv_obj_align(icon_wifi, LV_ALIGN_TOP_MID, 0, 80);
 
     lv_obj_t *icon_newline2 = lv_img_create(home_bar);

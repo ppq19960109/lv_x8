@@ -66,12 +66,12 @@ int main(void)
     while (1)
     {
         lv_timer_handler();
+        usleep(5000);
         if (++tcp_recv_count > 2)
         {
             tcp_recv_count = 0;
             uds_client_task();
         }
-        usleep(5000);
     }
 
     return 0;

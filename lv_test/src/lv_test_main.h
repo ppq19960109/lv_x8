@@ -37,6 +37,7 @@ extern "C"
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_40);
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_50);
     extern lv_style_t roller_style_unselected, roller_style_selected;
+    extern int g_wifi_state;
     /**********************
      * GLOBAL PROTOTYPES
      **********************/

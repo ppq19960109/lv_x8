@@ -321,6 +321,11 @@
             "uartByteLen": 1
         },
         {
+            "cloudKey": "WifiState",
+            "valueType": 0,
+            "uartByteLen": 1
+        },
+        {
             "cloudKey": "WifiScanR",
             "valueType": 2,
             "uartByteLen": 0
