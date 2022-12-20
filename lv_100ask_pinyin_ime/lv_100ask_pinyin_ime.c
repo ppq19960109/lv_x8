@@ -563,16 +563,18 @@ static void lv_100ask_pinyin_ime_constructor(const lv_obj_class_t * class_p, lv_
     lv_memset_00(pinyin_ime->py_num, sizeof(pinyin_ime->py_num));
     lv_memset_00(pinyin_ime->py_pos, sizeof(pinyin_ime->py_pos));
 
-    lv_obj_set_size(obj, LV_PCT(100), LV_PCT(55));
+    lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_align(obj, LV_ALIGN_BOTTOM_MID, 0, 0);
 
-    pinyin_ime->kb = lv_keyboard_create(lv_scr_act());
-    lv_obj_align_to(pinyin_ime->kb, obj, LV_ALIGN_BOTTOM_MID, 0, 0);
-
+    pinyin_ime->kb = lv_keyboard_create(lv_obj_get_parent(obj));
+    // lv_obj_align_to(pinyin_ime->kb, obj, LV_ALIGN_BOTTOM_MID, 0, 0);
+    lv_obj_set_size(pinyin_ime->kb, LV_PCT(100), LV_PCT(85));
+    lv_obj_align(pinyin_ime->kb, LV_ALIGN_BOTTOM_MID, 0, 0);
+    
     init_pinyin_dict(obj, lv_100ask_def_pinyin_dict);
 
     /* Init pinyin_ime->cand_panel */
-    pinyin_ime->cand_panel = lv_btnmatrix_create(lv_scr_act());
+    pinyin_ime->cand_panel = lv_btnmatrix_create(lv_obj_get_parent(obj));
     lv_btnmatrix_set_map(pinyin_ime->cand_panel, (const char **)btnm_def_pinyin_sel_map);
     lv_obj_set_size(pinyin_ime->cand_panel, LV_PCT(100), LV_PCT(10));
     lv_obj_align_to(pinyin_ime->cand_panel, pinyin_ime->kb, LV_ALIGN_OUT_TOP_MID, 0, 0);

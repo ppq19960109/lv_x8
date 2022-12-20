@@ -189,11 +189,13 @@ static void init_main_page(lv_obj_t *page)
 //-------------------------------------------------
 static void init_style()
 {
+    lv_style_init(&roller_style_unselected);
     lv_style_set_text_font(&roller_style_unselected, &lv_font_SiYuanHeiTi_Normal_30);
     lv_style_set_text_color(&roller_style_unselected, lv_color_hex(0xffffff));
     lv_style_set_text_align(&roller_style_unselected, LV_TEXT_ALIGN_CENTER);
     lv_style_set_text_line_space(&roller_style_unselected, 16);
 
+    lv_style_init(&roller_style_selected);
     lv_style_set_text_font(&roller_style_selected, &lv_font_SiYuanHeiTi_Normal_34);
     lv_style_set_text_color(&roller_style_selected, lv_color_hex(themesTextColor));
     lv_style_set_text_align(&roller_style_selected, LV_TEXT_ALIGN_CENTER);

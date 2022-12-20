@@ -126,6 +126,32 @@ static void wifi_input_event_handler(lv_event_t *e)
         break;
     }
 }
+static void ta_event_cb(lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t *ta = lv_event_get_target(e);
+    lv_obj_t *kb = lv_event_get_user_data(e);
+
+    if (code == LV_EVENT_FOCUSED)
+    {
+        if (lv_indev_get_type(lv_indev_get_act()) != LV_INDEV_TYPE_KEYPAD)
+        {
+            LV_LOG_USER("%s,code:%d\n", __func__, e->code);
+            lv_keyboard_set_textarea(kb, ta);
+            lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        }
+    }
+    else if (code == LV_EVENT_READY || code == LV_EVENT_CANCEL)
+    {
+        LV_LOG_USER("%s,code:%d\n", __func__, code);
+        if (code == LV_EVENT_CANCEL)
+            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_state(ta, LV_STATE_FOCUSED);
+        lv_indev_reset(NULL, ta); /*To forget the last clicked object to make it focusable again*/
+    }
+}
+LV_FONT_DECLARE(lv_font_source_han_sans_normal_16);
+
 static lv_obj_t *lv_wifi_input_dialog(const char *ssid, const int flags)
 {
     lv_obj_t *obj = lv_obj_create(lv_layer_top());
@@ -156,7 +182,52 @@ static lv_obj_t *lv_wifi_input_dialog(const char *ssid, const int flags)
     lv_label_set_text(label_title, ssid);
     lv_obj_set_style_text_color(label_title, lv_color_hex(themesTextColor2), 0);
     lv_obj_align(label_title, LV_ALIGN_CENTER, 0, 0);
+    //--------------------------------------------
+    lv_obj_t *bottom_bar = lv_obj_create(obj);
+    lv_obj_set_size(bottom_bar, LV_PCT(100), 345);
+    lv_obj_set_align(bottom_bar, LV_ALIGN_BOTTOM_MID);
 
+    lv_obj_t *pinyin = lv_obj_create(bottom_bar);
+    lv_obj_set_size(pinyin, 900, LV_PCT(100));
+    lv_obj_set_align(pinyin, LV_ALIGN_BOTTOM_RIGHT);
+
+    lv_obj_t *pinyin_ime = lv_100ask_pinyin_ime_create(pinyin);
+    lv_obj_set_style_bg_opa(pinyin_ime, LV_OPA_COVER, 0);
+    lv_obj_set_style_text_font(pinyin_ime, &lv_font_source_han_sans_normal_16, 0);
+   
+    lv_obj_t *kb = lv_100ask_pinyin_ime_get_kb(pinyin_ime);
+
+    //-------------------------------------
+    lv_obj_t *ta1 = lv_textarea_create(bottom_bar);
+    lv_obj_set_size(ta1, 350, 160);
+    lv_obj_set_style_bg_opa(ta1, LV_OPA_100, 0);
+    lv_obj_set_style_bg_color(ta1, lv_color_hex(themesWindowBackgroundColor), 0);
+    lv_obj_set_style_text_font(ta1, &lv_font_SiYuanHeiTi_Normal_30, 0);
+    lv_obj_set_style_text_color(ta1, lv_color_hex(0xECF4FC), 0);
+    lv_obj_set_style_text_color(ta1, lv_color_hex(0xff0000), LV_PART_SELECTED);
+    lv_obj_align(ta1, LV_ALIGN_TOP_LEFT, 10, 10);
+    lv_textarea_set_cursor_click_pos(ta1, true);
+    lv_textarea_set_text_selection(ta1, true);
+    lv_textarea_set_placeholder_text(ta1, "请输入密码");
+    lv_obj_set_style_pad_all(ta1, 10, 0);
+    lv_obj_set_style_pad_gap(ta1, 10, 0);
+
+    static lv_style_t ta_cursor;
+    lv_style_init(&ta_cursor);
+    lv_style_set_border_color(&ta_cursor, lv_color_hex(0xECF4FC));
+    lv_style_set_border_width(&ta_cursor, 2);
+    lv_style_set_pad_left(&ta_cursor, -2);
+    lv_style_set_border_side(&ta_cursor, LV_BORDER_SIDE_LEFT);
+    lv_style_set_anim_time(&ta_cursor, 500);
+    lv_obj_add_style(ta1, &ta_cursor, LV_PART_CURSOR | LV_STATE_FOCUSED);
+
+    lv_obj_t *label1 = lv_textarea_get_label(ta1);
+    lv_obj_set_style_text_color(label1, lv_color_hex(0xff0000), LV_PART_SELECTED);
+    lv_label_set_text_sel_start(label1, 0);
+    lv_label_set_text_sel_end(label1, 2);
+
+    lv_obj_add_event_cb(ta1, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_keyboard_set_textarea(kb, ta1);
     return obj;
 }
 
@@ -219,8 +290,8 @@ void lv_page_wifi_visible(const int visible)
     if (visible)
     {
         scan_count = 0;
-        POSIXTimerSet(wifi_timer, 2, 2);
-        get_toServer("WifiScanR");
+        // POSIXTimerSet(wifi_timer, 2, 2);
+        // get_toServer("WifiScanR");
     }
     else
     {
