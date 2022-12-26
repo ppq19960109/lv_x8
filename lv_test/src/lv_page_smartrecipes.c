@@ -50,6 +50,7 @@ static void recipe_event_cb(lv_event_t *e)
     {
         if (lv_obj_has_state(current_target, LV_STATE_CHECKED))
         {
+            lv_100ask_page_manager_set_open_page(NULL,"page_cook_details");
             return;
         }
         lv_obj_t *parent = lv_obj_get_parent(current_target);

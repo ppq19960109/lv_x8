@@ -37,6 +37,7 @@ extern "C"
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_40);
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_50);
     extern lv_style_t roller_style_unselected, roller_style_selected;
+    extern lv_style_t slider_style_main, slider_style_indicator, slider_style_knob;
     extern int g_wifi_state;
     /**********************
      * GLOBAL PROTOTYPES
@@ -49,13 +50,16 @@ extern "C"
     lv_obj_t *lv_page_top_bar_init(lv_obj_t *parent, const int index);
     lv_obj_t *lv_rotate_anim(lv_obj_t *obj, const int run);
     lv_obj_t *lv_custom_text_btn_create(lv_obj_t *parent, const char *text);
+
     void lv_page_hood_init(lv_obj_t *page);
     void lv_page_steamoven_init(lv_obj_t *page);
     void lv_page_smartrecipes_init(lv_obj_t *page);
     void lv_page_steaming_init(lv_obj_t *page);
     void lv_page_steam_left_init(lv_obj_t *page);
     void lv_page_set_init(lv_obj_t *page);
+    void lv_page_cook_details_init(lv_obj_t *page);
 
+    void lv_page_local_set_create(lv_obj_t *page);
     void lv_page_wifi_create(lv_obj_t *page);
     void lv_page_wifi_visible(const int visible);
     void lv_wifi_property_change_cb(const char *key, void *value);

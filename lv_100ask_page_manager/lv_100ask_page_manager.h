@@ -50,6 +50,7 @@ typedef struct {
     void (*close_page)(lv_obj_t * obj);
     void (*page_property_change_cb)(const char *key, void *value);
     void (*page_update_cb)();
+    void * user_data;
 } lv_100ask_page_manager_page_t;
 
 typedef struct {

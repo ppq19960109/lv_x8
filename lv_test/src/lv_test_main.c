@@ -11,6 +11,7 @@
  *********************/
 int g_wifi_state = 0;
 lv_style_t roller_style_unselected, roller_style_selected;
+lv_style_t slider_style_main, slider_style_indicator, slider_style_knob;
 static lv_obj_t *icon_wifi;
 /**********************
  *  STATIC VARIABLES
@@ -131,7 +132,7 @@ static void property_change_cb(const char *key, void *value)
     else if (strcmp("WifiState", key) == 0)
     {
         g_wifi_state = get_value_int(value);
-        
+
         if (g_wifi_state == RK_WIFI_State_CONNECTED)
         {
             lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_half_connect.png");
@@ -200,6 +201,20 @@ static void init_style()
     lv_style_set_text_color(&roller_style_selected, lv_color_hex(themesTextColor));
     lv_style_set_text_align(&roller_style_selected, LV_TEXT_ALIGN_CENTER);
     lv_style_set_text_line_space(&roller_style_selected, 16);
+
+    lv_style_init(&slider_style_main);
+    lv_style_set_bg_opa(&slider_style_main, LV_OPA_COVER);
+    lv_style_set_bg_color(&slider_style_main, lv_color_hex(themesTextColor2));
+    lv_style_set_radius(&slider_style_main, LV_RADIUS_CIRCLE);
+
+    lv_style_init(&slider_style_indicator);
+    lv_style_set_bg_opa(&slider_style_indicator, LV_OPA_COVER);
+    lv_style_set_bg_color(&slider_style_indicator, lv_color_hex(themesTextColor));
+    lv_style_set_radius(&slider_style_indicator, LV_RADIUS_CIRCLE);
+
+    lv_style_init(&slider_style_knob);
+    lv_style_set_pad_all(&slider_style_knob, 30);
+    lv_style_set_bg_img_src(&slider_style_knob, themesImagesPath "icon_slide.png");
 }
 void lv_test_widgets(void)
 {
@@ -282,6 +297,7 @@ void lv_test_widgets(void)
     lv_obj_t *page_steaming = lv_100ask_page_manager_page_create(page_manager, "page_steaming");
     lv_obj_t *page_steam_left = lv_100ask_page_manager_page_create(page_manager, "page_steam_left");
     lv_obj_t *page_set = lv_100ask_page_manager_page_create(page_manager, "page_set");
+    lv_obj_t *page_cook_details = lv_100ask_page_manager_page_create(page_manager, "page_cook_details");
 
     lv_100ask_page_manager_set_page_init(main_page, init_main_page);
     lv_100ask_page_manager_set_page_init(page_hood, lv_page_hood_init);
@@ -290,6 +306,7 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_page_init(page_steaming, lv_page_steaming_init);
     lv_100ask_page_manager_set_page_init(page_steam_left, lv_page_steam_left_init);
     lv_100ask_page_manager_set_page_init(page_set, lv_page_set_init);
+    lv_100ask_page_manager_set_page_init(page_cook_details, lv_page_cook_details_init);
 #if LV_100ASK_PAGE_MANAGER_COSTOM_ANIMARION
     lv_100ask_page_manager_set_open_page_anim(main_page, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(main_page, close_page_anim);
@@ -305,6 +322,8 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_close_page_anim(page_steaming, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_set, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_set, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_cook_details, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_cook_details, close_page_anim);
 #endif
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");

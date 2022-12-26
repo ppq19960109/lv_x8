@@ -61,19 +61,17 @@ void lv_page_set_init(lv_obj_t *page)
     lv_obj_t *tab4 = lv_tabview_add_tab(tabview, "系统更新");
     lv_obj_t *tab5 = lv_tabview_add_tab(tabview, "恢复出厂");
 
-    lv_obj_set_style_bg_opa(tab1, LV_OPA_COVER, 0);
+    // lv_obj_set_style_bg_opa(tab1, LV_OPA_COVER, 0);
     // lv_obj_set_style_bg_opa(tab2, LV_OPA_COVER, 0);
     lv_obj_set_style_bg_opa(tab3, LV_OPA_COVER, 0);
     lv_obj_set_style_bg_opa(tab4, LV_OPA_COVER, 0);
     lv_obj_set_style_bg_opa(tab5, LV_OPA_COVER, 0);
 
     /*Add content to the tabs*/
-    lv_obj_t *label = lv_label_create(tab1);
-    lv_label_set_text(label, "First tab");
-
+    lv_page_local_set_create(tab1);
     lv_page_wifi_create(tab2);
 
-    label = lv_label_create(tab3);
+    lv_obj_t * label = lv_label_create(tab3);
     lv_label_set_text(label, "Third tab");
 
     label = lv_label_create(tab4);

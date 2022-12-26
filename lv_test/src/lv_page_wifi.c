@@ -177,6 +177,14 @@ static lv_obj_t *lv_wifi_input_dialog(const char *ssid, const int flags)
     lv_obj_add_flag(label_cancel, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(label_cancel, wifi_input_event_handler, LV_EVENT_CLICKED, (void *)0);
 
+    lv_obj_t *label_connect = lv_label_create(back_bar);
+    lv_obj_set_style_text_font(label_connect, &lv_font_SiYuanHeiTi_Normal_30, 0);
+    lv_label_set_text(label_connect, "连接");
+    lv_obj_set_style_text_color(label_connect, lv_color_hex(themesTextColor2), 0);
+    lv_obj_align(label_connect, LV_ALIGN_RIGHT_MID, -40, 0);
+    lv_obj_add_flag(label_connect, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(label_connect, wifi_input_event_handler, LV_EVENT_CLICKED, (void *)1);
+
     lv_obj_t *label_title = lv_label_create(back_bar);
     lv_obj_set_style_text_font(label_title, &lv_font_SiYuanHeiTi_Normal_30, 0);
     lv_label_set_text(label_title, ssid);
