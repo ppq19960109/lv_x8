@@ -38,6 +38,7 @@ extern "C"
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_50);
     extern lv_style_t roller_style_unselected, roller_style_selected;
     extern lv_style_t slider_style_main, slider_style_indicator, slider_style_knob;
+    extern lv_style_t switch_style_indicator, switch_style_indicator_check, switch_style_knob;
     extern int g_wifi_state;
     /**********************
      * GLOBAL PROTOTYPES
@@ -56,6 +57,7 @@ extern "C"
     void lv_page_smartrecipes_init(lv_obj_t *page);
     void lv_page_steaming_init(lv_obj_t *page);
     void lv_page_steam_left_init(lv_obj_t *page);
+    void lv_page_multistage_init(lv_obj_t *page);
     void lv_page_set_init(lv_obj_t *page);
     void lv_page_cook_details_init(lv_obj_t *page);
 

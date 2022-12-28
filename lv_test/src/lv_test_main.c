@@ -12,6 +12,7 @@
 int g_wifi_state = 0;
 lv_style_t roller_style_unselected, roller_style_selected;
 lv_style_t slider_style_main, slider_style_indicator, slider_style_knob;
+lv_style_t switch_style_indicator, switch_style_indicator_check, switch_style_knob;
 static lv_obj_t *icon_wifi;
 /**********************
  *  STATIC VARIABLES
@@ -28,7 +29,7 @@ static void open_page_anim(lv_obj_t *obj)
     /*Do something with LVGL*/
     lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)obj;
     if (page->page_update_cb != NULL)
-        page->page_update_cb();
+        page->page_update_cb(page);
 
     if (page->page_property_change_cb != NULL)
         page_property_change_cb = page->page_property_change_cb;
@@ -215,6 +216,20 @@ static void init_style()
     lv_style_init(&slider_style_knob);
     lv_style_set_pad_all(&slider_style_knob, 30);
     lv_style_set_bg_img_src(&slider_style_knob, themesImagesPath "icon_slide.png");
+
+    lv_style_init(&switch_style_indicator);
+    lv_style_set_bg_opa(&switch_style_indicator, LV_OPA_COVER);
+    lv_style_set_bg_color(&switch_style_indicator, lv_color_hex(0x333333));
+    lv_style_set_radius(&switch_style_indicator, LV_RADIUS_CIRCLE);
+
+    lv_style_init(&switch_style_indicator_check);
+    lv_style_set_bg_color(&switch_style_indicator_check, lv_color_hex(themesTextColor));
+
+    lv_style_init(&switch_style_knob);
+    lv_style_set_bg_opa(&switch_style_knob, LV_OPA_COVER);
+    lv_style_set_bg_color(&switch_style_knob, lv_color_hex(0xfffff));
+    lv_style_set_radius(&switch_style_knob, LV_RADIUS_CIRCLE);
+    lv_style_set_pad_all(&switch_style_knob, -3);
 }
 void lv_test_widgets(void)
 {
@@ -298,6 +313,7 @@ void lv_test_widgets(void)
     lv_obj_t *page_steam_left = lv_100ask_page_manager_page_create(page_manager, "page_steam_left");
     lv_obj_t *page_set = lv_100ask_page_manager_page_create(page_manager, "page_set");
     lv_obj_t *page_cook_details = lv_100ask_page_manager_page_create(page_manager, "page_cook_details");
+    lv_obj_t *page_multistage = lv_100ask_page_manager_page_create(page_manager, "page_multistage");
 
     lv_100ask_page_manager_set_page_init(main_page, init_main_page);
     lv_100ask_page_manager_set_page_init(page_hood, lv_page_hood_init);
@@ -307,6 +323,7 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_page_init(page_steam_left, lv_page_steam_left_init);
     lv_100ask_page_manager_set_page_init(page_set, lv_page_set_init);
     lv_100ask_page_manager_set_page_init(page_cook_details, lv_page_cook_details_init);
+    lv_100ask_page_manager_set_page_init(page_multistage, lv_page_multistage_init);
 #if LV_100ASK_PAGE_MANAGER_COSTOM_ANIMARION
     lv_100ask_page_manager_set_open_page_anim(main_page, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(main_page, close_page_anim);
@@ -324,6 +341,8 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_close_page_anim(page_set, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_cook_details, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_cook_details, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_multistage, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_multistage, close_page_anim);
 #endif
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");

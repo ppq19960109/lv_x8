@@ -50,7 +50,9 @@ static void recipe_event_cb(lv_event_t *e)
     {
         if (lv_obj_has_state(current_target, LV_STATE_CHECKED))
         {
-            lv_100ask_page_manager_set_open_page(NULL,"page_cook_details");
+            lv_100ask_page_manager_page_t *page = lv_page_get_page("page_cook_details");
+            page->user_data = user_data;
+            lv_100ask_page_manager_set_open_page(NULL, "page_cook_details");
             return;
         }
         lv_obj_t *parent = lv_obj_get_parent(current_target);
@@ -131,7 +133,7 @@ static lv_obj_t *lv_text_img_btn_create(lv_obj_t *parent, const char *text, void
     lv_obj_center(label);
     return btn1;
 }
-static lv_obj_t *lv_recipe_create(lv_obj_t *parent, const char *img_src, const char *text)
+static lv_obj_t *lv_recipe_create(lv_obj_t *parent, const char *img_src, const char *text, void *arg)
 {
     char imgUrl[256];
     sprintf(imgUrl, "%s%s%s", recipesImagesPath, img_src, "/0.png");
@@ -139,7 +141,7 @@ static lv_obj_t *lv_recipe_create(lv_obj_t *parent, const char *img_src, const c
 
     lv_obj_t *obj = lv_obj_create(parent);
     lv_obj_set_size(obj, 152, 210);
-    lv_obj_add_event_cb(obj, recipe_event_cb, LV_EVENT_CLICKED, parent);
+    lv_obj_add_event_cb(obj, recipe_event_cb, LV_EVENT_CLICKED, arg);
 
     lv_obj_t *img = lv_img_create(obj);
     lv_obj_set_size(img, LV_PCT(100) - 10, LV_PCT(100));
@@ -173,7 +175,7 @@ static void lv_get_recipes(lv_obj_t *parent, unsigned char recipeType)
     {
         if (recipeType == g_recipes[i].recipeType)
         {
-            lv_recipe_create(parent, g_recipes[i].imgUrl, g_recipes[i].dishName);
+            lv_recipe_create(parent, g_recipes[i].imgUrl, g_recipes[i].dishName, &g_recipes[i]);
         }
     }
     lv_obj_t *child = lv_obj_get_child(parent, 0);
@@ -197,7 +199,7 @@ void lv_page_smartrecipes_init(lv_obj_t *page)
     lv_img_set_src(menulist, themesImagesPath "menulist_background.png");
 
     lv_obj_t *list = lv_list_create(left_content);
-    
+
     lv_obj_set_size(list, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_align(list, LV_ALIGN_TOP_MID, 0, 15);
     lv_obj_t *first_btn = lv_text_img_btn_create(list, "蔬菜杂粮", right_content);

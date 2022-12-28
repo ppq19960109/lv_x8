@@ -202,7 +202,7 @@ static lv_obj_t *lv_wifi_input_dialog(const char *ssid, const int flags)
     lv_obj_t *pinyin_ime = lv_100ask_pinyin_ime_create(pinyin);
     lv_obj_set_style_bg_opa(pinyin_ime, LV_OPA_COVER, 0);
     lv_obj_set_style_text_font(pinyin_ime, &lv_font_source_han_sans_normal_16, 0);
-   
+
     lv_obj_t *kb = lv_100ask_pinyin_ime_get_kb(pinyin_ime);
 
     //-------------------------------------
@@ -336,15 +336,9 @@ void lv_page_wifi_create(lv_obj_t *page)
     lv_label_set_text(label1_sw, "关");
     lv_obj_align(label1_sw, LV_ALIGN_CENTER, 20, 0);
 
-    lv_obj_set_style_bg_opa(sw, LV_OPA_100, LV_PART_INDICATOR);
-    lv_obj_set_style_bg_color(sw, lv_color_hex(0x333333), LV_PART_INDICATOR);
-    lv_obj_set_style_bg_color(sw, lv_color_hex(themesTextColor), LV_PART_INDICATOR | LV_STATE_CHECKED);
-    lv_obj_set_style_radius(sw, LV_RADIUS_CIRCLE, LV_PART_INDICATOR);
-
-    lv_obj_set_style_bg_opa(sw, LV_OPA_COVER, LV_PART_KNOB);
-    lv_obj_set_style_bg_color(sw, lv_color_hex(0xfffff), LV_PART_KNOB);
-    lv_obj_set_style_radius(sw, LV_RADIUS_CIRCLE, LV_PART_KNOB);
-    lv_obj_set_style_pad_all(sw, -3, LV_PART_KNOB);
+    lv_obj_add_style(sw, &switch_style_indicator, LV_PART_INDICATOR);
+    lv_obj_add_style(sw, &switch_style_indicator_check, LV_PART_INDICATOR | LV_STATE_CHECKED);
+    lv_obj_add_style(sw, &switch_style_knob, LV_PART_KNOB);
 
     lv_obj_add_event_cb(sw, switch_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
 

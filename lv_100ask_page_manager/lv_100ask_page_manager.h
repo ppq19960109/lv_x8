@@ -49,7 +49,7 @@ typedef struct {
     void (*open_page)(lv_obj_t * obj);
     void (*close_page)(lv_obj_t * obj);
     void (*page_property_change_cb)(const char *key, void *value);
-    void (*page_update_cb)();
+    void (*page_update_cb)(void * user_data);
     void * user_data;
 } lv_100ask_page_manager_page_t;
 
@@ -102,6 +102,7 @@ void lv_page_back_replace_page(lv_obj_t * obj, char * name);
 int lv_page_exist_page(const char* name);
 int lv_page_current_exist_page(const char* name);
 int lv_page_back_page(const char* name);
+lv_100ask_page_manager_page_t * lv_page_get_page(char *name);
 /*=====================
  * Getter functions
  *====================*/

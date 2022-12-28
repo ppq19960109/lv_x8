@@ -9,7 +9,7 @@
 /*********************
  *      DEFINES
  *********************/
-static lv_obj_t *left_steam_oven_rotate;
+static lv_obj_t *left_steam_oven_rotate, *multistage_cook;
 static lv_obj_t *right_steam_rotate;
 /**********************
  *  STATIC VARIABLES
@@ -23,12 +23,14 @@ static void page_update_LStOvState(void)
         lv_obj_clear_flag(left_steam_oven_rotate, LV_OBJ_FLAG_HIDDEN);
         lv_rotate_anim(left_steam_oven_rotate, 1);
         lv_100ask_page_manager_set_load_page_event(parent, NULL, "page_steaming");
+        lv_100ask_page_manager_set_load_page_event(multistage_cook, NULL, "page_steaming");
     }
     else
     {
         lv_obj_add_flag(left_steam_oven_rotate, LV_OBJ_FLAG_HIDDEN);
         lv_rotate_anim(left_steam_oven_rotate, 0);
         lv_100ask_page_manager_set_load_page_event(parent, NULL, "page_steam_left");
+        lv_100ask_page_manager_set_load_page_event(multistage_cook, NULL, "page_multistage");
     }
 }
 static void page_update_RStOvState(void)
@@ -139,6 +141,6 @@ void lv_page_steamoven_init(lv_obj_t *page)
     lv_obj_set_flex_align(cont_col, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_t *assist_cook = lv_steamoven_item2_create(cont_col, themesImagesPath "assist_cook_background.png",
                                                       themesImagesPath "assist_cook_text.png");
-    lv_obj_t *multistage_cook = lv_steamoven_item2_create(cont_col, themesImagesPath "multistage_cook_background.png",
-                                                          themesImagesPath "multistage_cook_text.png");
+    multistage_cook = lv_steamoven_item2_create(cont_col, themesImagesPath "multistage_cook_background.png",
+                                                themesImagesPath "multistage_cook_text.png");
 }

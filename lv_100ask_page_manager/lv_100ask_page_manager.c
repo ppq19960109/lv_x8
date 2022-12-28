@@ -396,6 +396,10 @@ static void lv_page_back_btn_create(lv_obj_t * parent)
     lv_obj_add_event_cb(back_btn, lv_page_back_event_cb, LV_EVENT_CLICKED, lv_obj_get_parent(parent));  
     lv_obj_add_event_cb(back_btn, lv_page_back_event_cb, LV_EVENT_PRESSING, NULL);   
 }
+lv_100ask_page_manager_page_t * lv_page_get_page(char *name)
+{
+    return get_page(g_obj_page_manager, name);
+}
 void lv_page_back_previous_page(void)
 {
     lv_100ask_page_manager_t * page_manager = (lv_100ask_page_manager_t *)(g_obj_page_manager);

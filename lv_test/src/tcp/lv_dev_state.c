@@ -410,6 +410,19 @@ static void *recipes_parse_json(void *input, const char *str) // 启动时解析
         g_recipes[i].recipeid = recipeid->valueint;
         g_recipes[i].recipeType = recipeType->valueint;
         g_recipes[i].cookPos = cookPos->valueint;
+
+        cJSON *detailSub;
+        g_recipes[i].details_count = cJSON_GetArraySize(details);
+        g_recipes[i].details = malloc(g_recipes[i].details_count * sizeof(char *));
+        for (int j = 0; j < g_recipes[i].details_count; ++j)
+        {
+            detailSub = cJSON_GetArrayItem(details, j);
+            if (detailSub == NULL)
+                continue;
+            // dzlog_info("recipes step:%d,value%s\n", j, detailSub->valuestring);
+            g_recipes[i].details[j] = malloc(strlen(detailSub->valuestring) + 1);
+            strcpy(g_recipes[i].details[j], detailSub->valuestring);
+        }
     }
 fail:
     cJSON_Delete(root);
