@@ -124,7 +124,7 @@ static void page_update_StOvState(const int index, void *ptr)
             btn_text[btn_count++] = "辅助烹饪";
         }
     }
-    else if (value == WORK_STATE_PAUSE)
+    else if (value == WORK_STATE_PAUSE || value == WORK_STATE_PREHEAT_RESERVE)
     {
         btn_text[btn_count++] = "继续";
         btn_text[btn_count++] = "取消";
@@ -155,7 +155,7 @@ static void page_update_StOvState(const int index, void *ptr)
 
 static void page_update_StOvRealTemp(const int index, void *ptr)
 {
-    if (work_state[index] != WORK_STATE_PREHEAT)
+    if (work_state[index] != WORK_STATE_PREHEAT && work_state[index] != WORK_STATE_PREHEAT_RESERVE)
         return;
     int value;
     lv_obj_t **child;
@@ -179,8 +179,6 @@ static void page_update_StOvRealTemp(const int index, void *ptr)
 }
 static void page_update_StOvSetTimerLeft(const int index, void *ptr)
 {
-    if (work_state[index] != WORK_STATE_RUN && work_state[index] != WORK_STATE_PAUSE)
-        return;
     int value;
     float setTime_value;
     lv_obj_t **child;
@@ -200,9 +198,13 @@ static void page_update_StOvSetTimerLeft(const int index, void *ptr)
     }
     if (ptr != NULL)
         value = get_value_int(ptr);
-    char buf[16];
-    sprintf(buf, "%d分钟", value);
-    lv_label_set_text(child[3], buf);
+
+    if (work_state[index] == WORK_STATE_RUN || work_state[index] == WORK_STATE_PAUSE)
+    {
+        char buf[16];
+        sprintf(buf, "%d分钟", value);
+        lv_label_set_text(child[3], buf);
+    }
 
     lv_arc_set_value(child[6], (value / setTime_value) * 100);
 }
@@ -500,7 +502,7 @@ static void left_btn_event_cb(lv_event_t *e)
         }
         else
         {
-            lv_custom_dialog2("是否取消左腔烹饪？", "否", "是",left_dialog2_event_cb);
+            lv_custom_dialog2("是否取消左腔烹饪？", "否", "是", left_dialog2_event_cb);
         }
         break;
     case 2:

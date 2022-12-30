@@ -6,7 +6,7 @@
 recipe_t g_recipes[40];
 static pthread_mutex_t mutex;
 static dev_state_t *g_dev_state = NULL;
-const char *workStateChineseEnum[] = {"停止", "预约中", "预热中", "运行中", "烹饪完成", "暂停中", "预约暂停中"};
+const char *workStateChineseEnum[] = {"停止", "预约中", "预热中", "运行中", "烹饪完成", "暂停中", "预约暂停中", "预热暂停中"};
 const char *workModeEnum[] = {"未设定", "经典蒸", "鲜嫩蒸", "高温蒸", "热风烧烤", "上下加热", "立体热风", "蒸汽嫩烤", "空气速炸", "解冻", "发酵", "保温"};
 const char *workModeName(const char mode)
 {
