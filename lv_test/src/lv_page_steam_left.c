@@ -9,7 +9,7 @@
 /*********************
  *      DEFINES
  *********************/
-lv_obj_t *roller1, *roller2, *roller3;
+static lv_obj_t *roller1, *roller2, *roller3;
 
 static steamoven_mode_t left_steamoven_mode[] = {
     {
@@ -76,7 +76,7 @@ static steamoven_mode_t left_steamoven_mode[] = {
 /**********************
  *  STATIC VARIABLES
  **********************/
-static steamoven_mode_t *get_steamoven_mode(unsigned char mode_index)
+steamoven_mode_t *get_steamoven_mode(unsigned char mode_index)
 {
     for (int i = 0; i < sizeof(left_steamoven_mode) / sizeof(left_steamoven_mode[0]); ++i)
     {
