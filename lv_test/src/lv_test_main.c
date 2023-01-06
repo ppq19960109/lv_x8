@@ -65,9 +65,9 @@ static void steamInterfaceChange(int state)
     {
         if (lv_page_exist_page("page_steaming") == 0)
         {
-            if (lv_page_current_exist_page("page_steam_left") || lv_page_current_exist_page("PageMultistage"))
+            if (lv_page_current_exist_page("page_steam_left") || lv_page_current_exist_page("page_multistage"))
                 lv_100ask_page_manager_set_open_page(NULL, "page_steaming");
-            else if (lv_page_current_exist_page("PageSmartRecipes") || lv_page_current_exist_page("PageCookDetails"))
+            else if (lv_page_current_exist_page("page_smartrecipes") || lv_page_current_exist_page("page_cook_details"))
             {
                 lv_100ask_page_manager_set_open_page(NULL, "page_steaming");
             }
