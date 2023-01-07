@@ -15,11 +15,14 @@ typedef struct
 } wifi_info_t;
 static timer_t wifi_timer;
 static lv_obj_t *wifi_list;
-
+static lv_obj_t *label_connect;
 static char *bssid;
 static char scan_count, scan_min_num = 2;
 static lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const int flags);
 static void lv_wifi_list_clean(void);
+static char *cur_ssid;
+static char cur_flags;
+static lv_obj_t *ta1;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -32,23 +35,41 @@ static int wifi_list_item(void *arg)
         LV_LOG_USER("%s,bssid,null\n", __func__);
     else
     {
-        if (strcmp(bssid, ptr->bssid) == 0)
+        if (wifi_connecting > 0 && strcmp(ptr->ssid, cur_ssid) == 0)
         {
+            lv_obj_t *img_indicator = lv_img_create(obj);
+            lv_obj_align(img_indicator, LV_ALIGN_TOP_LEFT, 0, 30);
+            lv_img_set_src(img_indicator, themesImagesPath "icon_loading_small.png");
+            lv_obj_move_to_index(obj, 0);
+            lv_obj_add_state(lv_obj_get_child(obj, 0), LV_STATE_CHECKED);
+        }
+        else if (strcmp(bssid, ptr->bssid) == 0 && wifi_connecting == 0)
+        {
+            lv_obj_t *img_indicator = lv_img_create(obj);
+            lv_obj_align(img_indicator, LV_ALIGN_TOP_LEFT, 0, 30);
+            lv_img_set_src(img_indicator, themesImagesPath "wifi/icon_selected.png");
             lv_obj_move_to_index(obj, 0);
             lv_obj_add_state(lv_obj_get_child(obj, 0), LV_STATE_CHECKED);
         }
     }
     return 0;
 }
+static void wifi_update()
+{
+    bssid = get_attr_value_string("bssid");
+    lv_wifi_list_clean();
+    wifi_list_each(wifi_list_item);
+    // lv_wifi_list_create("ASDF", -46, "WPA-PSK-CCMP+TKIP");
+}
 void lv_wifi_property_change_cb(const char *key, void *value)
 {
     LV_LOG_USER("%s,key:%s\n", __func__, key);
     if (strcmp("WifiScanR", key) == 0)
     {
-        bssid = get_attr_value_string("bssid");
-        lv_wifi_list_clean();
-        wifi_list_each(wifi_list_item);
-        // lv_wifi_list_create("ASDF", -46, "WPA-PSK-CCMP+TKIP");
+        if (wifi_connecting == 0)
+        {
+            wifi_update();
+        }
     }
 }
 
@@ -62,22 +83,29 @@ static void POSIXTimer_cb(union sigval val)
         {
             if (scan_count == 1)
             {
-                get_toServer("WifiCurConnected");
+                if (wifi_connecting == 0)
+                {
+                    get_toServer("WifiCurConnected");
+                }
                 set_num_toServer("WifiScan", -1);
             }
             else if (scan_count == scan_min_num)
             {
                 POSIXTimerSet(wifi_timer, 9, 9);
             }
-            get_toServer("WifiScanR");
+            if (wifi_connecting == 0)
+                get_toServer("WifiScanR");
         }
         else
         {
-            get_toServer("WifiCurConnected");
-            if (scan_count % 2 == 0)
-                set_num_toServer("WifiScan", -1);
-            else
-                get_toServer("WifiScanR");
+            if (wifi_connecting == 0)
+            {
+                get_toServer("WifiCurConnected");
+                if (scan_count % 2 == 0)
+                    set_num_toServer("WifiScan", -1);
+                else
+                    get_toServer("WifiScanR");
+            }
         }
     }
 }
@@ -121,9 +149,16 @@ static void wifi_input_event_handler(lv_event_t *e)
         lv_obj_clean(lv_layer_top());
         break;
     case 1:
-        break;
-    case 2:
-        break;
+    {
+        char *ta_text = lv_textarea_get_text(ta1);
+        int ta_text_len = strlen(ta_text);
+        if (ta_text_len >= 8)
+        {
+            connectWiFi(cur_ssid, ta_text, cur_flags);
+            wifi_update();
+        }
+    }
+    break;
     }
 }
 static void ta_event_cb(lv_event_t *e)
@@ -149,11 +184,26 @@ static void ta_event_cb(lv_event_t *e)
         lv_obj_clear_state(ta, LV_STATE_FOCUSED);
         lv_indev_reset(NULL, ta); /*To forget the last clicked object to make it focusable again*/
     }
+    else if (code == LV_EVENT_VALUE_CHANGED)
+    {
+        int ta_text_len = strlen(lv_textarea_get_text(ta));
+        LV_LOG_USER("%s,code:%d text len:%d\n", __func__, code, ta_text_len);
+        if (ta_text_len >= 8)
+        {
+            lv_obj_set_style_text_color(label_connect, lv_color_hex(themesTextColor), 0);
+        }
+        else
+        {
+            lv_obj_set_style_text_color(label_connect, lv_color_hex(themesTextColor2), 0);
+        }
+    }
 }
 LV_FONT_DECLARE(lv_font_source_han_sans_normal_16);
 
 static lv_obj_t *lv_wifi_input_dialog(const char *ssid, const int flags)
 {
+    cur_ssid = ssid;
+    cur_flags = flags;
     lv_obj_t *obj = lv_obj_create(lv_layer_top());
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_set_style_bg_opa(obj, LV_OPA_100, 0);
@@ -177,7 +227,7 @@ static lv_obj_t *lv_wifi_input_dialog(const char *ssid, const int flags)
     lv_obj_add_flag(label_cancel, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(label_cancel, wifi_input_event_handler, LV_EVENT_CLICKED, (void *)0);
 
-    lv_obj_t *label_connect = lv_label_create(back_bar);
+    label_connect = lv_label_create(back_bar);
     lv_obj_set_style_text_font(label_connect, &lv_font_SiYuanHeiTi_Normal_30, 0);
     lv_label_set_text(label_connect, "连接");
     lv_obj_set_style_text_color(label_connect, lv_color_hex(themesTextColor2), 0);
@@ -206,7 +256,7 @@ static lv_obj_t *lv_wifi_input_dialog(const char *ssid, const int flags)
     lv_obj_t *kb = lv_100ask_pinyin_ime_get_kb(pinyin_ime);
 
     //-------------------------------------
-    lv_obj_t *ta1 = lv_textarea_create(bottom_bar);
+    ta1 = lv_textarea_create(bottom_bar);
     lv_obj_set_size(ta1, 350, 160);
     lv_obj_set_style_bg_opa(ta1, LV_OPA_100, 0);
     lv_obj_set_style_bg_color(ta1, lv_color_hex(themesWindowBackgroundColor), 0);
@@ -261,7 +311,7 @@ lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const int flags)
     lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), 0);
     lv_obj_set_style_text_color(label, lv_color_hex(themesTextColor), LV_STATE_CHECKED);
     lv_label_set_text(label, ssid);
-    lv_obj_align(label, LV_ALIGN_TOP_LEFT, 30, 30);
+    lv_obj_align(label, LV_ALIGN_TOP_LEFT, 50, 30);
 
     lv_obj_t *divider = lv_divider_create(obj);
     lv_obj_align(divider, LV_ALIGN_BOTTOM_MID, 0, 0);
@@ -298,8 +348,9 @@ void lv_page_wifi_visible(const int visible)
     if (visible)
     {
         scan_count = 0;
-        // POSIXTimerSet(wifi_timer, 2, 2);
-        // get_toServer("WifiScanR");
+        POSIXTimerSet(wifi_timer, 2, 2);
+        // set_num_toServer("WifiScan", -1);
+        get_toServer("WifiScanR");
     }
     else
     {

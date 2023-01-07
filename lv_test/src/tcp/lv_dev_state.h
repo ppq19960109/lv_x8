@@ -119,6 +119,7 @@ typedef struct
 
 extern recipe_t g_recipes[40];
 extern const char *workStateChineseEnum[];
+extern char wifi_connecting;
 
 int lv_dev_init(void);
 void lv_dev_deinit(void);
@@ -135,4 +136,5 @@ void register_property_change_cb(void (*cb)(const char *key, void *value));
 void set_num_toServer(const char *key, int value);
 void get_toServer(const char *key);
 void set_cook_toServer(steamoven_t *steamoven);
+void connectWiFi(const char*ssid,const char*psk,int encryp);
 #endif

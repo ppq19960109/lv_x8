@@ -152,9 +152,6 @@ void lv_100ask_page_manager_set_open_page(lv_obj_t * obj, char *name)
         //     lv_page_back_btn_create(obj);
         // }
     }
-
-    if(page->open_page)
-        page->open_page(obj);
     
     /* del a new node */
     lv_100ask_page_manager_history_t * act_hist = _lv_ll_get_head(history_ll);
@@ -166,6 +163,8 @@ void lv_100ask_page_manager_set_open_page(lv_obj_t * obj, char *name)
     new_node->page = obj;
     page_manager->cur_depth++;
     LV_LOG_USER("%s,cur_depth:%d", __func__, page_manager->cur_depth);
+    if(page->open_page)
+        page->open_page(obj);
 }
 
 void lv_100ask_page_manager_set_close_page(lv_obj_t * obj, char *name)
@@ -399,6 +398,11 @@ static void lv_page_back_btn_create(lv_obj_t * parent)
 lv_100ask_page_manager_page_t * lv_page_get_page(char *name)
 {
     return get_page(g_obj_page_manager, name);
+}
+int lv_page_get_page_depth()
+{
+    lv_100ask_page_manager_t * page_manager = (lv_100ask_page_manager_t *)(g_obj_page_manager);
+    return page_manager->cur_depth;
 }
 void lv_page_back_previous_page(void)
 {

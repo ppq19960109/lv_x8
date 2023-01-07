@@ -13,7 +13,7 @@ int g_wifi_state = 0;
 lv_style_t roller_style_unselected, roller_style_selected;
 lv_style_t slider_style_main, slider_style_indicator, slider_style_knob;
 lv_style_t switch_style_indicator, switch_style_indicator_check, switch_style_knob;
-static lv_obj_t *icon_wifi;
+static lv_obj_t *icon_wifi, *icon_standby;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -28,6 +28,8 @@ static void open_page_anim(lv_obj_t *obj)
 {
     /*Do something with LVGL*/
     lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)obj;
+    LV_LOG_USER("open page anim. name:%s", page->name);
+    
     if (page->page_update_cb != NULL)
         page->page_update_cb(page);
 
@@ -35,9 +37,17 @@ static void open_page_anim(lv_obj_t *obj)
         page_property_change_cb = page->page_property_change_cb;
     else
         LV_LOG_USER("page name:%s,page_property_change_cb is null", page->name);
-    LV_LOG_USER("open page anim. name:%s", page->name);
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_HIDDEN);
+
+    if (lv_page_get_page_depth() > 1)
+    {
+        lv_img_set_src(icon_standby, themesImagesPath "icon_home.png");
+    }
+    else
+    {
+        lv_img_set_src(icon_standby, themesImagesPath "icon_sleep.png");
+    }
 }
 
 /*close page anim*/
@@ -133,7 +143,7 @@ static void property_change_cb(const char *key, void *value)
     else if (strcmp("WifiState", key) == 0)
     {
         g_wifi_state = get_value_int(value);
-
+        wifi_connecting = 0;
         if (g_wifi_state == RK_WIFI_State_CONNECTED)
         {
             lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_half_connect.png");
@@ -231,6 +241,34 @@ static void init_style()
     lv_style_set_radius(&switch_style_knob, LV_RADIUS_CIRCLE);
     lv_style_set_pad_all(&switch_style_knob, -3);
 }
+static void home_bar_event_cb(lv_event_t *e)
+{
+    lv_obj_t *target = lv_event_get_target(e);
+    int user_data = (int)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    switch (user_data)
+    {
+    case 0:
+        break;
+    case 1:
+        break;
+    case 2:
+    {
+    }
+    break;
+    case 3:
+    {
+        if (lv_page_get_page_depth() > 1)
+        {
+            lv_page_back_top_page();
+        }
+        else
+        {
+        }
+    }
+    break;
+    }
+}
 void lv_test_widgets(void)
 {
     LV_LOG_USER("lv_test_widgets...");
@@ -286,9 +324,11 @@ void lv_test_widgets(void)
     lv_img_set_src(icon_newline4, themesImagesPath "icon_newline.png");
     lv_obj_set_size(icon_newline4, LV_SIZE_CONTENT, 2);
     lv_obj_align(icon_newline4, LV_ALIGN_TOP_MID, 0, 314);
-    lv_obj_t *icon_standby = lv_img_create(home_bar);
+    icon_standby = lv_img_create(home_bar);
     lv_img_set_src(icon_standby, themesImagesPath "icon_standby.png");
     lv_obj_align(icon_standby, LV_ALIGN_TOP_MID, 0, 339);
+    lv_obj_add_flag(icon_standby, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(icon_standby, home_bar_event_cb, LV_EVENT_CLICKED, 3);
     //****************************************************
     lv_obj_t *home = lv_obj_create(lv_scr_act());
     // lv_obj_refresh_style(home, LV_PART_ANY, LV_STYLE_PROP_ANY);
@@ -347,5 +387,6 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");
 
+    lv_100ask_page_manager_set_load_page_event(icon_wifi, NULL, "page_set");
     lv_100ask_page_manager_set_load_page_event(icon_set, NULL, "page_set");
 }

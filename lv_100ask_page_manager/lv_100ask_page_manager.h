@@ -103,6 +103,7 @@ int lv_page_exist_page(const char* name);
 int lv_page_current_exist_page(const char* name);
 int lv_page_back_page(const char* name);
 lv_100ask_page_manager_page_t * lv_page_get_page(char *name);
+int lv_page_get_page_depth();
 /*=====================
  * Getter functions
  *====================*/

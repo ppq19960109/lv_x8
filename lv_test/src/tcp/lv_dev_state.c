@@ -4,6 +4,7 @@
 #include "lv_backlight.h"
 
 recipe_t g_recipes[40];
+char wifi_connecting = 0;
 static pthread_mutex_t mutex;
 static dev_state_t *g_dev_state = NULL;
 const char *workStateChineseEnum[] = {"停止", "预约中", "预热中", "运行中", "烹饪完成", "暂停中", "预约暂停中", "预热暂停中"};
@@ -215,7 +216,19 @@ void get_toServer(const char *key)
     cJSON_AddNullToObject(root, key);
     send_get_uds(root);
 }
+void connectWiFi(const char *ssid, const char *psk, int encryp)
+{
+    wifi_connecting = 1;
+    // cJSON *Data = cJSON_CreateObject();
+    // cJSON *wifiConnectInfo = cJSON_CreateObject();
 
+    // cJSON_AddStringToObject(wifiConnectInfo, "ssid", ssid);
+    // cJSON_AddStringToObject(wifiConnectInfo, "psk", psk);
+    // cJSON_AddNumberToObject(wifiConnectInfo, "encryp", encryp);
+
+    // cJSON_AddItemToObject(Data, "WifiConnect", wifiConnectInfo);
+    // send_set_uds(Data);
+}
 void set_cook_toServer(steamoven_t *steamoven)
 {
     cJSON *root = cJSON_CreateObject();

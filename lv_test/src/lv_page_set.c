@@ -9,18 +9,22 @@
 /*********************
  *      DEFINES
  *********************/
-
+static lv_obj_t *tabview;
 /**********************
  *  STATIC VARIABLES
  **********************/
 static void property_change_cb(const char *key, void *value)
 {
     LV_LOG_USER("lv_page_set,key:%s\n", key);
-    lv_wifi_property_change_cb(key,value);
+    lv_wifi_property_change_cb(key, value);
 }
 static void page_update_cb(void)
 {
     LV_LOG_USER("lv_page_set,%s\n", __func__);
+    // lv_tabview_set_act(tabview, 2, LV_ANIM_ON);
+    unsigned short index = lv_tabview_get_tab_act(tabview);
+    if (index == 1)
+        lv_page_wifi_visible(1);
 }
 static void tabview_event_cb(lv_event_t *e)
 {
@@ -34,6 +38,12 @@ static void tabview_event_cb(lv_event_t *e)
     else
         lv_page_wifi_visible(0);
 }
+static void back_bar_event_cb(lv_event_t *e)
+{
+    lv_page_wifi_visible(0);
+    lv_page_back_previous_page();
+}
+
 void lv_page_set_init(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
@@ -41,9 +51,9 @@ void lv_page_set_init(lv_obj_t *page)
     manager_page->page_property_change_cb = property_change_cb;
     manager_page->page_update_cb = page_update_cb;
 
-    lv_obj_t *back_bar = lv_page_back_bar_init(page, "设置", NULL, NULL);
+    lv_obj_t *back_bar = lv_page_back_bar_init(page, "设置", NULL, back_bar_event_cb);
 
-    lv_obj_t *tabview = lv_tabview_create(page, LV_DIR_LEFT, 180);
+    tabview = lv_tabview_create(page, LV_DIR_LEFT, 180);
     lv_obj_set_size(tabview, LV_PCT(100), 340);
     lv_obj_align_to(tabview, back_bar, LV_ALIGN_OUT_BOTTOM_MID, 0, 5);
     lv_obj_add_event_cb(tabview, tabview_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
@@ -71,7 +81,7 @@ void lv_page_set_init(lv_obj_t *page)
     lv_page_local_set_create(tab1);
     lv_page_wifi_create(tab2);
 
-    lv_obj_t * label = lv_label_create(tab3);
+    lv_obj_t *label = lv_label_create(tab3);
     lv_label_set_text(label, "Third tab");
 
     label = lv_label_create(tab4);
