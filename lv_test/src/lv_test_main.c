@@ -249,6 +249,8 @@ static void home_bar_event_cb(lv_event_t *e)
     switch (user_data)
     {
     case 0:
+        lv_100ask_page_manager_set_open_page(NULL, "page_set");
+        lv_page_set_tabview_set(1);
         break;
     case 1:
         break;
@@ -268,6 +270,10 @@ static void home_bar_event_cb(lv_event_t *e)
     }
     break;
     }
+}
+static void wifi_page_event_cb(lv_event_t *e)
+{
+    lv_100ask_page_manager_set_open_page(NULL, "page_set");
 }
 void lv_test_widgets(void)
 {
@@ -303,6 +309,8 @@ void lv_test_widgets(void)
     icon_wifi = lv_img_create(home_bar);
     lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_disconnect.png");
     lv_obj_align(icon_wifi, LV_ALIGN_TOP_MID, 0, 80);
+    lv_obj_add_flag(icon_wifi, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(icon_wifi, home_bar_event_cb, LV_EVENT_CLICKED, 0);
 
     lv_obj_t *icon_newline2 = lv_img_create(home_bar);
     lv_img_set_src(icon_newline2, themesImagesPath "icon_newline.png");
@@ -387,6 +395,6 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");
 
-    lv_100ask_page_manager_set_load_page_event(icon_wifi, NULL, "page_set");
+    //lv_100ask_page_manager_set_load_page_event(icon_wifi, NULL, "page_set");
     lv_100ask_page_manager_set_load_page_event(icon_set, NULL, "page_set");
 }

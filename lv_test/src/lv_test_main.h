@@ -60,11 +60,13 @@ extern "C"
     void lv_page_multistage_init(lv_obj_t *page);
     void lv_page_set_init(lv_obj_t *page);
     void lv_page_cook_details_init(lv_obj_t *page);
-
+    void lv_page_set_tabview_set(int index);
     void lv_page_local_set_create(lv_obj_t *page);
     void lv_page_wifi_create(lv_obj_t *page);
     void lv_page_wifi_visible(const int visible);
     void lv_wifi_property_change_cb(const char *key, void *value);
+    void lv_page_about_create(lv_obj_t *page);
+    
     steamoven_mode_t *get_steamoven_mode(unsigned char mode_index);
     /**********************
      *      MACROS

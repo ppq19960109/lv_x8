@@ -31,6 +31,7 @@ lv_obj_t *lv_custom_dialog2(const char *content, const char *cancel, const char 
 lv_obj_t *lv_custom_reserve_dialog(const char *content, lv_event_cb_t event_cb);
 int lv_get_reserve_dialog_time(lv_obj_t *reserve_dialog);
 lv_obj_t *radiobutton_create(lv_obj_t *parent, const char *txt);
+lv_obj_t *lv_divider_create(lv_obj_t *parent);
 
 char *time_roller_options(int max_time);
 char *temp_roller_options(int min_temp, int max_temp);

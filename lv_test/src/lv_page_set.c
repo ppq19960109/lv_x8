@@ -13,6 +13,10 @@ static lv_obj_t *tabview;
 /**********************
  *  STATIC VARIABLES
  **********************/
+void lv_page_set_tabview_set(int index)
+{
+    lv_tabview_set_act(tabview, index, LV_ANIM_ON);
+}
 static void property_change_cb(const char *key, void *value)
 {
     LV_LOG_USER("lv_page_set,key:%s\n", key);
@@ -73,18 +77,16 @@ void lv_page_set_init(lv_obj_t *page)
 
     // lv_obj_set_style_bg_opa(tab1, LV_OPA_COVER, 0);
     // lv_obj_set_style_bg_opa(tab2, LV_OPA_COVER, 0);
-    lv_obj_set_style_bg_opa(tab3, LV_OPA_COVER, 0);
+    // lv_obj_set_style_bg_opa(tab3, LV_OPA_COVER, 0);
     lv_obj_set_style_bg_opa(tab4, LV_OPA_COVER, 0);
     lv_obj_set_style_bg_opa(tab5, LV_OPA_COVER, 0);
 
     /*Add content to the tabs*/
     lv_page_local_set_create(tab1);
     lv_page_wifi_create(tab2);
+    lv_page_about_create(tab3);
 
-    lv_obj_t *label = lv_label_create(tab3);
-    lv_label_set_text(label, "Third tab");
-
-    label = lv_label_create(tab4);
+    lv_obj_t *label = lv_label_create(tab4);
     lv_label_set_text(label, "Forth tab");
 
     label = lv_label_create(tab5);

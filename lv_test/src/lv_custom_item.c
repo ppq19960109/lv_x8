@@ -358,3 +358,12 @@ int lv_get_reserve_dialog_time(lv_obj_t *reserve_dialog)
     unsigned char minute_time_index = lv_roller_get_selected(minute_roller);
     return hour_time_index * 60 + minute_time_index;
 }
+
+lv_obj_t *lv_divider_create(lv_obj_t *parent)
+{
+    lv_obj_t *divider = lv_obj_create(parent);
+    lv_obj_set_size(divider, LV_PCT(100), 2);
+    lv_obj_set_style_bg_opa(divider, 15, 0);
+    lv_obj_set_style_bg_color(divider, lv_color_hex(0xE7E7E7), 0);
+    return divider;
+}

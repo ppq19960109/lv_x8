@@ -131,14 +131,7 @@ static void switch_event_handler(lv_event_t *e)
         }
     }
 }
-static lv_obj_t *lv_divider_create(lv_obj_t *parent)
-{
-    lv_obj_t *divider = lv_obj_create(parent);
-    lv_obj_set_size(divider, LV_PCT(100), 2);
-    lv_obj_set_style_bg_opa(divider, 15, 0);
-    lv_obj_set_style_bg_color(divider, lv_color_hex(0xE7E7E7), 0);
-    return divider;
-}
+
 static void wifi_input_event_handler(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
