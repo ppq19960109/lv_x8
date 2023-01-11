@@ -302,15 +302,17 @@ void lv_test_widgets(void)
     lv_obj_set_style_text_color(clock_text, lv_color_hex(themesTextColor2), 0);
     lv_label_set_text(clock_text, "12:45");
 
-    lv_obj_t *icon_newline1 = lv_img_create(home_bar);
+    lv_obj_t *wifi_obj = lv_obj_create(home_bar);
+    lv_obj_set_size(wifi_obj, LV_PCT(100), 86);
+    lv_obj_align(wifi_obj, LV_ALIGN_TOP_MID, 0, 54);
+    lv_obj_t *icon_newline1 = lv_img_create(wifi_obj);
     lv_img_set_src(icon_newline1, themesImagesPath "icon_newline.png");
     lv_obj_set_size(icon_newline1, LV_SIZE_CONTENT, 2);
-    lv_obj_align(icon_newline1, LV_ALIGN_TOP_MID, 0, 54);
-    icon_wifi = lv_img_create(home_bar);
+    lv_obj_align(icon_newline1, LV_ALIGN_TOP_MID, 0, 0);
+    icon_wifi = lv_img_create(wifi_obj);
     lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_disconnect.png");
-    lv_obj_align(icon_wifi, LV_ALIGN_TOP_MID, 0, 80);
-    lv_obj_add_flag(icon_wifi, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_add_event_cb(icon_wifi, home_bar_event_cb, LV_EVENT_CLICKED, 0);
+    lv_obj_align(icon_wifi, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_add_event_cb(wifi_obj, home_bar_event_cb, LV_EVENT_CLICKED, 0);
 
     lv_obj_t *icon_newline2 = lv_img_create(home_bar);
     lv_img_set_src(icon_newline2, themesImagesPath "icon_newline.png");
