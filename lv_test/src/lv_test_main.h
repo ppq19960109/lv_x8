@@ -68,7 +68,8 @@ extern "C"
     void lv_page_about_create(lv_obj_t *page);
     void lv_page_update_create(lv_obj_t *page);
     void lv_page_reset_create(lv_obj_t *page);
-    
+
+    void recipe_cook_start(recipe_t *recipe, const int reserve_time);
     steamoven_mode_t *get_steamoven_mode(unsigned char mode_index);
     /**********************
      *      MACROS

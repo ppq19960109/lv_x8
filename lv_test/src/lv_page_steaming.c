@@ -243,12 +243,18 @@ static void page_update_StOvMode(const int index, void *ptr)
     lv_obj_t **child;
     if (index == 0)
     {
+        value = get_attr_value_int("LMultiMode");
+        if (value == MULTI_MODE_RECIPE)
+            return;
         if (ptr == NULL)
             value = get_attr_value_int("LStOvMode");
         child = left_child;
     }
     else
     {
+        value = get_attr_value_int("RMultiMode");
+        if (value == MULTI_MODE_RECIPE)
+            return;
         if (ptr == NULL)
             value = get_attr_value_int("RStOvMode");
         child = right_child;
@@ -256,6 +262,35 @@ static void page_update_StOvMode(const int index, void *ptr)
     if (ptr != NULL)
         value = get_value_int(ptr);
     lv_label_set_text(child[4], workModeName(value));
+}
+static void page_update_CookName(const int index, void *ptr)
+{
+    int multiMode_value;
+    char *value;
+    lv_obj_t **child;
+
+    if (index == 0)
+    {
+        multiMode_value = get_attr_value_int("LMultiMode");
+        if (multiMode_value != MULTI_MODE_RECIPE)
+            return;
+        if (ptr == NULL)
+            value = get_attr_value_string("LCookbookName");
+
+        child = left_child;
+    }
+    else
+    {
+        multiMode_value = get_attr_value_int("RMultiMode");
+        if (multiMode_value != MULTI_MODE_RECIPE)
+            return;
+        if (ptr == NULL)
+            value = get_attr_value_string("RCookbookName");
+        child = right_child;
+    }
+    if (ptr != NULL)
+        value = get_value_string(ptr);
+    lv_label_set_text(child[4], value);
 }
 static void page_update_StOvSetTemp_StOvSetTimer(const int index, void *ptr)
 {
@@ -320,6 +355,14 @@ static void property_change_cb(const char *key, void *value)
     {
         page_update_StOvMode(1, value);
     }
+    else if (strcmp("LCookbookName", key) == 0)
+    {
+        page_update_CookName(0, value);
+    }
+    else if (strcmp("RCookbookName", key) == 0)
+    {
+        page_update_CookName(1, value);
+    }
     else if (strcmp("LStOvSetTemp", key) == 0 || strcmp("LStOvSetTimer", key) == 0)
     {
         page_update_StOvSetTemp_StOvSetTimer(0, NULL);
@@ -342,6 +385,8 @@ static void page_update_cb(void)
     page_update_StOvOrderTimerLeft(1, NULL);
     page_update_StOvMode(0, NULL);
     page_update_StOvMode(1, NULL);
+    page_update_CookName(0, NULL);
+    page_update_CookName(1, NULL);
     page_update_StOvSetTemp_StOvSetTimer(0, NULL);
     page_update_StOvSetTemp_StOvSetTimer(1, NULL);
 }

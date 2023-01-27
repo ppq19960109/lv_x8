@@ -131,6 +131,8 @@ static void dialog_event_cb(lv_event_t *e)
     }
     break;
     }
+
+    // lv_obj_del(lv_obj_get_child(lv_scr_act(), -1));
     lv_obj_clean(lv_layer_top());
 }
 static void reserve_dialog_event_cb(lv_event_t *e)

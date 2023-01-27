@@ -13,7 +13,8 @@ int g_wifi_state = 0;
 lv_style_t roller_style_unselected, roller_style_selected;
 lv_style_t slider_style_main, slider_style_indicator, slider_style_knob;
 lv_style_t switch_style_indicator, switch_style_indicator_check, switch_style_knob;
-static lv_obj_t *icon_wifi, *icon_standby;
+static lv_obj_t *icon_wifi, *icon_standby, *clock_text;
+static timer_t clock_timer;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -29,7 +30,7 @@ static void open_page_anim(lv_obj_t *obj)
     /*Do something with LVGL*/
     lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)obj;
     LV_LOG_USER("open page anim. name:%s", page->name);
-    
+
     if (page->page_update_cb != NULL)
         page->page_update_cb(page);
 
@@ -59,6 +60,48 @@ static void close_page_anim(lv_obj_t *obj)
 }
 #endif
 //-------------------------------------------------
+void setClockTimestamp(long timestamp)
+{
+    LV_LOG_USER("setClockTimestamp:%ld", timestamp);
+
+    struct timeval tv;
+    tv.tv_sec = timestamp;
+    tv.tv_usec = 0;
+    LV_LOG_USER("settimeofday ret:%d", settimeofday(&tv, NULL));
+}
+void setClockTime(int hours, int minutes)
+{
+    LV_LOG_USER("set hour:%d min:%d", hours, minutes);
+    time_t t;
+    time(&t);
+    struct tm *local_tm = localtime(&t);
+    LV_LOG_USER("year:%d mon:%d day:%d", local_tm->tm_year, local_tm->tm_mon, local_tm->tm_mday);
+    LV_LOG_USER("hour:%d min:%d sec:%d", local_tm->tm_hour, local_tm->tm_min, local_tm->tm_sec);
+    local_tm->tm_hour = hours;
+    local_tm->tm_min = minutes;
+    t = mktime(local_tm);
+    setClockTimestamp(t);
+}
+void getCurrentTime()
+{
+    time_t t;
+    time(&t);
+    struct tm *local_tm = localtime(&t);
+    LV_LOG_USER("year:%d mon:%d day:%d", local_tm->tm_year, local_tm->tm_mon, local_tm->tm_mday);
+    LV_LOG_USER("hour:%d min:%d sec:%d", local_tm->tm_hour, local_tm->tm_min, local_tm->tm_sec);
+
+    char buf[8];
+    sprintf(buf, "%02d:%02d", local_tm->tm_hour, local_tm->tm_min);
+    lv_label_set_text(clock_text, buf);
+}
+static void POSIXTimer_cb(union sigval val)
+{
+    LV_LOG_USER("%s sival_int:%d", __func__, val.sival_int);
+    if (val.sival_int == 0)
+    {
+        getCurrentTime();
+    }
+}
 static void steamInterfaceChange(int state)
 {
     if (state == 0)
@@ -156,6 +199,12 @@ static void property_change_cb(const char *key, void *value)
         {
             lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_disconnect.png");
         }
+    }
+    else if (strcmp("NtpTimestamp", key) == 0)
+    {
+        long t = get_value_int(value);
+        setClockTimestamp(t);
+        getCurrentTime();
     }
     if (page_property_change_cb != NULL)
         page_property_change_cb(key, value);
@@ -284,6 +333,8 @@ void lv_test_widgets(void)
     // return 0;
     lv_dev_init();
     init_style();
+    clock_timer = POSIXTimerCreate(0, POSIXTimer_cb);
+    POSIXTimerSet(clock_timer, 60, 15);
 
     lv_obj_t *win_bg = lv_img_create(lv_scr_act());
     lv_img_set_src(win_bg, themesImagesPath "window-background.png");
@@ -297,7 +348,7 @@ void lv_test_widgets(void)
     lv_obj_set_size(newline2, 2, LV_SIZE_CONTENT);
     lv_obj_set_align(newline2, LV_ALIGN_LEFT_MID);
 
-    lv_obj_t *clock_text = lv_label_create(home_bar);
+    clock_text = lv_label_create(home_bar);
     lv_obj_align(clock_text, LV_ALIGN_TOP_MID, 0, 17);
     lv_obj_set_style_text_color(clock_text, lv_color_hex(themesTextColor2), 0);
     lv_label_set_text(clock_text, "12:45");
@@ -397,6 +448,6 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");
 
-    //lv_100ask_page_manager_set_load_page_event(icon_wifi, NULL, "page_set");
+    // lv_100ask_page_manager_set_load_page_event(icon_wifi, NULL, "page_set");
     lv_100ask_page_manager_set_load_page_event(icon_set, NULL, "page_set");
 }

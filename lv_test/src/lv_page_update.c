@@ -59,4 +59,5 @@ void lv_page_update_create(lv_obj_t *page)
     lv_obj_set_style_text_color(label, lv_color_hex(0), 0);
     lv_label_set_text(label, "检查更新");
     lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+
 }

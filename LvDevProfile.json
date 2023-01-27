@@ -196,6 +196,11 @@
             "uartByteLen": 1
         },
         {
+            "cloudKey": "RMultiMode",
+            "valueType": 0,
+            "uartByteLen": 1
+        },
+        {
             "cloudKey": "RStOvState",
             "valueType": 0,
             "uartByteLen": 1
@@ -344,6 +349,11 @@
             "cloudKey": "bssid",
             "valueType": 2,
             "uartByteLen": 0
+        },
+        {
+            "cloudKey": "NtpTimestamp",
+            "valueType": 0,
+            "uartByteLen": 4
         }
     ],
     "event": [],

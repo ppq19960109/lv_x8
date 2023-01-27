@@ -13,7 +13,7 @@ static lv_obj_t *label_ingredient;
 static lv_obj_t *tabview;
 static lv_obj_t *tv_steps;
 static lv_obj_t *recipe_img;
-static recipe_t *recipe;
+static recipe_t *cur_recipe;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -25,14 +25,14 @@ static void page_update_cb(void *user_data)
 {
     lv_tabview_set_act(tabview, 0, LV_ANIM_OFF);
     lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)user_data;
-    recipe = (recipe_t *)page->user_data;
+    cur_recipe = (recipe_t *)page->user_data;
     LV_LOG_USER("%s\n", __func__);
-    lv_label_set_text(label_ingredient, recipe->ingredients);
+    lv_label_set_text(label_ingredient, cur_recipe->ingredients);
 
     lv_obj_t *cont = lv_tabview_get_content(tv_steps);
     lv_obj_clean(cont);
     char url[80];
-    for (int j = 0; j < recipe->details_count; ++j)
+    for (int j = 0; j < cur_recipe->details_count; ++j)
     {
         lv_obj_t *tab = lv_tabview_add_tab(tv_steps, "1");
 
@@ -40,7 +40,7 @@ static void page_update_cb(void *user_data)
         lv_obj_set_style_text_font(label_step, &lv_font_SiYuanHeiTi_Normal_26, 0);
         lv_obj_set_style_text_color(label_step, lv_color_hex(0xffffff), 0);
 
-        sprintf(url, "%s%d%s%d", "步骤", j + 1, "/", recipe->details_count);
+        sprintf(url, "%s%d%s%d", "步骤", j + 1, "/", cur_recipe->details_count);
         lv_label_set_text(label_step, url);
 
         lv_obj_t *label = lv_label_create(tab);
@@ -49,10 +49,21 @@ static void page_update_cb(void *user_data)
         lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_30, 0);
         lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), 0);
         lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
-        lv_label_set_text(label, recipe->details[j]);
+        lv_label_set_text(label, cur_recipe->details[j]);
         lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 40);
+
+        lv_obj_set_style_pad_all(label, 12, 0);
+
+        static lv_style_t scrollbar;
+        lv_style_init(&scrollbar);
+        lv_style_set_bg_color(&scrollbar, lv_color_hex(themesTextColor));
+        lv_style_set_radius(&scrollbar, LV_RADIUS_CIRCLE);
+        lv_style_set_pad_all(&scrollbar, 0);
+        lv_style_set_width(&scrollbar, 5);
+        lv_style_set_bg_opa(&scrollbar, LV_OPA_80);
+        lv_obj_add_style(tab, &scrollbar, LV_PART_SCROLLBAR);
     }
-    sprintf(url, "%s%s%s", recipesImagesPath, recipe->imgUrl, "/0.png");
+    sprintf(url, "%s%s%s", recipesImagesPath, cur_recipe->imgUrl, "/0.png");
     LV_LOG_USER("%s,img url:%s\n", __func__, url);
     lv_img_set_src(recipe_img, url);
 }
@@ -67,14 +78,67 @@ static void tabview_event_cb(lv_event_t *e)
     char url[80];
     if (user_data == 0 && index == 0)
     {
-        sprintf(url, "%s%s%s", recipesImagesPath, recipe->imgUrl, "/0.png");
+        sprintf(url, "%s%s%s", recipesImagesPath, cur_recipe->imgUrl, "/0.png");
     }
     else
     {
         index = lv_tabview_get_tab_act(tv_steps);
-        sprintf(url, "%s%s%s%d%s", recipesImagesPath, recipe->imgUrl, "/", index + 1, ".png");
+        sprintf(url, "%s%s%s%d%s", recipesImagesPath, cur_recipe->imgUrl, "/", index + 1, ".png");
     }
     lv_img_set_src(recipe_img, url);
+}
+static void dialog_event_cb(lv_event_t *e)
+{
+    LV_LOG_USER("%s,code:%d\n", __func__, e->code);
+    lv_obj_t *obj = lv_event_get_current_target(e);
+    int user_data = (int)lv_event_get_user_data(e);
+    switch (user_data)
+    {
+    case 0:
+    case 1:
+        break;
+    case 2:
+    {
+        recipe_cook_start(cur_recipe, 0);
+    }
+    break;
+    }
+    lv_obj_clean(lv_layer_top());
+}
+static void reserve_dialog_event_cb(lv_event_t *e)
+{
+    LV_LOG_USER("%s,code:%d\n", __func__, e->code);
+    lv_obj_t *obj = lv_event_get_current_target(e);
+    int user_data = (int)lv_event_get_user_data(e);
+    switch (user_data)
+    {
+    case 0:
+    case 1:
+        break;
+    case 2:
+    {
+        lv_obj_t *reserve_dialog = lv_obj_get_child(lv_layer_top(), 0);
+        int orderTime = lv_get_reserve_dialog_time(reserve_dialog);
+        LV_LOG_USER("%s,orderTime:%d\n", __func__, orderTime);
+        recipe_cook_start(cur_recipe, orderTime);
+    }
+    break;
+    }
+    lv_obj_clean(lv_layer_top());
+}
+static void btn_array_event_cb(lv_event_t *e)
+{
+    lv_obj_t *target = lv_event_get_target(e);
+    int user_data = (int)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    if (user_data == 0)
+    {
+        lv_custom_cook_dialog("请将食物放入左腔,水箱中加满水", dialog_event_cb);
+    }
+    else
+    {
+        lv_custom_reserve_dialog("左腔将在", reserve_dialog_event_cb);
+    }
 }
 void lv_page_cook_details_init(lv_obj_t *page)
 {
@@ -155,4 +219,8 @@ void lv_page_cook_details_init(lv_obj_t *page)
     lv_label_set_text(label, "First tv1");
     label = lv_label_create(tv_tab2);
     lv_label_set_text(label, "First tv2");
+    //------------------------------
+    const char *text[] = {"启动", "预约"};
+    lv_obj_t *btn_array = lv_custom_btn_array_create(page, text, 2, btn_array_event_cb);
+    lv_obj_align_to(btn_array, back_bar, LV_ALIGN_OUT_BOTTOM_RIGHT, -25, 90);
 }
