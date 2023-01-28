@@ -367,3 +367,40 @@ lv_obj_t *lv_divider_create(lv_obj_t *parent)
     lv_obj_set_style_bg_color(divider, lv_color_hex(0xE7E7E7), 0);
     return divider;
 }
+
+lv_obj_t *lv_page_indicator_create(lv_obj_t *parent, int count)
+{
+    lv_obj_t *cont_row = lv_obj_create(parent);
+    lv_obj_set_size(cont_row, 15 * count + 15 * (count - 1), 15);
+    lv_obj_set_flex_flow(cont_row, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t *element;
+    for (int i = 0; i < count; ++i)
+    {
+        element = lv_btn_create(cont_row);
+        lv_obj_set_size(element, 15, 15);
+        lv_obj_set_style_bg_color(element, lv_color_hex(0x6F6F6F), 0);
+        lv_obj_set_style_bg_color(element, lv_color_hex(0xffffff), LV_STATE_CHECKED);
+        lv_obj_set_style_bg_opa(element, LV_OPA_100, 0);
+        lv_obj_set_style_radius(element, LV_RADIUS_CIRCLE, 0);
+    }
+    return cont_row;
+}
+void lv_page_indicator_check(lv_obj_t *page_indicator, int index)
+{
+    int count = lv_obj_get_child_cnt(page_indicator);
+    lv_obj_t *child;
+    for (int i = 0; i < count; ++i)
+    {
+        child = lv_obj_get_child(page_indicator, i);
+        if (i == index)
+        {
+            lv_obj_add_state(child, LV_STATE_CHECKED);
+        }
+        else if (lv_obj_has_state(child, LV_STATE_CHECKED))
+        {
+            lv_obj_clear_state(child, LV_STATE_CHECKED);
+        }
+    }
+}

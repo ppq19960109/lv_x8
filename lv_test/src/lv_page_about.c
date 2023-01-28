@@ -56,6 +56,13 @@ static lv_obj_t *lv_about_bind_dialog(const char *topText, const char *centerTex
     lv_obj_align(qrcode_img, LV_ALIGN_CENTER, -150, 10);
     lv_img_set_src(qrcode_img, recipesImagesPath "QrCode.png");
 
+    // lv_obj_t *qr = lv_qrcode_create(popup, 200, lv_color_hex(0x0), lv_color_hex(0xffffff));
+    // const char *data = "https://lvgl.io";
+    // lv_qrcode_update(qr, data, strlen(data));
+    // lv_obj_center(qr);
+    // lv_obj_set_style_border_color(qr, lv_color_hex(0xffffff), 0);
+    // lv_obj_set_style_border_width(qr, 5, 0);
+
     label = lv_label_create(popup);
     lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_30, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), 0);

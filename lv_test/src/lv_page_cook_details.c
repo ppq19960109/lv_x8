@@ -14,6 +14,8 @@ static lv_obj_t *tabview;
 static lv_obj_t *tv_steps;
 static lv_obj_t *recipe_img;
 static recipe_t *cur_recipe;
+
+static lv_obj_t *page_indicator = NULL;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -66,6 +68,13 @@ static void page_update_cb(void *user_data)
     sprintf(url, "%s%s%s", recipesImagesPath, cur_recipe->imgUrl, "/0.png");
     LV_LOG_USER("%s,img url:%s\n", __func__, url);
     lv_img_set_src(recipe_img, url);
+
+    if (page_indicator != NULL)
+        lv_obj_del(page_indicator);
+    page_indicator = lv_page_indicator_create(page, cur_recipe->details_count);
+    lv_obj_align(page_indicator, LV_ALIGN_BOTTOM_MID, 0, -10);
+    lv_page_indicator_check(page_indicator, 0);
+    lv_obj_add_flag(page_indicator, LV_OBJ_FLAG_HIDDEN);
 }
 static void tabview_event_cb(lv_event_t *e)
 {
@@ -79,11 +88,14 @@ static void tabview_event_cb(lv_event_t *e)
     if (user_data == 0 && index == 0)
     {
         sprintf(url, "%s%s%s", recipesImagesPath, cur_recipe->imgUrl, "/0.png");
+        lv_obj_add_flag(page_indicator, LV_OBJ_FLAG_HIDDEN);
     }
     else
     {
         index = lv_tabview_get_tab_act(tv_steps);
         sprintf(url, "%s%s%s%d%s", recipesImagesPath, cur_recipe->imgUrl, "/", index + 1, ".png");
+        lv_obj_clear_flag(page_indicator, LV_OBJ_FLAG_HIDDEN);
+        lv_page_indicator_check(page_indicator, index);
     }
     lv_img_set_src(recipe_img, url);
 }

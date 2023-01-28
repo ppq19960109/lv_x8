@@ -53,6 +53,7 @@ extern "C"
     lv_obj_t *lv_custom_text_btn_create(lv_obj_t *parent, const char *text);
 
     void lv_page_hood_init(lv_obj_t *page);
+    void lv_page_smart_cook_init(lv_obj_t *page);
     void lv_page_steamoven_init(lv_obj_t *page);
     void lv_page_smartrecipes_init(lv_obj_t *page);
     void lv_page_steaming_init(lv_obj_t *page);
