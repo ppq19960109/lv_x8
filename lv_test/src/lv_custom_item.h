@@ -33,7 +33,8 @@ extern "C"
     int lv_get_reserve_dialog_time(lv_obj_t *reserve_dialog);
     lv_obj_t *radiobutton_create(lv_obj_t *parent, const char *txt);
     lv_obj_t *lv_divider_create(lv_obj_t *parent);
-
+    lv_obj_t *lv_btn_array_create(lv_obj_t *parent, const char count, lv_event_cb_t event_cb);
+    
     lv_obj_t *lv_page_indicator_create(lv_obj_t *parent, int count);
     void lv_page_indicator_check(lv_obj_t *page_indicator, int index);
 

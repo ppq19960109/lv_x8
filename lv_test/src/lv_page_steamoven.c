@@ -10,7 +10,7 @@
  *      DEFINES
  *********************/
 static lv_obj_t *left_steam_oven_rotate, *multistage_cook;
-static lv_obj_t *right_steam_rotate;
+static lv_obj_t *right_steam_rotate, *assist_cook;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -41,11 +41,15 @@ static void page_update_RStOvState(void)
     {
         lv_obj_clear_flag(right_steam_rotate, LV_OBJ_FLAG_HIDDEN);
         lv_rotate_anim(right_steam_rotate, 1);
+        lv_100ask_page_manager_set_load_page_event(parent, NULL, "page_steaming");
+        lv_100ask_page_manager_set_load_page_event(assist_cook, NULL, "page_steaming");
     }
     else
     {
         lv_obj_add_flag(right_steam_rotate, LV_OBJ_FLAG_HIDDEN);
         lv_rotate_anim(right_steam_rotate, 0);
+        lv_100ask_page_manager_set_load_page_event(parent, NULL, "page_steam_right");
+        lv_100ask_page_manager_set_load_page_event(assist_cook, NULL, "page_steam_assist");
     }
 }
 static void property_change_cb(const char *key, void *value)
@@ -139,8 +143,8 @@ void lv_page_steamoven_init(lv_obj_t *page)
     lv_obj_set_size(cont_col, 344, 266);
     lv_obj_set_flex_flow(cont_col, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(cont_col, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_t *assist_cook = lv_steamoven_item2_create(cont_col, themesImagesPath "assist_cook_background.png",
-                                                      themesImagesPath "assist_cook_text.png");
+    assist_cook = lv_steamoven_item2_create(cont_col, themesImagesPath "assist_cook_background.png",
+                                            themesImagesPath "assist_cook_text.png");
     multistage_cook = lv_steamoven_item2_create(cont_col, themesImagesPath "multistage_cook_background.png",
                                                 themesImagesPath "multistage_cook_text.png");
 }

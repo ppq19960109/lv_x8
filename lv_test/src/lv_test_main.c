@@ -94,12 +94,23 @@ void getCurrentTime()
     sprintf(buf, "%02d:%02d", local_tm->tm_hour, local_tm->tm_min);
     lv_label_set_text(clock_text, buf);
 }
+static void signalHandler(int signal)
+{
+    printf("signalHandler signal is %d\n", signal);
+    if (signal == SIGRTMIN)
+    {
+        getCurrentTime();
+    }
+}
 static void POSIXTimer_cb(union sigval val)
 {
     LV_LOG_USER("%s sival_int:%d", __func__, val.sival_int);
     if (val.sival_int == 0)
     {
+        // raise(SIGRTMIN);
+        pthread_mutex_lock(&g_mutex);
         getCurrentTime();
+        pthread_mutex_unlock(&g_mutex);
     }
 }
 static void steamInterfaceChange(int state)
@@ -118,7 +129,7 @@ static void steamInterfaceChange(int state)
     {
         if (lv_page_exist_page("page_steaming") == 0)
         {
-            if (lv_page_current_exist_page("page_steam_left") || lv_page_current_exist_page("page_multistage"))
+            if (lv_page_current_exist_page("page_steam_left") || lv_page_current_exist_page("page_multistage") || lv_page_current_exist_page("page_steam_right") || lv_page_current_exist_page("page_steam_assist"))
                 lv_100ask_page_manager_set_open_page(NULL, "page_steaming");
             else if (lv_page_current_exist_page("page_smartrecipes") || lv_page_current_exist_page("page_cook_details"))
             {
@@ -149,6 +160,19 @@ static void property_change_cb(const char *key, void *value)
     }
     else if (strcmp("RStOvState", key) == 0)
     {
+        int LStOvState = get_attr_value_int("LStOvState");
+        int RStOvState = get_attr_value_int("RStOvState");
+        if (RStOvState == WORK_STATE_STOP)
+        {
+            if (LStOvState == WORK_STATE_STOP)
+            {
+                steamInterfaceChange(0);
+            }
+        }
+        else
+        {
+            steamInterfaceChange(1);
+        }
     }
     else if (strcmp("WifiScanR", key) == 0)
     {
@@ -335,6 +359,7 @@ void lv_test_widgets(void)
     init_style();
     clock_timer = POSIXTimerCreate(0, POSIXTimer_cb);
     POSIXTimerSet(clock_timer, 60, 15);
+    signal(SIGRTMIN, signalHandler);
 
     lv_obj_t *win_bg = lv_img_create(lv_scr_act());
     lv_img_set_src(win_bg, themesImagesPath "window-background.png");
@@ -416,6 +441,9 @@ void lv_test_widgets(void)
     lv_obj_t *page_cook_details = lv_100ask_page_manager_page_create(page_manager, "page_cook_details");
     lv_obj_t *page_multistage = lv_100ask_page_manager_page_create(page_manager, "page_multistage");
     lv_obj_t *page_smart_cook = lv_100ask_page_manager_page_create(page_manager, "page_smart_cook");
+    lv_obj_t *page_close_heat = lv_100ask_page_manager_page_create(page_manager, "page_close_heat");
+    lv_obj_t *page_steam_right = lv_100ask_page_manager_page_create(page_manager, "page_steam_right");
+    lv_obj_t *page_steam_assist = lv_100ask_page_manager_page_create(page_manager, "page_steam_assist");
 
     lv_100ask_page_manager_set_page_init(main_page, init_main_page);
     lv_100ask_page_manager_set_page_init(page_hood, lv_page_hood_init);
@@ -427,6 +455,9 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_page_init(page_cook_details, lv_page_cook_details_init);
     lv_100ask_page_manager_set_page_init(page_multistage, lv_page_multistage_init);
     lv_100ask_page_manager_set_page_init(page_smart_cook, lv_page_smart_cook_init);
+    lv_100ask_page_manager_set_page_init(page_close_heat, lv_page_close_heat_init);
+    lv_100ask_page_manager_set_page_init(page_steam_right, lv_page_steam_right_init);
+    lv_100ask_page_manager_set_page_init(page_steam_assist, lv_page_steam_assist_init);
 #if LV_100ASK_PAGE_MANAGER_COSTOM_ANIMARION
     lv_100ask_page_manager_set_open_page_anim(main_page, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(main_page, close_page_anim);
@@ -448,6 +479,12 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_close_page_anim(page_multistage, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_smart_cook, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_smart_cook, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_close_heat, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_close_heat, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_steam_right, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_steam_right, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_steam_assist, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_steam_assist, close_page_anim);
 #endif
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");

@@ -5,16 +5,17 @@
 
 #define PROFILE_NAME "LvDevProfile.json"
 
-typedef enum {
-	RK_WIFI_State_IDLE = 0,
-	RK_WIFI_State_CONNECTING,
-	RK_WIFI_State_CONNECTFAILED,
-	RK_WIFI_State_CONNECTFAILED_WRONG_KEY,
-	RK_WIFI_State_CONNECTED,
-	RK_WIFI_State_DISCONNECTED,
-	RK_WIFI_State_OPEN,
-	RK_WIFI_State_OFF,
-	RK_WIFI_State_LINK_CONNECTED
+typedef enum
+{
+    RK_WIFI_State_IDLE = 0,
+    RK_WIFI_State_CONNECTING,
+    RK_WIFI_State_CONNECTFAILED,
+    RK_WIFI_State_CONNECTFAILED_WRONG_KEY,
+    RK_WIFI_State_CONNECTED,
+    RK_WIFI_State_DISCONNECTED,
+    RK_WIFI_State_OPEN,
+    RK_WIFI_State_OFF,
+    RK_WIFI_State_LINK_CONNECTED
 } RK_WIFI_RUNNING_State_e;
 
 enum LINK_VALUE_TYPE
@@ -55,6 +56,18 @@ enum WORK_STATE_ENUM
     WORK_STATE_PAUSE,
     WORK_STATE_PAUSE_RESERVE,
     WORK_STATE_PREHEAT_RESERVE,
+};
+enum TIMING_OPERATION_ENUM
+{
+    TIMING_OPERATION_START = 0x01,
+    TIMING_OPERATION_CANCEL,
+};
+enum TIMING_STATE_ENUM
+{
+    TIMING_STATE_STOP = 0x00,
+    TIMING_STATE_RUN,
+    TIMING_STATE_PAUSE,
+    TIMING_STATE_CONFIRM,
 };
 typedef struct
 {
@@ -136,5 +149,5 @@ void register_property_change_cb(void (*cb)(const char *key, void *value));
 void set_num_toServer(const char *key, int value);
 void get_toServer(const char *key);
 void set_cook_toServer(steamoven_t *steamoven);
-void connectWiFi(const char*ssid,const char*psk,int encryp);
+void connectWiFi(const char *ssid, const char *psk, int encryp);
 #endif

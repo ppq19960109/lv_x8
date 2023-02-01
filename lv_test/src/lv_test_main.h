@@ -40,6 +40,7 @@ extern "C"
     extern lv_style_t slider_style_main, slider_style_indicator, slider_style_knob;
     extern lv_style_t switch_style_indicator, switch_style_indicator_check, switch_style_knob;
     extern int g_wifi_state;
+    extern pthread_mutex_t g_mutex;
     /**********************
      * GLOBAL PROTOTYPES
      **********************/
@@ -54,10 +55,13 @@ extern "C"
 
     void lv_page_hood_init(lv_obj_t *page);
     void lv_page_smart_cook_init(lv_obj_t *page);
+    void lv_page_close_heat_init(lv_obj_t *page);
     void lv_page_steamoven_init(lv_obj_t *page);
     void lv_page_smartrecipes_init(lv_obj_t *page);
     void lv_page_steaming_init(lv_obj_t *page);
     void lv_page_steam_left_init(lv_obj_t *page);
+    void lv_page_steam_right_init(lv_obj_t *page);
+    void lv_page_steam_assist_init(lv_obj_t *page);
     void lv_page_multistage_init(lv_obj_t *page);
     void lv_page_set_init(lv_obj_t *page);
     void lv_page_cook_details_init(lv_obj_t *page);

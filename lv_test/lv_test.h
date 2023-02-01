@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include <pthread.h>
 #include "../lvgl/lvgl.h"
 
 #include "src/lv_test_main.h"

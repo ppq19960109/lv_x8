@@ -207,6 +207,7 @@ void lv_page_hood_init(lv_obj_t *page)
     lv_obj_t *turn_off_fire = lv_hood_item_create(cont_row, themesImagesPath "turn_off_fire_background.png",
                                                   "定时关火", &turn_off_fire_rotate);
     lv_rotate_anim(turn_off_fire_rotate, 1);
+    lv_100ask_page_manager_set_load_page_event(turn_off_fire, NULL, "page_close_heat");
 
     lv_obj_t *intelligent_cooking_rotate;
     lv_obj_t *intelligent_cooking = lv_hood_item_create(cont_row, themesImagesPath "intelligent_cooking.png", "智慧烹饪",
