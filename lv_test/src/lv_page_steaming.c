@@ -547,7 +547,7 @@ static void left_btn_event_cb(lv_event_t *e)
         }
         else
         {
-            lv_custom_dialog2("是否取消左腔烹饪？", "否", "是", left_dialog2_event_cb);
+            lv_manual_dialog1("是否取消左腔烹饪？", "否", "是", left_dialog2_event_cb);
         }
         break;
     case 2:

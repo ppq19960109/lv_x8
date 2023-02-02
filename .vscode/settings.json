@@ -24,6 +24,8 @@
         "uds_client_task.h": "c",
         "lv_custom_item.h": "c",
         "lv_draw_sw_gradient.h": "c",
-        "lvgl.h": "c"
+        "lvgl.h": "c",
+        "wifi_list.h": "c",
+        "lv_auto_dialog.h": "c"
     }
 }

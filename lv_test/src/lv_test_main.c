@@ -15,6 +15,8 @@ lv_style_t slider_style_main, slider_style_indicator, slider_style_knob;
 lv_style_t switch_style_indicator, switch_style_indicator_check, switch_style_knob;
 static lv_obj_t *icon_wifi, *icon_standby, *clock_text;
 static timer_t clock_timer;
+
+int LStOvState = 0, RStOvState = 0;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -138,14 +140,15 @@ static void steamInterfaceChange(int state)
         }
     }
 }
+
 static void property_change_cb(const char *key, void *value)
 {
     LV_LOG_USER("key:%s value:%p\n", key, value);
 
     if (strcmp("LStOvState", key) == 0)
     {
-        int LStOvState = get_attr_value_int("LStOvState");
-        int RStOvState = get_attr_value_int("RStOvState");
+        LStOvState = get_value_int(value);
+        RStOvState = get_attr_value_int("RStOvState");
         if (LStOvState == WORK_STATE_STOP)
         {
             if (RStOvState == WORK_STATE_STOP)
@@ -160,8 +163,8 @@ static void property_change_cb(const char *key, void *value)
     }
     else if (strcmp("RStOvState", key) == 0)
     {
-        int LStOvState = get_attr_value_int("LStOvState");
-        int RStOvState = get_attr_value_int("RStOvState");
+        LStOvState = get_attr_value_int("LStOvState");
+        RStOvState = get_value_int(value);
         if (RStOvState == WORK_STATE_STOP)
         {
             if (LStOvState == WORK_STATE_STOP)

@@ -164,11 +164,11 @@ static void btn_array_event_cb(lv_event_t *e)
     LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
     if (user_data == 0)
     {
-        lv_custom_cook_dialog("请将食物放入左腔,水箱中加满水", dialog_event_cb);
+        lv_manual_cook_dialog("请将食物放入左腔,水箱中加满水", dialog_event_cb);
     }
     else
     {
-        lv_custom_reserve_dialog("左腔将在", reserve_dialog_event_cb);
+        lv_manual_reserve_dialog("左腔将在", reserve_dialog_event_cb);
     }
 }
 static void scroll_event_cb(lv_event_t *e)

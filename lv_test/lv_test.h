@@ -24,12 +24,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define recipesImagesPath "S:/oem/marssenger/"
-#define themesImagesPath "S:/oem/marssenger/themes/X8GCZ/"
-#define themesWindowBackgroundColor 0x1A1A1A
-#define themesPopupWindowColor 0x333333
-#define themesTextColor 0xE68855
-#define themesTextColor2 0xA2A2A2
+
 /**********************
  *      TYPEDEFS
  **********************/

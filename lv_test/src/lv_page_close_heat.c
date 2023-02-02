@@ -154,7 +154,7 @@ static void left_btn_event_cb(lv_event_t *e)
     case 1:
         if (timing_state[0] == TIMING_STATE_RUN)
         {
-            lv_custom_dialog2("是否取消左灶定时关火？", "否", "是", left_dialog2_event_cb);
+            lv_manual_dialog1("是否取消左灶定时关火？", "否", "是", left_dialog2_event_cb);
         }
         break;
     }
@@ -174,7 +174,7 @@ static void right_btn_event_cb(lv_event_t *e)
     case 1:
         if (timing_state[1] == TIMING_STATE_RUN)
         {
-            lv_custom_dialog2("是否取消右灶定时关火？", "否", "是", right_dialog2_event_cb);
+            lv_manual_dialog1("是否取消右灶定时关火？", "否", "是", right_dialog2_event_cb);
         }
         break;
     }

@@ -9,7 +9,7 @@ extern "C"
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_test.h"
+
     /*********************
      *      DEFINES
      *********************/
@@ -27,10 +27,7 @@ extern "C"
     lv_obj_t *lv_rotate_anim(lv_obj_t *obj, const int run);
     lv_obj_t *lv_custom_text_btn_create(lv_obj_t *parent, const char *text);
     lv_obj_t *lv_custom_btn_array_create(lv_obj_t *parent, const char *text[], const char count, lv_event_cb_t event_cb);
-    lv_obj_t *lv_custom_cook_dialog(const char *content, lv_event_cb_t event_cb);
-    lv_obj_t *lv_custom_dialog2(const char *content, const char *cancel, const char *confirm, lv_event_cb_t event_cb);
-    lv_obj_t *lv_custom_reserve_dialog(const char *content, lv_event_cb_t event_cb);
-    int lv_get_reserve_dialog_time(lv_obj_t *reserve_dialog);
+
     lv_obj_t *radiobutton_create(lv_obj_t *parent, const char *txt);
     lv_obj_t *lv_divider_create(lv_obj_t *parent);
     lv_obj_t *lv_btn_array_create(lv_obj_t *parent, const char count, lv_event_cb_t event_cb);
