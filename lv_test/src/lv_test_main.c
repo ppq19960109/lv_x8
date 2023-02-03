@@ -51,6 +51,8 @@ static void open_page_anim(lv_obj_t *obj)
     {
         lv_img_set_src(icon_standby, themesImagesPath "icon_sleep.png");
     }
+    // lv_obj_t *layer=lv_scr_act();
+    // LV_LOG_USER("lv_scr_act child_cnt:%d user_data:%d",lv_obj_get_child_cnt(layer),layer->user_data);
 }
 
 /*close page anim*/
@@ -233,9 +235,40 @@ static void property_change_cb(const char *key, void *value)
         setClockTimestamp(t);
         getCurrentTime();
     }
+    else if (strcmp("HoodOffLeftTime", key) == 0)
+    {
+        int data = get_value_int(value);
+        if (data)
+        {
+            char buf[120], buf1[36];
+            sprintf(buf, "烟机自动延时#E68855 %d分钟#\n后关闭,清除余烟", data);
+            sprintf(buf1, "立即关闭#E68855 %d分钟#", data);
+            lv_auto_dialog3_update(buf, buf1);
+        }
+        else
+        {
+            lv_auto_dialog3_close();
+        }
+    }
+    else if (strcmp("HoodOffRemind", key) == 0)
+    {
+        int data = get_value_int(value);
+        switch (data)
+        {
+        case 1:
+            lv_auto_dialog3();
+            break;
+        case 2:
+            break;
+        case 3:
+
+            break;
+        }
+    }
     if (page_property_change_cb != NULL)
         page_property_change_cb(key, value);
 }
+
 static void init_main_page(lv_obj_t *page)
 {
     lv_obj_t *cont_row = lv_obj_create(page);
@@ -351,13 +384,17 @@ static void wifi_page_event_cb(lv_event_t *e)
 {
     lv_100ask_page_manager_set_open_page(NULL, "page_set");
 }
+lv_obj_t *manual_scr = NULL, *main_scr = NULL;
 void lv_test_widgets(void)
 {
-    LV_LOG_USER("lv_test_widgets...");
+    // manual_scr = lv_obj_create(NULL);
+    main_scr = lv_scr_act();
+    LV_LOG_USER("lv_test_widgets...manual_scr:%p main_scr:%p", manual_scr, main_scr);
     // lv_100ask_pinyin_ime_simple_test();
     // lv_100ask_page_manager_simple_test();
     // lv_100ask_demo_layer();
     // return 0;
+
     lv_dev_init();
     init_style();
     clock_timer = POSIXTimerCreate(0, POSIXTimer_cb);

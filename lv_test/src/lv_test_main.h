@@ -48,6 +48,7 @@ extern "C"
     extern lv_style_t switch_style_indicator, switch_style_indicator_check, switch_style_knob;
     extern int g_wifi_state;
     extern pthread_mutex_t g_mutex;
+    extern lv_obj_t *manual_scr, *main_scr;
     /**********************
      * GLOBAL PROTOTYPES
      **********************/

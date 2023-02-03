@@ -507,7 +507,7 @@ static lv_obj_t *lv_steam_item_create(lv_obj_t *parent, const char index)
     lv_obj_center(label_finish_btn_text);
     return obj;
 }
-static void left_dialog2_event_cb(lv_event_t *e)
+static void left_dialog1_event_cb(lv_event_t *e)
 {
     int user_data = (int)lv_event_get_user_data(e);
     switch (user_data)
@@ -519,7 +519,7 @@ static void left_dialog2_event_cb(lv_event_t *e)
         set_num_toServer("LStOvOperation", WORK_OPERATION_CANCEL);
         break;
     }
-    lv_obj_clean(lv_layer_top());
+    clean_manual_layer();
 }
 static void left_btn_event_cb(lv_event_t *e)
 {
@@ -547,7 +547,7 @@ static void left_btn_event_cb(lv_event_t *e)
         }
         else
         {
-            lv_manual_dialog1("是否取消左腔烹饪？", "否", "是", left_dialog2_event_cb);
+            lv_manual_dialog1("是否取消左腔烹饪？", "否", "是", left_dialog1_event_cb);
         }
         break;
     case 2:

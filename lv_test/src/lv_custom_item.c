@@ -101,6 +101,7 @@ lv_obj_t *lv_custom_text_btn_create(lv_obj_t *parent, const char *text)
     lv_obj_set_style_text_color(label, lv_color_hex(0x000000), 0);
     lv_label_set_text(label, text);
     lv_obj_center(label);
+    lv_label_set_recolor(label, true);
     return btn;
 }
 static void set_angle(void *img, int32_t v)

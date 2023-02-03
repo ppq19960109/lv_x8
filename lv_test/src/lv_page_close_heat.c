@@ -110,7 +110,7 @@ static lv_obj_t *lv_custom_heat_create(lv_obj_t *parent, int index)
     lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 135);
     return obj;
 }
-static void left_dialog2_event_cb(lv_event_t *e)
+static void left_dialog1_event_cb(lv_event_t *e)
 {
     int user_data = (int)lv_event_get_user_data(e);
     switch (user_data)
@@ -122,9 +122,9 @@ static void left_dialog2_event_cb(lv_event_t *e)
         set_num_toServer("LStoveTimingOpera", WORK_OPERATION_CANCEL);
         break;
     }
-    lv_obj_clean(lv_layer_top());
+    clean_manual_layer();
 }
-static void right_dialog2_event_cb(lv_event_t *e)
+static void right_dialog1_event_cb(lv_event_t *e)
 {
     int user_data = (int)lv_event_get_user_data(e);
     switch (user_data)
@@ -136,7 +136,7 @@ static void right_dialog2_event_cb(lv_event_t *e)
         set_num_toServer("RStoveTimingOpera", WORK_OPERATION_CANCEL);
         break;
     }
-    lv_obj_clean(lv_layer_top());
+    clean_manual_layer();
 }
 static void left_btn_event_cb(lv_event_t *e)
 {
@@ -154,7 +154,7 @@ static void left_btn_event_cb(lv_event_t *e)
     case 1:
         if (timing_state[0] == TIMING_STATE_RUN)
         {
-            lv_manual_dialog1("是否取消左灶定时关火？", "否", "是", left_dialog2_event_cb);
+            lv_manual_dialog1("是否取消左灶定时关火？", "否", "是", left_dialog1_event_cb);
         }
         break;
     }
@@ -174,7 +174,7 @@ static void right_btn_event_cb(lv_event_t *e)
     case 1:
         if (timing_state[1] == TIMING_STATE_RUN)
         {
-            lv_manual_dialog1("是否取消右灶定时关火？", "否", "是", right_dialog2_event_cb);
+            lv_manual_dialog1("是否取消右灶定时关火？", "否", "是", right_dialog1_event_cb);
         }
         break;
     }

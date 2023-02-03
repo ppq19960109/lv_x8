@@ -281,7 +281,7 @@ static void dialog_event_cb(lv_event_t *e)
     }
     break;
     }
-    lv_obj_clean(lv_layer_top());
+    clean_manual_layer();
 }
 static void reserve_dialog_event_cb(lv_event_t *e)
 {
@@ -296,14 +296,13 @@ static void reserve_dialog_event_cb(lv_event_t *e)
         break;
     case 2:
     {
-        lv_obj_t *reserve_dialog = lv_obj_get_child(lv_layer_top(), 0);
-        int orderTime = lv_get_reserve_dialog_time(reserve_dialog);
+        int orderTime = lv_get_reserve_dialog_time();
         LV_LOG_USER("%s,orderTime:%d\n", __func__, orderTime);
         multistage_cook_start(orderTime);
     }
     break;
     }
-    lv_obj_clean(lv_layer_top());
+    clean_manual_layer();
 }
 
 static void btn_array_event_cb(lv_event_t *e)

@@ -12,15 +12,37 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if 1
 lv_obj_t *get_manual_layer()
 {
     return lv_scr_act();
 }
 void clean_manual_layer()
 {
-    lv_obj_del(lv_obj_get_child(lv_scr_act(), -1));
+    lv_obj_t *layer = lv_scr_act();
+    LV_LOG_USER("%s,child_cnt:%d user_data:%d", __func__, lv_obj_get_child_cnt(layer), layer->user_data);
+    if (layer->user_data > 0)
+    {
+        layer->user_data = 0;
+        lv_obj_del(lv_obj_get_child(layer, -1));
+    }
 }
-
+#else
+lv_obj_t *get_manual_layer()
+{
+    if (manual_scr == NULL)
+        manual_scr = lv_obj_create(NULL);
+    LV_LOG_USER("%s,manual_scr:%p main_scr:%p", __func__, manual_scr, main_scr);
+    lv_scr_load(manual_scr);
+    return manual_scr;
+}
+void clean_manual_layer()
+{
+    LV_LOG_USER("%s,manual_scr:%p main_scr:%p", __func__, manual_scr, main_scr);
+    lv_scr_load(main_scr);
+    lv_obj_clean(manual_scr);
+}
+#endif
 static void scroll_event_cb(lv_event_t *e)
 {
     lv_obj_t *user_data = lv_event_get_user_data(e);
@@ -35,7 +57,9 @@ static void scroll_event_cb(lv_event_t *e)
 }
 lv_obj_t *lv_manual_reserve_dialog(const char *content, lv_event_cb_t event_cb)
 {
-    lv_obj_t *obj = lv_obj_create(lv_layer_top());
+    lv_obj_t *layer = get_manual_layer();
+    layer->user_data = 2;
+    lv_obj_t *obj = lv_obj_create(layer);
     lv_obj_set_size(obj, 730, 350);
     lv_obj_center(obj);
 
@@ -122,8 +146,12 @@ lv_obj_t *lv_manual_reserve_dialog(const char *content, lv_event_cb_t event_cb)
     lv_obj_align(btn2, LV_ALIGN_BOTTOM_MID, 130, -25);
     return obj;
 }
-int lv_get_reserve_dialog_time(lv_obj_t *reserve_dialog)
+int lv_get_reserve_dialog_time()
 {
+    lv_obj_t *layer = lv_scr_act();
+    if (layer->user_data != 2)
+        return -1;
+    lv_obj_t *reserve_dialog = lv_obj_get_child(layer, -1);
     lv_obj_t *hour_roller = lv_obj_get_child(lv_obj_get_child(reserve_dialog, -4), -1);
     lv_obj_t *minute_roller = lv_obj_get_child(lv_obj_get_child(reserve_dialog, -3), -1);
     unsigned char hour_time_index = lv_roller_get_selected(hour_roller);
@@ -133,79 +161,14 @@ int lv_get_reserve_dialog_time(lv_obj_t *reserve_dialog)
 
 lv_obj_t *lv_manual_cook_dialog(const char *content, lv_event_cb_t event_cb)
 {
-    lv_obj_t *obj = lv_obj_create(lv_layer_top());
-    lv_obj_set_size(obj, 730, 350);
-    lv_obj_center(obj);
-
-    lv_obj_set_style_bg_opa(obj, LV_OPA_100, 0);
-    lv_obj_set_style_bg_color(obj, lv_color_hex(themesPopupWindowColor), 0);
-    lv_obj_set_style_radius(obj, 10, 0);
-
-    lv_obj_t *close_obj = lv_obj_create(obj);
-    lv_obj_set_size(close_obj, 80, 80);
-    lv_obj_align(close_obj, LV_ALIGN_TOP_RIGHT, 0, 0);
-    lv_obj_add_event_cb(close_obj, event_cb, LV_EVENT_CLICKED, (void *)0);
-    lv_obj_t *close_img = lv_img_create(close_obj);
-    lv_obj_align(close_img, LV_ALIGN_CENTER, 0, 0);
-    lv_img_set_src(close_img, themesImagesPath "icon_window_close.png");
-
-    lv_obj_t *icon_img = lv_img_create(obj);
-    lv_obj_align(icon_img, LV_ALIGN_TOP_MID, 0, 55);
-    lv_img_set_src(icon_img, themesImagesPath "icon_warn.png");
-
-    lv_obj_t *label_content = lv_label_create(obj);
-    lv_obj_set_style_text_font(label_content, &lv_font_SiYuanHeiTi_Normal_30, 0);
-    lv_obj_set_style_text_color(label_content, lv_color_hex(0xffffff), 0);
-    lv_label_set_text(label_content, content);
-    lv_obj_align(label_content, LV_ALIGN_CENTER, 0, 0);
-
-    lv_obj_t *btn1 = lv_custom_text_btn_create(obj, "取消");
-    lv_obj_add_event_cb(btn1, event_cb, LV_EVENT_CLICKED, (void *)1);
-    lv_obj_align(btn1, LV_ALIGN_BOTTOM_MID, -130, -25);
-
-    lv_obj_t *btn2 = lv_custom_text_btn_create(obj, "开始");
-    lv_obj_add_event_cb(btn2, event_cb, LV_EVENT_CLICKED, (void *)2);
-    lv_obj_align(btn2, LV_ALIGN_BOTTOM_MID, 130, -25);
-
+    lv_obj_t *layer = get_manual_layer();
+    lv_obj_t *obj = lv_dialog1(layer, content, "取消", "开始", NULL, event_cb);
     lv_obj_t *radio_btn = radiobutton_create(obj, "下次不再提示");
     lv_obj_align(radio_btn, LV_ALIGN_TOP_MID, 0, 212);
     return obj;
 }
 lv_obj_t *lv_manual_dialog1(const char *content, const char *cancel, const char *confirm, lv_event_cb_t event_cb)
 {
-    lv_obj_t *obj = lv_obj_create(lv_layer_top());
-    lv_obj_set_size(obj, 730, 350);
-    lv_obj_center(obj);
-
-    lv_obj_set_style_bg_opa(obj, LV_OPA_100, 0);
-    lv_obj_set_style_bg_color(obj, lv_color_hex(themesPopupWindowColor), 0);
-    lv_obj_set_style_radius(obj, 10, 0);
-
-    lv_obj_t *close_obj = lv_obj_create(obj);
-    lv_obj_set_size(close_obj, 80, 80);
-    lv_obj_align(close_obj, LV_ALIGN_TOP_RIGHT, 0, 0);
-    lv_obj_add_event_cb(close_obj, event_cb, LV_EVENT_CLICKED, (void *)0);
-    lv_obj_t *close_img = lv_img_create(close_obj);
-    lv_obj_align(close_img, LV_ALIGN_CENTER, 0, 0);
-    lv_img_set_src(close_img, themesImagesPath "icon_window_close.png");
-
-    lv_obj_t *icon_img = lv_img_create(obj);
-    lv_obj_align(icon_img, LV_ALIGN_TOP_MID, 0, 55);
-    lv_img_set_src(icon_img, themesImagesPath "icon_warn.png");
-
-    lv_obj_t *label_content = lv_label_create(obj);
-    lv_obj_set_style_text_font(label_content, &lv_font_SiYuanHeiTi_Normal_30, 0);
-    lv_obj_set_style_text_color(label_content, lv_color_hex(0xffffff), 0);
-    lv_label_set_text(label_content, content);
-    lv_obj_align(label_content, LV_ALIGN_CENTER, 0, 0);
-
-    lv_obj_t *btn1 = lv_custom_text_btn_create(obj, cancel);
-    lv_obj_add_event_cb(btn1, event_cb, LV_EVENT_CLICKED, (void *)1);
-    lv_obj_align(btn1, LV_ALIGN_BOTTOM_MID, -130, -25);
-
-    lv_obj_t *btn2 = lv_custom_text_btn_create(obj, confirm);
-    lv_obj_add_event_cb(btn2, event_cb, LV_EVENT_CLICKED, (void *)2);
-    lv_obj_align(btn2, LV_ALIGN_BOTTOM_MID, 130, -25);
-
-    return obj;
+    lv_obj_t *layer = get_manual_layer();
+    return lv_dialog1(layer, content, cancel, confirm, NULL, event_cb);
 }
