@@ -16,7 +16,8 @@ lv_style_t switch_style_indicator, switch_style_indicator_check, switch_style_kn
 static lv_obj_t *icon_wifi, *icon_standby, *clock_text;
 static timer_t clock_timer;
 
-int LStOvState = 0, RStOvState = 0;
+char LStOvState = 0, RStOvState = 0;
+char LStoveStatus = 0, RStoveStatus = 0;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -179,6 +180,14 @@ static void property_change_cb(const char *key, void *value)
             steamInterfaceChange(1);
         }
     }
+    else if (strcmp("LStoveStatus", key) == 0)
+    {
+        LStoveStatus = get_value_int(value);
+    }
+    else if (strcmp("RStoveStatus", key) == 0)
+    {
+        RStoveStatus = get_value_int(value);
+    }
     else if (strcmp("WifiScanR", key) == 0)
     {
         cJSON *root = cJSON_Parse(get_value_string(value));
@@ -259,9 +268,18 @@ static void property_change_cb(const char *key, void *value)
             lv_auto_dialog3();
             break;
         case 2:
+            // if (LStOvState == WORK_STATE_PREHEAT || LStOvState == WORK_STATE_RUN || LStOvState == WORK_STATE_PAUSE || RStOvState == WORK_STATE_PREHEAT || RStOvState == WORK_STATE_RUN || RStOvState == WORK_STATE_PAUSE)
+            lv_auto_dialog1("蒸烤箱工作中,需散热,烟机无法关闭", NULL, "好的", NULL);
             break;
         case 3:
-
+            // if (LStOvState == WORK_STATE_PREHEAT || LStOvState == WORK_STATE_RUN || LStOvState == WORK_STATE_PAUSE)
+            lv_auto_dialog1("烤箱工作中,需散热,烟机不得低于2档", NULL, "好的", NULL);
+            break;
+        case 4:
+            if (LStoveStatus > 0 || RStoveStatus > 0)
+                lv_auto_dialog1("灶具工作中，烟机无法关闭", NULL, "好的", NULL);
+            break;
+        case 5:
             break;
         }
     }

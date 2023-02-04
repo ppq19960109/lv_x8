@@ -6,9 +6,9 @@ extern "C"
 {
 #endif
 
-/*********************
- *      INCLUDES
- *********************/
+    /*********************
+     *      INCLUDES
+     *********************/
 
     /*********************
      *      DEFINES
@@ -22,8 +22,7 @@ extern "C"
      * GLOBAL PROTOTYPES
      **********************/
     int lv_custom_isSteam(steamoven_t *steamoven);
-    lv_obj_t *lv_custom_image_button_create(lv_obj_t *parent, const void *img_src, lv_coord_t width, lv_coord_t height,
-                                            lv_coord_t x, lv_coord_t y);
+    lv_obj_t *lv_custom_image_button_create(lv_obj_t *parent, const void *img_src, lv_coord_t x, lv_coord_t y);
     lv_obj_t *lv_rotate_anim(lv_obj_t *obj, const int run);
     lv_obj_t *lv_custom_text_btn_create(lv_obj_t *parent, const char *text);
     lv_obj_t *lv_custom_btn_array_create(lv_obj_t *parent, const char *text[], const char count, lv_event_cb_t event_cb);
@@ -31,7 +30,7 @@ extern "C"
     lv_obj_t *radiobutton_create(lv_obj_t *parent, const char *txt);
     lv_obj_t *lv_divider_create(lv_obj_t *parent);
     lv_obj_t *lv_btn_array_create(lv_obj_t *parent, const char count, lv_event_cb_t event_cb);
-    
+
     lv_obj_t *lv_page_indicator_create(lv_obj_t *parent, int count);
     void lv_page_indicator_check(lv_obj_t *page_indicator, int index);
 

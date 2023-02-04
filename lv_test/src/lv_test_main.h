@@ -56,6 +56,7 @@ extern "C"
     void lv_test_widgets(void);
 
     lv_obj_t *lv_page_back_bar_init(lv_obj_t *parent, const char *name, const char *title, lv_event_cb_t event_cb);
+    lv_obj_t *lv_custom_back_button_create(lv_obj_t *parent, const void *img_src, const char *text);
     lv_obj_t *lv_page_top_bar_init(lv_obj_t *parent, const int index);
 
     void lv_page_hood_init(lv_obj_t *page);
@@ -73,6 +74,7 @@ extern "C"
 
     void lv_page_set_tabview_set(int index);
     void lv_page_local_set_create(lv_obj_t *page);
+    void lv_page_local_set_visible(const int visible);
     void lv_page_wifi_create(lv_obj_t *page);
     void lv_page_wifi_visible(const int visible);
     void lv_wifi_property_change_cb(const char *key, void *value);

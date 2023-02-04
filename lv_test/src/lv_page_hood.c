@@ -116,7 +116,8 @@ static void hood_speed_event_cb(lv_event_t *e)
 }
 static lv_obj_t *lv_hood_item_create(lv_obj_t *parent, const void *img_src, const void *name, lv_obj_t **img_out)
 {
-    lv_obj_t *item = lv_custom_image_button_create(parent, img_src, 200, LV_PCT(100), 0, 18);
+    lv_obj_t *item = lv_custom_image_button_create(parent, img_src, 0, 18);
+    lv_obj_set_size(item, 200, LV_PCT(100));
     lv_obj_set_style_bg_color(item, lv_color_hex(0x000), 0);
     lv_obj_set_style_bg_opa(item, LV_OPA_100, 0);
     lv_obj_set_style_border_color(item, lv_color_hex(0x858585), 0);

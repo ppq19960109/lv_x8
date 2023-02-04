@@ -9,9 +9,23 @@
  *      DEFINES
  *********************/
 static lv_obj_t *sleep_slider_label;
+static lv_obj_t *cont_col, *screensaver;
 /**********************
  *  STATIC VARIABLES
  **********************/
+void lv_page_local_set_visible(const int visible)
+{
+    if (visible)
+    {
+        lv_obj_clear_flag(cont_col, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(screensaver, LV_OBJ_FLAG_HIDDEN);
+    }
+    else
+    {
+        lv_obj_add_flag(cont_col, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(screensaver, LV_OBJ_FLAG_HIDDEN);
+    }
+}
 
 static void slider_event_cb(lv_event_t *e)
 {
@@ -50,10 +64,29 @@ static void switch_event_handler(lv_event_t *e)
         }
     }
 }
+static void btn_event_cb(lv_event_t *e)
+{
+    LV_LOG_USER("%s,code:%d\n", __func__, e->code);
+    lv_obj_t *target = lv_event_get_target(e);
+    int user_data = (int)lv_event_get_user_data(e);
+    switch (user_data)
+    {
+    case 0:
+        break;
+    case 1:
+        lv_page_local_set_visible(0);
+        break;
+    case 2:
+        lv_page_local_set_visible(1);
+        break;
+    }
+}
 void lv_page_local_set_create(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
-    lv_obj_t *cont_col = lv_obj_create(page);
+    char buf[96];
+
+    cont_col = lv_obj_create(page);
     lv_obj_set_size(cont_col, LV_PCT(100), LV_PCT(100));
     lv_obj_set_flex_flow(cont_col, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(cont_col, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -143,7 +176,7 @@ void lv_page_local_set_create(lv_obj_t *page)
     lv_obj_align_to(sleep_slider_label, sleep_slider, LV_ALIGN_OUT_TOP_MID, 0, -15);
     lv_obj_set_style_text_font(sleep_slider_label, &lv_font_SiYuanHeiTi_Normal_24, 0);
     lv_obj_set_style_text_color(sleep_slider_label, lv_color_hex(0xffffff), 0);
-    char buf[16];
+
     lv_snprintf(buf, sizeof(buf), "%d分钟", (int)lv_slider_get_value(sleep_slider));
     lv_label_set_text(sleep_slider_label, buf);
     //----------------------------------
@@ -154,4 +187,52 @@ void lv_page_local_set_create(lv_obj_t *page)
     lv_label_set_text(label_time, "时间");
     lv_obj_set_style_text_color(label_time, lv_color_hex(0xffffff), 0);
     lv_obj_align(label_time, LV_ALIGN_LEFT_MID, 10, 0);
+    lv_obj_add_event_cb(time_obj, btn_event_cb, LV_EVENT_CLICKED, 0);
+    //----------------------------------
+    lv_obj_t *screen_obj = lv_obj_create(cont_col);
+    lv_obj_set_size(screen_obj, LV_PCT(100), 100);
+    lv_obj_t *label_screen = lv_label_create(screen_obj);
+    lv_obj_set_style_text_font(label_screen, &lv_font_SiYuanHeiTi_Normal_30, 0);
+    lv_label_set_text(label_screen, "屏保");
+    lv_obj_set_style_text_color(label_screen, lv_color_hex(0xffffff), 0);
+    lv_obj_align(label_screen, LV_ALIGN_LEFT_MID, 10, 0);
+    lv_obj_add_event_cb(screen_obj, btn_event_cb, LV_EVENT_CLICKED, 1);
+    //--------------------------------------------------------------------------------
+    screensaver = lv_obj_create(page);
+    lv_obj_add_flag(screensaver, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_size(screensaver, LV_PCT(100), LV_PCT(100));
+    lv_obj_t *back_button = lv_custom_back_button_create(screensaver, themesImagesPath "back_button_background.png", "屏保");
+    lv_obj_add_event_cb(back_button, btn_event_cb, LV_EVENT_CLICKED, 2);
+    static lv_coord_t col_dsc[] = {438, 438, LV_GRID_TEMPLATE_LAST};
+    static lv_coord_t row_dsc[] = {116, 116, LV_GRID_TEMPLATE_LAST};
+
+    /*Create a container with grid*/
+    lv_obj_t *cont = lv_obj_create(screensaver);
+    lv_obj_set_layout(cont, LV_LAYOUT_GRID);
+    // lv_obj_set_grid_dsc_array(cont, col_dsc, row_dsc);
+    lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
+    lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
+    lv_obj_set_size(cont, 438 * 2 + 25, 116 * 2 + 18);
+    lv_obj_align(cont, LV_ALIGN_TOP_MID, 0, 74);
+    lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_BETWEEN, LV_GRID_ALIGN_SPACE_BETWEEN);
+
+    lv_obj_t *element_obj, *element;
+
+    for (int i = 0; i < 4; i++)
+    {
+        uint8_t col = i % 2;
+        uint8_t row = i / 2;
+
+        element_obj = lv_obj_create(cont);
+        // lv_obj_set_size(element_obj, 418 , 116);
+        lv_obj_set_grid_cell(element_obj, LV_GRID_ALIGN_STRETCH, col, 1,
+                             LV_GRID_ALIGN_STRETCH, row, 1);
+
+        element = lv_img_create(element_obj);
+        sprintf(buf, themesImagesPath "screen_saver%d_narrow.png", i);
+        lv_img_set_src(element, buf);
+
+        element = radiobutton_create(element_obj, "");
+        lv_obj_align(element, LV_ALIGN_RIGHT_MID, 0, 0);
+    }
 }

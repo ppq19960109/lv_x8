@@ -43,6 +43,11 @@ void clean_manual_layer()
     lv_obj_clean(manual_scr);
 }
 #endif
+static void manual_dialog_define_event_cb(lv_event_t *e)
+{
+    LV_LOG_USER("%s,code:%d\n", __func__, e->code);
+    clean_manual_layer();
+}
 static void scroll_event_cb(lv_event_t *e)
 {
     lv_obj_t *user_data = lv_event_get_user_data(e);

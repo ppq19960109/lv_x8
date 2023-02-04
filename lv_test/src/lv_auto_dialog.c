@@ -77,10 +77,17 @@ lv_obj_t *lv_dialog1(lv_obj_t *layer, const char *content, const char *cancel, c
 
     return obj;
 }
+static void auto_dialog_define_event_cb(lv_event_t *e)
+{
+    LV_LOG_USER("%s,code:%d\n", __func__, e->code);
+    clean_auto_layer();
+}
 lv_obj_t *lv_auto_dialog1(const char *content, const char *cancel, const char *confirm, lv_event_cb_t event_cb)
 {
     clean_auto_layer();
     lv_obj_t *layer = get_auto_layer();
+    if (event_cb == NULL)
+        event_cb = auto_dialog_define_event_cb;
     return lv_dialog1(layer, content, cancel, confirm, NULL, event_cb);
 }
 static void hoodOff_dialog_event_cb(lv_event_t *e)
