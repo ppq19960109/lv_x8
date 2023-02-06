@@ -16,6 +16,8 @@ static lv_obj_t *tabview;
 void lv_page_set_tabview_set(int index)
 {
     lv_tabview_set_act(tabview, index, LV_ANIM_ON);
+    if (index == 1)
+        lv_page_wifi_visible(1);
 }
 static void property_change_cb(const char *key, void *value)
 {
@@ -24,13 +26,12 @@ static void property_change_cb(const char *key, void *value)
 }
 static void page_update_cb(void)
 {
-    LV_LOG_USER("lv_page_set,%s\n", __func__);
-    // lv_tabview_set_act(tabview, 2, LV_ANIM_ON);
     unsigned short index = lv_tabview_get_tab_act(tabview);
+    LV_LOG_USER("lv_page_set,%s index:%d\n", __func__, index);
+    // lv_tabview_set_act(tabview, 2, LV_ANIM_ON);
+
     if (index == 0)
         lv_page_local_set_visible(1);
-    else if (index == 1)
-        lv_page_wifi_visible(1);
 }
 static void tabview_event_cb(lv_event_t *e)
 {

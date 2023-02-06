@@ -15,7 +15,7 @@ lv_style_t slider_style_main, slider_style_indicator, slider_style_knob;
 lv_style_t switch_style_indicator, switch_style_indicator_check, switch_style_knob;
 static lv_obj_t *icon_wifi, *icon_standby, *clock_text;
 static timer_t clock_timer;
-
+static lv_obj_t *home, *home_bar;
 char LStOvState = 0, RStOvState = 0;
 char LStoveStatus = 0, RStoveStatus = 0;
 /**********************
@@ -26,6 +26,19 @@ void register_page_property_change_cb(void (*cb)(const char *key, void *value))
 {
     page_property_change_cb = cb;
 }
+void production_mode(const char state)
+{
+    if (state)
+    {
+        lv_obj_add_flag(home_bar, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_set_width(home, 1280);
+    }
+    else
+    {
+        lv_obj_clear_flag(home_bar, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_set_width(home, 1160);
+    }
+}
 #if LV_100ASK_PAGE_MANAGER_COSTOM_ANIMARION
 /*open page anim*/
 static void open_page_anim(lv_obj_t *obj)
@@ -33,7 +46,10 @@ static void open_page_anim(lv_obj_t *obj)
     /*Do something with LVGL*/
     lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)obj;
     LV_LOG_USER("open page anim. name:%s", page->name);
-
+    if (strcmp("page_screen_line", page->name) == 0)
+    {
+        production_mode(1);
+    }
     if (page->page_update_cb != NULL)
         page->page_update_cb(page);
 
@@ -60,7 +76,12 @@ static void open_page_anim(lv_obj_t *obj)
 static void close_page_anim(lv_obj_t *obj)
 {
     /*Do something with LVGL*/
-    LV_LOG_USER("close page anim.");
+    lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)obj;
+    LV_LOG_USER("close page anim. name:%s", page->name);
+    if (strcmp("page_screen_line", page->name) == 0)
+    {
+        production_mode(0);
+    }
     lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
 }
 #endif
@@ -422,7 +443,7 @@ void lv_test_widgets(void)
     lv_obj_t *win_bg = lv_img_create(lv_scr_act());
     lv_img_set_src(win_bg, themesImagesPath "window-background.png");
 
-    lv_obj_t *home_bar = lv_obj_create(lv_scr_act());
+    home_bar = lv_obj_create(lv_scr_act());
     lv_obj_set_size(home_bar, 120, LV_PCT(100));
     lv_obj_set_align(home_bar, LV_ALIGN_RIGHT_MID);
 
@@ -474,7 +495,7 @@ void lv_test_widgets(void)
     lv_obj_add_flag(icon_standby, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(icon_standby, home_bar_event_cb, LV_EVENT_CLICKED, 3);
     //****************************************************
-    lv_obj_t *home = lv_obj_create(lv_scr_act());
+    home = lv_obj_create(lv_scr_act());
     // lv_obj_refresh_style(home, LV_PART_ANY, LV_STYLE_PROP_ANY);
     // lv_obj_invalidate(home);
     // lv_obj_update_layout(home);
@@ -502,6 +523,7 @@ void lv_test_widgets(void)
     lv_obj_t *page_close_heat = lv_100ask_page_manager_page_create(page_manager, "page_close_heat");
     lv_obj_t *page_steam_right = lv_100ask_page_manager_page_create(page_manager, "page_steam_right");
     lv_obj_t *page_steam_assist = lv_100ask_page_manager_page_create(page_manager, "page_steam_assist");
+    lv_obj_t *page_screen_line = lv_100ask_page_manager_page_create(page_manager, "page_screen_line");
 
     lv_100ask_page_manager_set_page_init(main_page, init_main_page);
     lv_100ask_page_manager_set_page_init(page_hood, lv_page_hood_init);
@@ -516,6 +538,7 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_page_init(page_close_heat, lv_page_close_heat_init);
     lv_100ask_page_manager_set_page_init(page_steam_right, lv_page_steam_right_init);
     lv_100ask_page_manager_set_page_init(page_steam_assist, lv_page_steam_assist_init);
+    lv_100ask_page_manager_set_page_init(page_screen_line, lv_page_screen_line_init);
 #if LV_100ASK_PAGE_MANAGER_COSTOM_ANIMARION
     lv_100ask_page_manager_set_open_page_anim(main_page, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(main_page, close_page_anim);
@@ -543,6 +566,8 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_close_page_anim(page_steam_right, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_steam_assist, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_steam_assist, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_screen_line, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_screen_line, close_page_anim);
 #endif
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");
