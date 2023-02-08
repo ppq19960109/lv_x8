@@ -63,7 +63,7 @@ void lv_page_set_init(lv_obj_t *page)
 
     lv_obj_t *back_bar = lv_page_back_bar_init(page, "设置", NULL, back_bar_event_cb);
 
-    tabview = lv_tabview_create(page, LV_DIR_LEFT, 180);
+    tabview = lv_tabview_create(page, LV_DIR_LEFT, 200);
     lv_obj_set_size(tabview, LV_PCT(100), 340);
     lv_obj_align_to(tabview, back_bar, LV_ALIGN_OUT_BOTTOM_MID, 0, 5);
     lv_obj_add_event_cb(tabview, tabview_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
@@ -71,6 +71,8 @@ void lv_page_set_init(lv_obj_t *page)
     lv_obj_t *tab_btns = lv_tabview_get_tab_btns(tabview);
     lv_obj_set_style_bg_img_src(tab_btns, themesImagesPath "menulist_item_background.png", LV_PART_ITEMS | LV_STATE_CHECKED);
     lv_obj_set_style_text_color(tab_btns, lv_color_hex(0xffffff), 0);
+    lv_obj_set_style_border_color(tab_btns, lv_color_hex(0xffffff), 0);
+    lv_obj_set_style_border_width(tab_btns, 2, 0);
 
     lv_obj_set_style_text_font(tab_btns, &lv_font_SiYuanHeiTi_Normal_24, 0);
     lv_obj_set_style_text_font(tab_btns, &lv_font_SiYuanHeiTi_Normal_30, LV_STATE_CHECKED);
@@ -79,7 +81,7 @@ void lv_page_set_init(lv_obj_t *page)
     lv_obj_t *tab2 = lv_tabview_add_tab(tabview, "网络连接");
     lv_obj_t *tab3 = lv_tabview_add_tab(tabview, "关于本机");
     lv_obj_t *tab4 = lv_tabview_add_tab(tabview, "系统更新");
-    lv_obj_t *tab5 = lv_tabview_add_tab(tabview, "恢复出厂");
+    lv_obj_t *tab5 = lv_tabview_add_tab(tabview, "恢复出厂设置");
 
     // lv_obj_set_style_bg_opa(tab1, LV_OPA_COVER, 0);
     // lv_obj_set_style_bg_opa(tab2, LV_OPA_COVER, 0);

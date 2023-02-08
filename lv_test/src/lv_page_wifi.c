@@ -391,6 +391,7 @@ void lv_page_wifi_create(lv_obj_t *page)
     lv_obj_set_size(wifi_list, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_align(wifi_list, LV_ALIGN_TOP_MID, 0, 0);
 
-    lv_wifi_list_create("abc", -66, 2);
-    lv_wifi_list_create("QWER", -46, 1);
+    // lv_wifi_list_create("abc", -66, 2);
+    // lv_wifi_list_create("QWER", -46, 1);
+    wifi_update();
 }

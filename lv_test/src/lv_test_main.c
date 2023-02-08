@@ -46,10 +46,7 @@ static void open_page_anim(lv_obj_t *obj)
     /*Do something with LVGL*/
     lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)obj;
     LV_LOG_USER("open page anim. name:%s", page->name);
-    if (strcmp("page_screen_line", page->name) == 0)
-    {
-        production_mode(1);
-    }
+
     if (page->page_update_cb != NULL)
         page->page_update_cb(page);
 
@@ -78,10 +75,7 @@ static void close_page_anim(lv_obj_t *obj)
     /*Do something with LVGL*/
     lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)obj;
     LV_LOG_USER("close page anim. name:%s", page->name);
-    if (strcmp("page_screen_line", page->name) == 0)
-    {
-        production_mode(0);
-    }
+
     lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
 }
 #endif
@@ -401,6 +395,7 @@ static void home_bar_event_cb(lv_event_t *e)
         lv_page_set_tabview_set(1);
         break;
     case 1:
+        lv_100ask_page_manager_set_open_page(NULL, "page_set");
         break;
     case 2:
     {
@@ -419,10 +414,7 @@ static void home_bar_event_cb(lv_event_t *e)
     break;
     }
 }
-static void wifi_page_event_cb(lv_event_t *e)
-{
-    lv_100ask_page_manager_set_open_page(NULL, "page_set");
-}
+
 lv_obj_t *manual_scr = NULL, *main_scr = NULL;
 void lv_test_widgets(void)
 {
@@ -447,10 +439,10 @@ void lv_test_widgets(void)
     lv_obj_set_size(home_bar, 120, LV_PCT(100));
     lv_obj_set_align(home_bar, LV_ALIGN_RIGHT_MID);
 
-    lv_obj_t *newline2 = lv_img_create(home_bar);
-    lv_img_set_src(newline2, themesImagesPath "icon_newline2.png");
-    lv_obj_set_size(newline2, 2, LV_SIZE_CONTENT);
-    lv_obj_set_align(newline2, LV_ALIGN_LEFT_MID);
+    lv_obj_t *icon_newline2 = lv_img_create(home_bar);
+    lv_img_set_src(icon_newline2, themesImagesPath "icon_newline2.png");
+    lv_obj_set_size(icon_newline2, 2, LV_SIZE_CONTENT);
+    lv_obj_set_align(icon_newline2, LV_ALIGN_LEFT_MID);
 
     clock_text = lv_label_create(home_bar);
     lv_obj_align(clock_text, LV_ALIGN_TOP_MID, 0, 17);
@@ -469,31 +461,41 @@ void lv_test_widgets(void)
     lv_obj_align(icon_wifi, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_event_cb(wifi_obj, home_bar_event_cb, LV_EVENT_CLICKED, 0);
 
-    lv_obj_t *icon_newline2 = lv_img_create(home_bar);
-    lv_img_set_src(icon_newline2, themesImagesPath "icon_newline.png");
-    lv_obj_set_size(icon_newline2, LV_SIZE_CONTENT, 2);
-    lv_obj_align(icon_newline2, LV_ALIGN_TOP_MID, 0, 133);
-    lv_obj_t *icon_set = lv_img_create(home_bar);
+    lv_obj_t *set_obj = lv_obj_create(home_bar);
+    lv_obj_set_size(set_obj, LV_PCT(100), 86);
+    lv_obj_align(set_obj, LV_ALIGN_TOP_MID, 0, 133);
+    icon_newline1 = lv_img_create(set_obj);
+    lv_img_set_src(icon_newline1, themesImagesPath "icon_newline.png");
+    lv_obj_set_size(icon_newline1, LV_SIZE_CONTENT, 2);
+    lv_obj_align(icon_newline1, LV_ALIGN_TOP_MID, 0, 0);
+    lv_obj_t *icon_set = lv_img_create(set_obj);
     lv_img_set_src(icon_set, themesImagesPath "icon_set.png");
-    lv_obj_align(icon_set, LV_ALIGN_TOP_MID, 0, 163);
+    lv_obj_align(icon_set, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_add_event_cb(set_obj, home_bar_event_cb, LV_EVENT_CLICKED, 1);
 
-    lv_obj_t *icon_newline3 = lv_img_create(home_bar);
-    lv_img_set_src(icon_newline3, themesImagesPath "icon_newline.png");
-    lv_obj_set_size(icon_newline3, LV_SIZE_CONTENT, 2);
-    lv_obj_align(icon_newline3, LV_ALIGN_TOP_MID, 0, 223);
-    lv_obj_t *icon_alarm = lv_img_create(home_bar);
+    lv_obj_t *alarm_obj = lv_obj_create(home_bar);
+    lv_obj_set_size(alarm_obj, LV_PCT(100), 86);
+    lv_obj_align(alarm_obj, LV_ALIGN_TOP_MID, 0, 223);
+    icon_newline1 = lv_img_create(alarm_obj);
+    lv_img_set_src(icon_newline1, themesImagesPath "icon_newline.png");
+    lv_obj_set_size(icon_newline1, LV_SIZE_CONTENT, 2);
+    lv_obj_align(icon_newline1, LV_ALIGN_TOP_MID, 0, 0);
+    lv_obj_t *icon_alarm = lv_img_create(alarm_obj);
     lv_img_set_src(icon_alarm, themesImagesPath "icon_alarm.png");
-    lv_obj_align(icon_alarm, LV_ALIGN_TOP_MID, 0, 248);
+    lv_obj_align(icon_alarm, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_add_event_cb(alarm_obj, home_bar_event_cb, LV_EVENT_CLICKED, 2);
 
-    lv_obj_t *icon_newline4 = lv_img_create(home_bar);
-    lv_img_set_src(icon_newline4, themesImagesPath "icon_newline.png");
-    lv_obj_set_size(icon_newline4, LV_SIZE_CONTENT, 2);
-    lv_obj_align(icon_newline4, LV_ALIGN_TOP_MID, 0, 314);
-    icon_standby = lv_img_create(home_bar);
+    lv_obj_t *standby_obj = lv_obj_create(home_bar);
+    lv_obj_set_size(standby_obj, LV_PCT(100), 86);
+    lv_obj_align(standby_obj, LV_ALIGN_TOP_MID, 0, 314);
+    icon_newline1 = lv_img_create(standby_obj);
+    lv_img_set_src(icon_newline1, themesImagesPath "icon_newline.png");
+    lv_obj_set_size(icon_newline1, LV_SIZE_CONTENT, 2);
+    lv_obj_align(icon_newline1, LV_ALIGN_TOP_MID, 0, 0);
+    icon_standby = lv_img_create(standby_obj);
     lv_img_set_src(icon_standby, themesImagesPath "icon_standby.png");
-    lv_obj_align(icon_standby, LV_ALIGN_TOP_MID, 0, 339);
-    lv_obj_add_flag(icon_standby, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_add_event_cb(icon_standby, home_bar_event_cb, LV_EVENT_CLICKED, 3);
+    lv_obj_align(icon_standby, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_add_event_cb(standby_obj, home_bar_event_cb, LV_EVENT_CLICKED, 3);
     //****************************************************
     home = lv_obj_create(lv_scr_act());
     // lv_obj_refresh_style(home, LV_PART_ANY, LV_STYLE_PROP_ANY);
@@ -523,6 +525,8 @@ void lv_test_widgets(void)
     lv_obj_t *page_close_heat = lv_100ask_page_manager_page_create(page_manager, "page_close_heat");
     lv_obj_t *page_steam_right = lv_100ask_page_manager_page_create(page_manager, "page_steam_right");
     lv_obj_t *page_steam_assist = lv_100ask_page_manager_page_create(page_manager, "page_steam_assist");
+    lv_obj_t *page_production_main = lv_100ask_page_manager_page_create(page_manager, "page_production_main");
+    lv_obj_t *page_screen_main = lv_100ask_page_manager_page_create(page_manager, "page_screen_main");
     lv_obj_t *page_screen_line = lv_100ask_page_manager_page_create(page_manager, "page_screen_line");
 
     lv_100ask_page_manager_set_page_init(main_page, init_main_page);
@@ -538,6 +542,8 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_page_init(page_close_heat, lv_page_close_heat_init);
     lv_100ask_page_manager_set_page_init(page_steam_right, lv_page_steam_right_init);
     lv_100ask_page_manager_set_page_init(page_steam_assist, lv_page_steam_assist_init);
+    lv_100ask_page_manager_set_page_init(page_production_main, lv_page_production_main_init);
+    lv_100ask_page_manager_set_page_init(page_screen_main, lv_page_screen_main_init);
     lv_100ask_page_manager_set_page_init(page_screen_line, lv_page_screen_line_init);
 #if LV_100ASK_PAGE_MANAGER_COSTOM_ANIMARION
     lv_100ask_page_manager_set_open_page_anim(main_page, open_page_anim);
@@ -568,10 +574,11 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_close_page_anim(page_steam_assist, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_screen_line, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_screen_line, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_production_main, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_production_main, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_screen_main, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_screen_main, close_page_anim);
 #endif
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");
-
-    // lv_100ask_page_manager_set_load_page_event(icon_wifi, NULL, "page_set");
-    lv_100ask_page_manager_set_load_page_event(icon_set, NULL, "page_set");
 }

@@ -93,7 +93,8 @@ static void about_event_handler(lv_event_t *e)
     {
         if (index == 0)
         {
-            lv_100ask_page_manager_set_open_page(NULL, "page_screen_line");
+            production_mode(1);
+            lv_100ask_page_manager_set_open_page(NULL, "page_production_main");
         }
         else if (index == 0)
         {
@@ -149,7 +150,7 @@ lv_obj_t *lv_about2_list_create(const char *key)
 void lv_page_about_create(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
-    
+
     about_list = lv_list_create(page);
     lv_obj_set_size(about_list, LV_PCT(100), LV_PCT(100));
     lv_obj_align(about_list, LV_ALIGN_BOTTOM_MID, 0, 0);

@@ -84,7 +84,10 @@ extern "C"
 
     void recipe_cook_start(recipe_t *recipe, const int reserve_time);
     steamoven_mode_t *get_steamoven_mode(unsigned char mode_index);
-
+    void production_mode(const char state);
+    
+    void lv_page_production_main_init(lv_obj_t *page);
+    void lv_page_screen_main_init(lv_obj_t *page);
     void lv_page_screen_line_init(lv_obj_t *page);
     /**********************
      *      MACROS
