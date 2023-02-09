@@ -23,10 +23,12 @@ static void lv_wifi_list_clean(void);
 static char *cur_ssid;
 static char cur_flags;
 static lv_obj_t *ta1;
-/**********************
- *  STATIC VARIABLES
- **********************/
-static int wifi_list_item(void *arg)
+static lv_obj_t *sw;
+    /**********************
+     *  STATIC VARIABLES
+     **********************/
+    static int
+    wifi_list_item(void *arg)
 {
     wifi_node_t *ptr = arg;
     // LV_LOG_USER("%s,ssid:%s,rssi:%d,flags:%d\n", __func__, ptr->ssid, ptr->rssi, ptr->flags);
@@ -109,6 +111,24 @@ static void POSIXTimer_cb(union sigval val)
         }
     }
 }
+static void switch_value_state(const char state)
+{
+    lv_obj_t *label_sw = lv_obj_get_child(sw, 0);
+    if (state)
+    {
+        lv_obj_set_style_text_color(label_sw, lv_color_hex(0xffffff), 0);
+        lv_label_set_text(label_sw, "开");
+        lv_obj_align(label_sw, LV_ALIGN_CENTER, -20, 0);
+        lv_obj_add_state(sw, LV_STATE_CHECKED);
+    }
+    else
+    {
+        lv_obj_set_style_text_color(label_sw, lv_color_hex(themesTextColor2), 0);
+        lv_label_set_text(label_sw, "关");
+        lv_obj_align(label_sw, LV_ALIGN_CENTER, 20, 0);
+        lv_obj_clear_state(sw, LV_STATE_CHECKED);
+    }
+}
 static void switch_event_handler(lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
@@ -116,19 +136,17 @@ static void switch_event_handler(lv_event_t *e)
     if (code == LV_EVENT_VALUE_CHANGED)
     {
         // LV_LOG_USER("State: %s\n", lv_obj_has_state(obj, LV_STATE_CHECKED) ? "On" : "Off");
-        lv_obj_t *label1_sw = lv_obj_get_child(obj, 0);
+        // lv_obj_t *label_sw = lv_obj_get_child(obj, 0);
         if (lv_obj_has_state(obj, LV_STATE_CHECKED))
         {
-            lv_obj_set_style_text_color(label1_sw, lv_color_hex(0xffffff), 0);
-            lv_label_set_text(label1_sw, "开");
-            lv_obj_align(label1_sw, LV_ALIGN_CENTER, -20, 0);
+            g_save_settings.wifiEnable = 1;
         }
         else
         {
-            lv_obj_set_style_text_color(label1_sw, lv_color_hex(themesTextColor2), 0);
-            lv_label_set_text(label1_sw, "关");
-            lv_obj_align(label1_sw, LV_ALIGN_CENTER, 20, 0);
+            g_save_settings.wifiEnable = 0;
         }
+        switch_value_state(g_save_settings.wifiEnable);
+        LV_LOG_USER("H_Kv_Set:%d", H_Kv_Set("wifiEnable", &g_save_settings.wifiEnable, 1, 0));
     }
 }
 
@@ -344,6 +362,7 @@ void lv_page_wifi_visible(const int visible)
         POSIXTimerSet(wifi_timer, 2, 2);
         // set_num_toServer("WifiScan", -1);
         get_toServer("WifiScanR");
+        switch_value_state(g_save_settings.wifiEnable);
     }
     else
     {
@@ -370,15 +389,15 @@ void lv_page_wifi_create(lv_obj_t *page)
     lv_label_set_text(label, "WIFI");
     lv_obj_align(label, LV_ALIGN_TOP_LEFT, 30, 30);
 
-    lv_obj_t *sw = lv_switch_create(head);
+    sw = lv_switch_create(head);
     lv_obj_align(sw, LV_ALIGN_TOP_RIGHT, -114, 25);
     lv_obj_set_size(sw, 100, 46);
 
-    lv_obj_t *label1_sw = lv_label_create(sw);
-    lv_obj_set_style_text_font(label1_sw, &lv_font_SiYuanHeiTi_Normal_26, 0);
-    lv_obj_set_style_text_color(label1_sw, lv_color_hex(themesTextColor2), 0);
-    lv_label_set_text(label1_sw, "关");
-    lv_obj_align(label1_sw, LV_ALIGN_CENTER, 20, 0);
+    lv_obj_t *label_sw = lv_label_create(sw);
+    lv_obj_set_style_text_font(label_sw, &lv_font_SiYuanHeiTi_Normal_26, 0);
+    lv_obj_set_style_text_color(label_sw, lv_color_hex(themesTextColor2), 0);
+    lv_label_set_text(label_sw, "关");
+    lv_obj_align(label_sw, LV_ALIGN_CENTER, 20, 0);
 
     lv_obj_add_style(sw, &switch_style_indicator, LV_PART_INDICATOR);
     lv_obj_add_style(sw, &switch_style_indicator_check, LV_PART_INDICATOR | LV_STATE_CHECKED);

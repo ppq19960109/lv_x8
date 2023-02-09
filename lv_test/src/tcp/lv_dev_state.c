@@ -4,6 +4,7 @@
 #include "lv_backlight.h"
 
 recipe_t g_recipes[40];
+save_settings_t g_save_settings;
 char wifi_connecting = 0;
 static pthread_mutex_t mutex;
 static dev_state_t *g_dev_state = NULL;
@@ -442,6 +443,17 @@ fail:
     return NULL;
 }
 
+void save_settings_init()
+{
+    int len = 1;
+    H_Kv_Get("firstStartup", &g_save_settings.firstStartup, &len);
+    H_Kv_Get("sleepSwitch", &g_save_settings.sleepSwitch, &len);
+    H_Kv_Get("sleepTime", &g_save_settings.sleepTime, &len);
+    H_Kv_Get("screenSaverIndex", &g_save_settings.screenSaverIndex, &len);
+    H_Kv_Get("brightness", &g_save_settings.brightness, &len);
+    H_Kv_Get("wifiEnable", &g_save_settings.wifiEnable, &len);
+    LV_LOG_USER("%s,wifiEnable:%d\n", __func__, g_save_settings.wifiEnable);
+}
 int lv_dev_init(void) // 初始化
 {
     pthread_mutex_init(&mutex, NULL);
@@ -452,7 +464,7 @@ int lv_dev_init(void) // 初始化
         printf("dzlog_init failed\n");
         return -1;
     }
-
+    save_settings_init();
     backlightEnable();
     backlightSet(200);
 

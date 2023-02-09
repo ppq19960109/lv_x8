@@ -2,6 +2,7 @@
 #define _LV_DEV_STATE_H_
 
 #include "cJSON.h"
+#include "KV_linux.h"
 
 #define PROFILE_NAME "LvDevProfile.json"
 
@@ -130,9 +131,21 @@ typedef struct
     int cookPos;
 } recipe_t;
 
+typedef struct
+{
+    char firstStartup;
+    char sleepSwitch;
+    char sleepTime;
+    char screenSaverIndex;
+    unsigned char brightness;
+    char wifiEnable;
+    char reboot;
+} save_settings_t;
+
 extern recipe_t g_recipes[40];
 extern const char *workStateChineseEnum[];
 extern char wifi_connecting;
+extern save_settings_t g_save_settings;
 
 int lv_dev_init(void);
 void lv_dev_deinit(void);

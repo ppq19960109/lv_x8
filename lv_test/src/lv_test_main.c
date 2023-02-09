@@ -414,7 +414,11 @@ static void home_bar_event_cb(lv_event_t *e)
     break;
     }
 }
-
+static void screen_event_cb(lv_event_t *e)
+{
+        LV_LOG_USER("-----------------------------------------------%s,code:%d\n", __func__, e->code);
+    lv_obj_t *target = lv_event_get_target(e);
+}
 lv_obj_t *manual_scr = NULL, *main_scr = NULL;
 void lv_test_widgets(void)
 {
@@ -425,7 +429,6 @@ void lv_test_widgets(void)
     // lv_100ask_page_manager_simple_test();
     // lv_100ask_demo_layer();
     // return 0;
-
     lv_dev_init();
     init_style();
     clock_timer = POSIXTimerCreate(0, POSIXTimer_cb);
@@ -496,6 +499,7 @@ void lv_test_widgets(void)
     lv_img_set_src(icon_standby, themesImagesPath "icon_standby.png");
     lv_obj_align(icon_standby, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_event_cb(standby_obj, home_bar_event_cb, LV_EVENT_CLICKED, 3);
+
     //****************************************************
     home = lv_obj_create(lv_scr_act());
     // lv_obj_refresh_style(home, LV_PART_ANY, LV_STYLE_PROP_ANY);
@@ -509,6 +513,7 @@ void lv_test_widgets(void)
 
     lv_obj_set_size(home, 1160, LV_PCT(100));
     lv_obj_set_align(home, LV_ALIGN_LEFT_MID);
+
     //****************************************************
     lv_obj_t *page_manager = lv_100ask_page_manager_create(home);
 

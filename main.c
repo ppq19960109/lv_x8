@@ -12,6 +12,12 @@
 
 #define DISP_BUF_SIZE (1280 * 400)
 pthread_mutex_t g_mutex;
+
+static void feedback_cb(struct _lv_indev_drv_t *lv_indev_drv, uint8_t event_code)
+{
+    if (LV_EVENT_CLICKED == event_code)
+        printf("%s,code:%d.............\n", __func__, event_code);
+}
 int main(void)
 {
     /*LittlevGL init*/
@@ -46,6 +52,7 @@ int main(void)
 
     /*This function will be called periodically (by the library) to get the mouse position and state*/
     indev_drv_1.read_cb = evdev_read;
+    indev_drv_1.feedback_cb = feedback_cb;
     lv_indev_t *mouse_indev = lv_indev_drv_register(&indev_drv_1);
 
     /*Set a cursor for the mouse*/
