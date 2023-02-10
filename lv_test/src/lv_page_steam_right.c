@@ -205,8 +205,8 @@ void lv_page_steam_right_init(lv_obj_t *page)
     lv_obj_t *temp_label = lv_label_create(temp_obj);
     lv_obj_set_style_text_font(temp_label, &lv_font_SiYuanHeiTi_Normal_34, 0);
     lv_obj_set_style_text_color(temp_label, lv_color_hex(themesTextColor), 0);
-    lv_label_set_text(temp_label, "度");
-    lv_obj_align(temp_label, LV_ALIGN_CENTER, 60, -8);
+    lv_label_set_text(temp_label, "C");
+    lv_obj_align(temp_label, LV_ALIGN_CENTER, 50, -6);
 
     roller2 = lv_roller_create(temp_obj);
     lv_obj_set_size(roller2, LV_PCT(100), LV_PCT(100));
@@ -226,7 +226,7 @@ void lv_page_steam_right_init(lv_obj_t *page)
     lv_obj_set_style_text_font(time_label, &lv_font_SiYuanHeiTi_Normal_34, 0);
     lv_obj_set_style_text_color(time_label, lv_color_hex(themesTextColor), 0);
     lv_label_set_text(time_label, "分钟");
-    lv_obj_align(time_label, LV_ALIGN_CENTER, 60, -8);
+    lv_obj_align(time_label, LV_ALIGN_CENTER, 70, -6);
 
     roller3 = lv_roller_create(time_obj);
     lv_obj_set_size(roller3, LV_PCT(100), LV_PCT(100));

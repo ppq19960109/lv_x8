@@ -223,8 +223,8 @@ static void steam_left_roller_create(lv_obj_t *parent)
     lv_obj_t *temp_label = lv_label_create(temp_obj);
     lv_obj_set_style_text_font(temp_label, &lv_font_SiYuanHeiTi_Normal_34, 0);
     lv_obj_set_style_text_color(temp_label, lv_color_hex(themesTextColor), 0);
-    lv_label_set_text(temp_label, "度");
-    lv_obj_align(temp_label, LV_ALIGN_CENTER, 60, -8);
+    lv_label_set_text(temp_label, "C");
+    lv_obj_align(temp_label, LV_ALIGN_CENTER, 50, -6);
 
     roller2 = lv_roller_create(temp_obj);
     lv_obj_set_size(roller2, LV_PCT(100), LV_PCT(100));
@@ -244,7 +244,7 @@ static void steam_left_roller_create(lv_obj_t *parent)
     lv_obj_set_style_text_font(time_label, &lv_font_SiYuanHeiTi_Normal_34, 0);
     lv_obj_set_style_text_color(time_label, lv_color_hex(themesTextColor), 0);
     lv_label_set_text(time_label, "分钟");
-    lv_obj_align(time_label, LV_ALIGN_CENTER, 60, -8);
+    lv_obj_align(time_label, LV_ALIGN_CENTER, 70, -6);
 
     roller3 = lv_roller_create(time_obj);
     lv_obj_set_size(roller3, LV_PCT(100), LV_PCT(100));
@@ -366,7 +366,7 @@ void lv_page_multistage_init(lv_obj_t *page)
 
     page_cont_row = lv_obj_create(page);
     lv_obj_set_size(page_cont_row, 300 * 3, 250);
-    lv_obj_align_to(page_cont_row, back_bar, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 50);
+    lv_obj_align_to(page_cont_row, back_bar, LV_ALIGN_OUT_BOTTOM_LEFT, 20, 50);
     lv_obj_set_flex_flow(page_cont_row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(page_cont_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
@@ -399,13 +399,13 @@ void lv_page_multistage_init(lv_obj_t *page)
         label = lv_label_create(first_obj); // 4
         lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_24, 0);
         lv_obj_set_style_text_color(label, lv_color_hex(0xFFA834), 0);
-        lv_obj_align(label, LV_ALIGN_TOP_LEFT, 36, 130);
+        lv_obj_align(label, LV_ALIGN_TOP_LEFT, 40, 130);
         lv_label_set_text(label, "180C");
 
         label = lv_label_create(first_obj); // 5
         lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_24, 0);
         lv_obj_set_style_text_color(label, lv_color_hex(0xFFA834), 0);
-        lv_obj_align(label, LV_ALIGN_TOP_RIGHT, -36, 130);
+        lv_obj_align(label, LV_ALIGN_TOP_RIGHT, -40, 130);
         lv_label_set_text(label, "120分钟");
 
         lv_obj_t *btn = lv_btn_create(first_obj); // 6

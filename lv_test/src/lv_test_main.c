@@ -18,6 +18,7 @@ static timer_t clock_timer;
 static lv_obj_t *home, *home_bar;
 char LStOvState = 0, RStOvState = 0;
 char LStoveStatus = 0, RStoveStatus = 0;
+static lv_obj_t *gif;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -129,6 +130,11 @@ static void POSIXTimer_cb(union sigval val)
     {
         // raise(SIGRTMIN);
         pthread_mutex_lock(&g_mutex);
+        if (gif != NULL)
+        {
+            lv_obj_del(gif);
+            gif = NULL;
+        }
         getCurrentTime();
         pthread_mutex_unlock(&g_mutex);
     }
@@ -339,6 +345,10 @@ static void init_main_page(lv_obj_t *page)
     lv_100ask_page_manager_set_load_page_event(home_smartrecipes, NULL, "page_smartrecipes");
 
     register_property_change_cb(property_change_cb);
+
+    // gif = lv_gif_create(lv_scr_act());
+    // lv_gif_set_src(gif, "S:/oem/boot.gif");
+    // lv_gif_restart(gif);
 }
 //-------------------------------------------------
 static void init_style()
@@ -347,13 +357,13 @@ static void init_style()
     lv_style_set_text_font(&roller_style_unselected, &lv_font_SiYuanHeiTi_Normal_30);
     lv_style_set_text_color(&roller_style_unselected, lv_color_hex(0xffffff));
     lv_style_set_text_align(&roller_style_unselected, LV_TEXT_ALIGN_CENTER);
-    lv_style_set_text_line_space(&roller_style_unselected, 16);
+    lv_style_set_text_line_space(&roller_style_unselected, 18);
 
     lv_style_init(&roller_style_selected);
     lv_style_set_text_font(&roller_style_selected, &lv_font_SiYuanHeiTi_Normal_34);
     lv_style_set_text_color(&roller_style_selected, lv_color_hex(themesTextColor));
     lv_style_set_text_align(&roller_style_selected, LV_TEXT_ALIGN_CENTER);
-    lv_style_set_text_line_space(&roller_style_selected, 16);
+    lv_style_set_text_line_space(&roller_style_selected, 18);
 
     lv_style_init(&slider_style_main);
     lv_style_set_bg_opa(&slider_style_main, LV_OPA_COVER);
@@ -409,6 +419,7 @@ static void home_bar_event_cb(lv_event_t *e)
         }
         else
         {
+            lv_auto_screen_dialog4(0);
         }
     }
     break;
@@ -416,7 +427,7 @@ static void home_bar_event_cb(lv_event_t *e)
 }
 static void screen_event_cb(lv_event_t *e)
 {
-        LV_LOG_USER("-----------------------------------------------%s,code:%d\n", __func__, e->code);
+    LV_LOG_USER("-----------------------------------------------%s,code:%d\n", __func__, e->code);
     lv_obj_t *target = lv_event_get_target(e);
 }
 lv_obj_t *manual_scr = NULL, *main_scr = NULL;
@@ -432,7 +443,7 @@ void lv_test_widgets(void)
     lv_dev_init();
     init_style();
     clock_timer = POSIXTimerCreate(0, POSIXTimer_cb);
-    POSIXTimerSet(clock_timer, 60, 15);
+    POSIXTimerSet(clock_timer, 60, 10);
     signal(SIGRTMIN, signalHandler);
 
     lv_obj_t *win_bg = lv_img_create(lv_scr_act());
@@ -486,6 +497,11 @@ void lv_test_widgets(void)
     lv_obj_t *icon_alarm = lv_img_create(alarm_obj);
     lv_img_set_src(icon_alarm, themesImagesPath "icon_alarm.png");
     lv_obj_align(icon_alarm, LV_ALIGN_CENTER, 0, 0);
+    // lv_obj_t *icon_alarm_time = lv_label_create(alarm_obj);
+    // lv_obj_set_style_text_font(icon_alarm_time, &lv_font_montserrat_24, 0);
+    // lv_obj_set_style_text_color(icon_alarm_time, lv_color_hex(themesTextColor), 0);
+    // lv_label_set_text(icon_alarm_time, "01:02:03");
+    // lv_obj_align(icon_alarm_time, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_event_cb(alarm_obj, home_bar_event_cb, LV_EVENT_CLICKED, 2);
 
     lv_obj_t *standby_obj = lv_obj_create(home_bar);

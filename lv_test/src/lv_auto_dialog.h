@@ -29,6 +29,8 @@ extern "C"
     lv_obj_t *lv_auto_dialog3();
     void lv_auto_dialog3_update(const char *content, const char *confirm);
     void lv_auto_dialog3_close();
+    void lv_auto_screen_dialog4(const char index);
+    void lv_auto_screen_dialog4_close();
     /**********************
      *      MACROS
      **********************/

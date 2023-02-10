@@ -126,3 +126,25 @@ void lv_auto_dialog3_close()
         return;
     clean_auto_layer();
 }
+static lv_obj_t *lv_screen_saver_dialog(lv_obj_t *parent)
+{
+    lv_obj_t *screen_img = lv_img_create(parent);
+    lv_img_set_src(screen_img, themesImagesPath "screen_saver1.png");
+    return screen_img;
+}
+void lv_auto_screen_dialog4(const char index)
+{
+    clean_auto_layer();
+    lv_obj_t *layer = get_auto_layer();
+    lv_screen_saver_dialog(layer);
+    layer->user_data = 4;
+    lv_obj_add_flag(layer,LV_OBJ_FLAG_CLICKABLE);
+}
+void lv_auto_screen_dialog4_close()
+{
+    lv_obj_t *layer = get_auto_layer();
+    if (layer->user_data != 4)
+        return;
+    clean_auto_layer();
+    lv_obj_clear_flag(layer,LV_OBJ_FLAG_CLICKABLE);
+}

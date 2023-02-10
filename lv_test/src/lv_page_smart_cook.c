@@ -61,7 +61,7 @@ lv_obj_t *lv_custom_switch_create(lv_obj_t *parent, int index)
 
     lv_obj_t *label1_sw = lv_label_create(sw);
     lv_obj_set_style_text_font(label1_sw, &lv_font_SiYuanHeiTi_Normal_26, 0);
-    lv_obj_set_style_text_color(label1_sw, lv_color_hex(themesTextColor2), 0);
+    lv_obj_set_style_text_color(label1_sw, lv_color_hex(0xffffff), 0);
     lv_label_set_text(label1_sw, "关");
     lv_obj_align(label1_sw, LV_ALIGN_CENTER, 0, 0);
 
