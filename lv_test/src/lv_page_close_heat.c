@@ -108,6 +108,18 @@ static lv_obj_t *lv_custom_heat_create(lv_obj_t *parent, int index)
     lv_obj_set_style_text_color(label, lv_color_hex(themesTextColor), 0);
     lv_label_set_text(label, "12:34");
     lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 135);
+
+    lv_obj_t *arc = lv_arc_create(obj); // 3
+    lv_obj_set_size(arc, 240, 240);
+    lv_arc_set_rotation(arc, 270);
+    lv_arc_set_bg_angles(arc, 0, 360);
+    lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
+    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_center(arc);
+    lv_obj_set_style_arc_color(arc, lv_color_hex(themesTextColor), LV_PART_INDICATOR);
+    lv_obj_set_style_arc_width(arc, 20, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_rounded(arc, true, LV_PART_INDICATOR);
+    lv_arc_set_value(arc, 50);
     return obj;
 }
 static void left_dialog1_event_cb(lv_event_t *e)

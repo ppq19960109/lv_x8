@@ -76,10 +76,9 @@ static int send_to_uds(cJSON *root)
     {
         free(send_buf);
     }
-
+    pthread_mutex_unlock(&mutex);
     cJSON_free(json);
     cJSON_Delete(root);
-    pthread_mutex_unlock(&mutex);
     return 0;
 }
 

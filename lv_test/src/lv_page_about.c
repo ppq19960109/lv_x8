@@ -23,11 +23,14 @@ static void about_bind_event_cb(lv_event_t *e)
     case 0:
         break;
     }
-    lv_obj_clean(lv_layer_top());
+    clean_auto_layer();
 }
-static lv_obj_t *lv_about_bind_dialog(const char *topText, const char *centerText)
+lv_obj_t *lv_about_bind_dialog(const char *topText, const char *centerText)
 {
-    lv_obj_t *obj = lv_obj_create(lv_layer_top());
+    clean_auto_layer();
+    lv_obj_t *layer = get_auto_layer();
+
+    lv_obj_t *obj = lv_obj_create(layer);
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_set_style_bg_opa(obj, LV_OPA_60, 0);
     lv_obj_set_style_bg_color(obj, lv_color_hex(0x000), 0);
@@ -52,16 +55,16 @@ static lv_obj_t *lv_about_bind_dialog(const char *topText, const char *centerTex
     lv_label_set_text(label, topText);
     lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 25);
 
-    lv_obj_t *qrcode_img = lv_img_create(popup);
-    lv_obj_align(qrcode_img, LV_ALIGN_CENTER, -150, 10);
-    lv_img_set_src(qrcode_img, recipesImagesPath "QrCode.png");
+    // lv_obj_t *qrcode_img = lv_img_create(popup);
+    // lv_obj_align(qrcode_img, LV_ALIGN_CENTER, -150, 10);
+    // lv_img_set_src(qrcode_img, recipesImagesPath "QrCode.png");
 
-    // lv_obj_t *qr = lv_qrcode_create(popup, 200, lv_color_hex(0x0), lv_color_hex(0xffffff));
-    // const char *data = "https://lvgl.io";
-    // lv_qrcode_update(qr, data, strlen(data));
-    // lv_obj_center(qr);
-    // lv_obj_set_style_border_color(qr, lv_color_hex(0xffffff), 0);
-    // lv_obj_set_style_border_width(qr, 5, 0);
+    lv_obj_t *qr = lv_qrcode_create(popup, 200, lv_color_hex(0x0), lv_color_hex(0xffffff));
+    const char *data = get_attr_value_string("QrCode");
+    lv_qrcode_update(qr, data, strlen(data));
+    lv_obj_align(qr, LV_ALIGN_CENTER, -150, 10);
+    lv_obj_set_style_border_color(qr, lv_color_hex(0xffffff), 0);
+    lv_obj_set_style_border_width(qr, 5, 0);
 
     label = lv_label_create(popup);
     lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_30, 0);
@@ -110,14 +113,14 @@ lv_obj_t *lv_about_list_create(const char *key, const char *value)
     lv_obj_t *label = lv_label_create(obj);
     lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_30, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), 0);
-    lv_label_set_text(label, key);
-    lv_obj_align(label, LV_ALIGN_LEFT_MID, 20, 0);
+    lv_label_set_text(label, value);
+    lv_obj_align(label, LV_ALIGN_RIGHT_MID, -20, 0);
 
     label = lv_label_create(obj);
     lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_30, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), 0);
-    lv_label_set_text(label, value);
-    lv_obj_align(label, LV_ALIGN_RIGHT_MID, -20, 0);
+    lv_label_set_text(label, key);
+    lv_obj_align(label, LV_ALIGN_LEFT_MID, 20, 0);
 
     lv_obj_t *divider = lv_divider_create(obj);
     lv_obj_align(divider, LV_ALIGN_BOTTOM_MID, 0, 0);
@@ -146,6 +149,15 @@ lv_obj_t *lv_about2_list_create(const char *key)
 
     lv_obj_add_event_cb(obj, about_event_handler, LV_EVENT_CLICKED, NULL);
     return obj;
+}
+void lv_page_about_visible(const int visible)
+{
+    lv_obj_t *child = lv_obj_get_child(about_list, 0);
+    lv_label_set_text(lv_obj_get_child(child, 0), get_attr_value_string("ProductCategory"));
+    child = lv_obj_get_child(about_list, 1);
+    lv_label_set_text(lv_obj_get_child(child, 0), get_attr_value_string("ProductModel"));
+    child = lv_obj_get_child(about_list, 2);
+    lv_label_set_text(lv_obj_get_child(child, 0), get_attr_value_string("DeviceName"));
 }
 void lv_page_about_create(lv_obj_t *page)
 {

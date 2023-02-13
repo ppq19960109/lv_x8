@@ -239,7 +239,7 @@ static void property_change_cb(const char *key, void *value)
 
             wifi_list_add(cur);
         }
-        wifi_list_each(NULL);
+        // wifi_list_each(NULL);
         cJSON_Delete(root);
     }
     else if (strcmp("WifiState", key) == 0)
@@ -377,6 +377,7 @@ static void init_style()
 
     lv_style_init(&slider_style_knob);
     lv_style_set_pad_all(&slider_style_knob, 30);
+    lv_style_set_bg_opa(&slider_style_knob, LV_OPA_0);
     lv_style_set_bg_img_src(&slider_style_knob, themesImagesPath "icon_slide.png");
 
     lv_style_init(&switch_style_indicator);

@@ -56,12 +56,15 @@ void wifi_list_add(wifi_node_t *cur)
 
 void wifi_list_each(int (*cb)(void *))
 {
-    wifi_node_t *ptr, *next;
-    list_for_each_entry_safe(ptr, next, &WIFI_LIST, node)
+    int i = 0;
+    wifi_node_t *ptr;
+    list_for_each_entry(ptr, &WIFI_LIST, node)
     {
         printf("%s,ssid:%s,rssi:%d,flags:%d\n", __func__, ptr->ssid, ptr->rssi, ptr->flags);
         if (cb != NULL)
             cb(ptr);
+        // if (++i >= 15)
+        //     break;
     }
 }
 void get_wifi_list_flags(const char *ssid)

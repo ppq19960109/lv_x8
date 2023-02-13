@@ -452,7 +452,8 @@ void save_settings_init()
     H_Kv_Get("screenSaverIndex", &g_save_settings.screenSaverIndex, &len);
     H_Kv_Get("brightness", &g_save_settings.brightness, &len);
     H_Kv_Get("wifiEnable", &g_save_settings.wifiEnable, &len);
-    LV_LOG_USER("%s,wifiEnable:%d\n", __func__, g_save_settings.wifiEnable);
+    LV_LOG_USER("%s,wifiEnable:%d brightness:%d\n", __func__, g_save_settings.wifiEnable, g_save_settings.brightness);
+    backlightSet(g_save_settings.brightness);
 }
 int lv_dev_init(void) // 初始化
 {
@@ -464,9 +465,8 @@ int lv_dev_init(void) // 初始化
         printf("dzlog_init failed\n");
         return -1;
     }
-    save_settings_init();
     backlightEnable();
-    backlightSet(200);
+    save_settings_init();
 
     uds_protocol_init();
     uds_client_init();

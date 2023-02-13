@@ -13,44 +13,103 @@ static lv_obj_t *hood_speed_obj[3];
 static lv_obj_t *stir_fried_rotate;
 
 static lv_obj_t *smart_smoke_rotate;
+static lv_obj_t *sw_obj[4];
 /**********************
  *  STATIC VARIABLES
  **********************/
-static void page_update_SmartSmokeSwitch(void)
+static void switch_update(int index, int value)
 {
-    int value = get_attr_value_int("SmartSmokeSwitch");
+    if (value)
+    {
+        lv_obj_add_state(sw_obj[index], LV_STATE_CHECKED);
+        lv_label_set_text(lv_obj_get_child(sw_obj[index], 0), "开");
+    }
+    else
+    {
+        lv_obj_clear_state(sw_obj[index], LV_STATE_CHECKED);
+        lv_label_set_text(lv_obj_get_child(sw_obj[index], 0), "关");
+    }
 }
-
+static void page_update_RAuxiliarySwitch(void *ptr)
+{
+    int value;
+    if (ptr == NULL)
+        value = get_attr_value_int("RAuxiliarySwitch");
+    else
+        value = get_value_int(ptr);
+    switch_update(0, value);
+}
+static void page_update_CookingCurveSwitch(void *ptr)
+{
+    int value;
+    if (ptr == NULL)
+        value = get_attr_value_int("CookingCurveSwitch");
+    else
+        value = get_value_int(ptr);
+    switch_update(1, value);
+}
+static void page_update_OilTempSwitch(void *ptr)
+{
+    int value;
+    if (ptr == NULL)
+        value = get_attr_value_int("OilTempSwitch");
+    else
+        value = get_value_int(ptr);
+    switch_update(2, value);
+}
+static void page_update_RMovePotLowHeatSwitch(void *ptr)
+{
+    int value;
+    if (ptr == NULL)
+        value = get_attr_value_int("RMovePotLowHeatSwitch");
+    else
+        value = get_value_int(ptr);
+    switch_update(3, value);
+}
 static void property_change_cb(const char *key, void *value)
 {
     LV_LOG_USER("key:%s\n", key);
-    if (strcmp("SmartSmokeSwitch", key) == 0)
+    if (strcmp("RAuxiliarySwitch", key) == 0)
     {
-        page_update_SmartSmokeSwitch();
+        page_update_RAuxiliarySwitch(value);
     }
-    else if (strcmp("HoodSpeed", key) == 0)
+    else if (strcmp("CookingCurveSwitch", key) == 0)
     {
+        page_update_CookingCurveSwitch(value);
+    }
+    else if (strcmp("OilTempSwitch", key) == 0)
+    {
+        page_update_OilTempSwitch(value);
+    }
+    else if (strcmp("RMovePotLowHeatSwitch", key) == 0)
+    {
+        page_update_RMovePotLowHeatSwitch(value);
     }
 }
 static void page_update_cb(void)
 {
-    page_update_SmartSmokeSwitch();
+    page_update_RAuxiliarySwitch(NULL);
+    page_update_CookingCurveSwitch(NULL);
+    page_update_OilTempSwitch(NULL);
+    page_update_RMovePotLowHeatSwitch(NULL);
 }
 static void switch_event_handler(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
     lv_obj_t *target = lv_event_get_target(e);
     int user_data = (int)lv_event_get_user_data(e);
-
+    bool state = lv_obj_has_state(target, LV_STATE_CHECKED);
     switch (user_data)
     {
     case 0:
     {
+        set_num_toServer("RAuxiliarySwitch", state);
     }
     break;
     case 1:
         break;
     case 2:
+        set_num_toServer("OilTempSwitch", state);
         break;
     }
 }
@@ -98,6 +157,7 @@ void lv_page_smart_cook_init(lv_obj_t *page)
     lv_obj_align(label_title, LV_ALIGN_TOP_MID, 0, 30);
     lv_obj_t *sw = lv_custom_switch_create(auxiliary_temp_control, 0);
     lv_obj_align(sw, LV_ALIGN_BOTTOM_MID, 0, -30);
+    sw_obj[0] = sw;
 
     lv_obj_t *cooking_curve = lv_img_create(cont_row);
     lv_img_set_src(cooking_curve, themesImagesPath "cooking_curve.png");
@@ -109,6 +169,7 @@ void lv_page_smart_cook_init(lv_obj_t *page)
     lv_obj_align(label_title, LV_ALIGN_TOP_MID, 0, 30);
     sw = lv_custom_switch_create(cooking_curve, 1);
     lv_obj_align(sw, LV_ALIGN_BOTTOM_MID, 0, -30);
+    sw_obj[1] = sw;
 
     lv_obj_t *oilTemp = lv_img_create(cont_row);
     lv_img_set_src(oilTemp, themesImagesPath "oil_temp.png");
@@ -120,6 +181,7 @@ void lv_page_smart_cook_init(lv_obj_t *page)
     lv_obj_align(label_title, LV_ALIGN_TOP_MID, 0, 30);
     sw = lv_custom_switch_create(oilTemp, 2);
     lv_obj_align(sw, LV_ALIGN_BOTTOM_MID, 0, -30);
+    sw_obj[2] = sw;
 
     lv_obj_t *lowHeat = lv_img_create(cont_row);
     lv_img_set_src(lowHeat, themesImagesPath "movePot_lowHeat.png");
@@ -132,4 +194,5 @@ void lv_page_smart_cook_init(lv_obj_t *page)
     lv_obj_align(label_title, LV_ALIGN_TOP_MID, 0, 30);
     sw = lv_custom_switch_create(lowHeat, 3);
     lv_obj_align(sw, LV_ALIGN_BOTTOM_MID, 0, -30);
+    sw_obj[3] = sw;
 }

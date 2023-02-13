@@ -354,6 +354,46 @@
             "cloudKey": "NtpTimestamp",
             "valueType": 0,
             "uartByteLen": 4
+        },
+        {
+            "cloudKey": "ProductCategory",
+            "valueType": 2,
+            "uartByteLen": 24
+        },
+        {
+            "cloudKey": "ProductModel",
+            "valueType": 2,
+            "uartByteLen": 24
+        },
+        {
+            "cloudKey": "ProductKey",
+            "valueType": 2,
+            "uartByteLen": 33
+        },
+        {
+            "cloudKey": "DeviceName",
+            "valueType": 2,
+            "uartByteLen": 33
+        },
+        {
+            "cloudKey": "ProductSecret",
+            "valueType": 2,
+            "uartByteLen": 33
+        },
+        {
+            "cloudKey": "DeviceSecret",
+            "valueType": 2,
+            "uartByteLen": 33
+        },
+        {
+            "cloudKey": "QrCode",
+            "valueType": 2,
+            "uartByteLen": 80
+        },
+        {
+            "cloudKey": "UpdateLog",
+            "valueType": 2,
+            "uartByteLen": 180
         }
     ],
     "event": [],

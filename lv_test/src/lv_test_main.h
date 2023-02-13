@@ -49,6 +49,7 @@ extern "C"
     extern int g_wifi_state;
     extern pthread_mutex_t g_mutex;
     extern lv_obj_t *manual_scr, *main_scr;
+    extern char scan_count;
     /**********************
      * GLOBAL PROTOTYPES
      **********************/
@@ -79,13 +80,14 @@ extern "C"
     void lv_page_wifi_visible(const int visible);
     void lv_wifi_property_change_cb(const char *key, void *value);
     void lv_page_about_create(lv_obj_t *page);
+    void lv_page_about_visible(const int visible);
     void lv_page_update_create(lv_obj_t *page);
     void lv_page_reset_create(lv_obj_t *page);
 
     void recipe_cook_start(recipe_t *recipe, const int reserve_time);
     steamoven_mode_t *get_steamoven_mode(unsigned char mode_index);
     void production_mode(const char state);
-    
+
     void lv_page_production_main_init(lv_obj_t *page);
     void lv_page_screen_main_init(lv_obj_t *page);
     void lv_page_screen_line_init(lv_obj_t *page);

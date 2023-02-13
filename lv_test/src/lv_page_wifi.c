@@ -8,27 +8,32 @@
 /*********************
  *      DEFINES
  *********************/
+#define POSIXTimer
 typedef struct
 {
     char ssid[33];
     int flags;
 } wifi_info_t;
-static timer_t wifi_timer;
+#ifdef POSIXTimer
+static timer_t *wifi_timer;
+#else
+static lv_timer_t *wifi_timer;
+#endif
+char scan_count;
 static lv_obj_t *wifi_list;
 static lv_obj_t *label_connect;
-static char *bssid;
-static char scan_count, scan_min_num = 2;
-static lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const int flags);
-static void lv_wifi_list_clean(void);
-static char *cur_ssid;
+static lv_obj_t *ta1, *sw;
+static scan_min_num = 2, wifi_input_enable = 0;
+static char *cur_ssid, *bssid;
 static char cur_flags;
-static lv_obj_t *ta1;
-static lv_obj_t *sw;
-    /**********************
-     *  STATIC VARIABLES
-     **********************/
-    static int
-    wifi_list_item(void *arg)
+
+static void lv_wifi_list_clean(void);
+static lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const int flags);
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+static int
+wifi_list_item(void *arg)
 {
     wifi_node_t *ptr = arg;
     // LV_LOG_USER("%s,ssid:%s,rssi:%d,flags:%d\n", __func__, ptr->ssid, ptr->rssi, ptr->flags);
@@ -56,58 +61,73 @@ static lv_obj_t *sw;
     }
     return 0;
 }
-static void wifi_update()
+static void *wifi_update_task(void *arg)
 {
+    pthread_mutex_lock(&g_mutex);
     bssid = get_attr_value_string("bssid");
     lv_wifi_list_clean();
     wifi_list_each(wifi_list_item);
-    // lv_wifi_list_create("ASDF", -46, "WPA-PSK-CCMP+TKIP");
+    pthread_mutex_unlock(&g_mutex);
+}
+static void wifi_update()
+{
+    // pthread_t tid;
+    // pthread_create(&tid, NULL, wifi_update_task, NULL);
+    // pthread_detach(tid);
+    bssid = get_attr_value_string("bssid");
+    lv_wifi_list_clean();
+    wifi_list_each(wifi_list_item);
 }
 void lv_wifi_property_change_cb(const char *key, void *value)
 {
     LV_LOG_USER("%s,key:%s\n", __func__, key);
     if (strcmp("WifiScanR", key) == 0)
     {
-        if (wifi_connecting == 0)
+        if (wifi_connecting == 0 && wifi_input_enable == 0)
         {
             wifi_update();
         }
     }
 }
-
+#ifdef POSIXTimer
 static void POSIXTimer_cb(union sigval val)
+#else
+static void lv_timer_cb(lv_timer_t *timer)
+#endif
 {
-    LV_LOG_USER("%s sival_int:%d", __func__, val.sival_int);
-    if (val.sival_int == 0)
+    LV_LOG_USER("%s,", __func__);
+
+    ++scan_count;
+    if (scan_count <= scan_min_num)
     {
-        ++scan_count;
-        if (scan_count <= scan_min_num)
+        if (scan_count == 1)
         {
-            if (scan_count == 1)
-            {
-                if (wifi_connecting == 0)
-                {
-                    get_toServer("WifiCurConnected");
-                }
-                set_num_toServer("WifiScan", -1);
-            }
-            else if (scan_count == scan_min_num)
-            {
-                POSIXTimerSet(wifi_timer, 9, 9);
-            }
-            if (wifi_connecting == 0)
-                get_toServer("WifiScanR");
-        }
-        else
-        {
-            if (wifi_connecting == 0)
+            if (wifi_connecting == 0 && wifi_input_enable == 0)
             {
                 get_toServer("WifiCurConnected");
-                if (scan_count % 2 == 0)
-                    set_num_toServer("WifiScan", -1);
-                else
-                    get_toServer("WifiScanR");
             }
+            set_num_toServer("WifiScan", -1);
+        }
+        else if (scan_count == scan_min_num)
+        {
+#ifdef POSIXTimer
+            POSIXTimerSet(wifi_timer, 9, 9);
+#else
+            lv_timer_set_period(wifi_timer, 10000);
+#endif
+        }
+        if (wifi_connecting == 0 && wifi_input_enable == 0)
+            get_toServer("WifiScanR");
+    }
+    else
+    {
+        if (wifi_connecting == 0 && wifi_input_enable == 0)
+        {
+            get_toServer("WifiCurConnected");
+            if (scan_count % 2 == 0)
+                set_num_toServer("WifiScan", -1);
+            else
+                get_toServer("WifiScanR");
         }
     }
 }
@@ -153,11 +173,13 @@ static void switch_event_handler(lv_event_t *e)
 static void wifi_input_event_handler(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
+    lv_obj_t *target = lv_event_get_target(e);
     int user_data = lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
-        lv_obj_clean(lv_layer_top());
+        wifi_input_enable = 0;
+        clean_manual_layer();
         break;
     case 1:
     {
@@ -165,6 +187,8 @@ static void wifi_input_event_handler(lv_event_t *e)
         int ta_text_len = strlen(ta_text);
         if (ta_text_len >= 8)
         {
+            lv_label_set_text(target, "连接中");
+            // lv_obj_set_style_text_color(target, lv_color_hex(themesTextColor2), 0);
             connectWiFi(cur_ssid, ta_text, cur_flags);
             wifi_update();
         }
@@ -211,11 +235,14 @@ static void ta_event_cb(lv_event_t *e)
 }
 LV_FONT_DECLARE(lv_font_source_han_sans_normal_16);
 
-static lv_obj_t *lv_wifi_input_dialog(const char *ssid, const int flags)
+static lv_obj_t *lv_wifi_input_dialog5(const char *ssid, const int flags)
 {
     cur_ssid = ssid;
     cur_flags = flags;
-    lv_obj_t *obj = lv_obj_create(lv_layer_top());
+    wifi_input_enable = 1;
+    lv_obj_t *layer = get_manual_layer();
+    layer->user_data = 1;
+    lv_obj_t *obj = lv_obj_create(layer);
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_set_style_bg_opa(obj, LV_OPA_100, 0);
     lv_obj_set_style_bg_color(obj, lv_color_hex(themesPopupWindowColor), 0);
@@ -306,7 +333,7 @@ static void wifi_event_handler(lv_event_t *e)
     lv_obj_t *target = lv_event_get_target(e);
     const char *user_data = lv_event_get_user_data(e);
     LV_LOG_USER("%s,code:%d current_target:%p target:%p\n", __func__, e->code, current_target, target);
-    lv_wifi_input_dialog(user_data, 1);
+    lv_wifi_input_dialog5(user_data, 1);
 }
 void lv_wifi_list_clean(void)
 {
@@ -356,24 +383,44 @@ lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const int flags)
 }
 void lv_page_wifi_visible(const int visible)
 {
+    LV_LOG_USER("%s...visible:%d", __func__, visible);
     if (visible)
     {
-        scan_count = 0;
-        POSIXTimerSet(wifi_timer, 2, 2);
+        // scan_count = 0;
+        wifi_input_enable = 0;
         // set_num_toServer("WifiScan", -1);
-        get_toServer("WifiScanR");
+
         switch_value_state(g_save_settings.wifiEnable);
+#ifdef POSIXTimer
+        get_toServer("WifiScanR");
+        if (scan_count == 0)
+            POSIXTimerSet(wifi_timer, 3, 3);
+        else
+            POSIXTimerSet(wifi_timer, 9, 9);
+#else
+        lv_timer_set_period(wifi_timer, 3000);
+        lv_timer_resume(wifi_timer);
+#endif
     }
     else
     {
+#ifdef POSIXTimer
         POSIXTimerSet(wifi_timer, 0, 0);
+#else
+        lv_timer_pause(wifi_timer);
+#endif
     }
 }
 void lv_page_wifi_create(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
+#ifdef POSIXTimer
     wifi_timer = POSIXTimerCreate(0, POSIXTimer_cb);
-
+#else
+    wifi_timer = lv_timer_create_basic();
+    lv_timer_set_cb(wifi_timer, lv_timer_cb);
+    lv_timer_pause(wifi_timer);
+#endif
     lv_obj_t *head = lv_obj_create(page);
     lv_obj_set_size(head, LV_PCT(100), 140);
     lv_obj_align(head, LV_ALIGN_TOP_MID, 0, 0);

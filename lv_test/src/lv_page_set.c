@@ -29,9 +29,11 @@ static void page_update_cb(void)
     unsigned short index = lv_tabview_get_tab_act(tabview);
     LV_LOG_USER("lv_page_set,%s index:%d\n", __func__, index);
     // lv_tabview_set_act(tabview, 2, LV_ANIM_ON);
-
+    scan_count = 0;
     if (index == 0)
         lv_page_local_set_visible(1);
+    else if (index == 1)
+        lv_page_wifi_visible(1);
 }
 static void tabview_event_cb(lv_event_t *e)
 {
@@ -42,6 +44,8 @@ static void tabview_event_cb(lv_event_t *e)
     LV_LOG_USER("%s,index:%d\n", __func__, index);
     if (index == 0)
         lv_page_local_set_visible(1);
+    else if (index == 2)
+        lv_page_about_visible(1);
 
     if (index == 1)
         lv_page_wifi_visible(1);

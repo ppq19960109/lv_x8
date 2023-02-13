@@ -10,18 +10,23 @@
  *********************/
 static lv_obj_t *sleep_slider_label;
 static lv_obj_t *cont_col, *screensaver;
+static lv_obj_t *light_slider;
 /**********************
  *  STATIC VARIABLES
  **********************/
 void lv_page_local_set_visible(const int visible)
 {
+    LV_LOG_USER("%s,brightness:%d\n", __func__, g_save_settings.brightness);
     if (visible)
     {
+        lv_obj_scroll_to_y(cont_col, 0, LV_ANIM_OFF);
+        lv_slider_set_value(light_slider, g_save_settings.brightness, LV_ANIM_OFF);
         lv_obj_clear_flag(cont_col, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(screensaver, LV_OBJ_FLAG_HIDDEN);
     }
     else
     {
+
         lv_obj_add_flag(cont_col, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(screensaver, LV_OBJ_FLAG_HIDDEN);
     }
@@ -31,11 +36,18 @@ static void slider_event_cb(lv_event_t *e)
 {
     lv_obj_t *slider = lv_event_get_target(e);
     int user_data = lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d slider value:%d user_data:%d\n", __func__, e->code, lv_slider_get_value(slider), user_data);
-    if (user_data == 1)
+    int slider_value = lv_slider_get_value(slider);
+    LV_LOG_USER("%s,code:%d slider value:%d user_data:%d\n", __func__, e->code, slider_value, user_data);
+    if (user_data == 0)
+    {
+        g_save_settings.brightness = slider_value;
+        backlightSet(g_save_settings.brightness);
+        H_Kv_Set("brightness", &g_save_settings.brightness, 1, 0);
+    }
+    else if (user_data == 1)
     {
         char buf[16];
-        lv_snprintf(buf, sizeof(buf), "%d分钟", (int)lv_slider_get_value(slider));
+        lv_snprintf(buf, sizeof(buf), "%d分钟", slider_value);
         lv_label_set_text(sleep_slider_label, buf);
     }
 }
@@ -107,11 +119,11 @@ void lv_page_local_set_create(lv_obj_t *page)
     lv_obj_align(light_img2, LV_ALIGN_RIGHT_MID, -90, 0);
     lv_img_set_src(light_img2, themesImagesPath "icon_light_big.png");
 
-    lv_obj_t *light_slider = lv_slider_create(light_obj);
-    lv_obj_set_size(light_slider, 590, 10);
+    light_slider = lv_slider_create(light_obj);
+    lv_obj_set_size(light_slider, 590, 15);
     lv_obj_align(light_slider, LV_ALIGN_CENTER, 0, 0);
     lv_slider_set_range(light_slider, 1, 255);
-    lv_slider_set_value(light_slider, 200, LV_ANIM_ON);
+    lv_slider_set_value(light_slider, 200, LV_ANIM_OFF);
 
     lv_obj_add_style(light_slider, &slider_style_main, LV_PART_MAIN);
     lv_obj_add_style(light_slider, &slider_style_indicator, LV_PART_INDICATOR);
@@ -160,10 +172,10 @@ void lv_page_local_set_create(lv_obj_t *page)
     lv_obj_align(label_sleep2, LV_ALIGN_RIGHT_MID, -70, 0);
 
     lv_obj_t *sleep_slider = lv_slider_create(sleep_obj);
-    lv_obj_set_size(sleep_slider, 590, 10);
+    lv_obj_set_size(sleep_slider, 590, 15);
     lv_obj_align(sleep_slider, LV_ALIGN_CENTER, 0, 0);
     lv_slider_set_range(sleep_slider, 1, 5);
-    lv_slider_set_value(sleep_slider, 3, LV_ANIM_ON);
+    lv_slider_set_value(sleep_slider, 3, LV_ANIM_OFF);
 
     lv_obj_add_style(sleep_slider, &slider_style_main, LV_PART_MAIN);
     lv_obj_add_style(sleep_slider, &slider_style_indicator, LV_PART_INDICATOR);
@@ -188,6 +200,12 @@ void lv_page_local_set_create(lv_obj_t *page)
     lv_obj_set_style_text_color(label_time, lv_color_hex(0xffffff), 0);
     lv_obj_align(label_time, LV_ALIGN_LEFT_MID, 10, 0);
     lv_obj_add_event_cb(time_obj, btn_event_cb, LV_EVENT_CLICKED, 0);
+
+    lv_obj_t *label_time2 = lv_label_create(time_obj);
+    lv_obj_set_style_text_font(label_time2, &lv_font_SiYuanHeiTi_Normal_30, 0);
+    lv_label_set_text(label_time2, "13:14");
+    lv_obj_set_style_text_color(label_time2, lv_color_hex(0xffffff), 0);
+    lv_obj_align(label_time2, LV_ALIGN_RIGHT_MID, -100, 0);
     //----------------------------------
     lv_obj_t *screen_obj = lv_obj_create(cont_col);
     lv_obj_set_size(screen_obj, LV_PCT(100), 100);
@@ -197,6 +215,12 @@ void lv_page_local_set_create(lv_obj_t *page)
     lv_obj_set_style_text_color(label_screen, lv_color_hex(0xffffff), 0);
     lv_obj_align(label_screen, LV_ALIGN_LEFT_MID, 10, 0);
     lv_obj_add_event_cb(screen_obj, btn_event_cb, LV_EVENT_CLICKED, 1);
+
+    lv_obj_t *label_screen2 = lv_label_create(screen_obj);
+    lv_obj_set_style_text_font(label_screen2, &lv_font_SiYuanHeiTi_Normal_30, 0);
+    lv_label_set_text(label_screen2, "时钟");
+    lv_obj_set_style_text_color(label_screen2, lv_color_hex(0xffffff), 0);
+    lv_obj_align(label_screen2, LV_ALIGN_RIGHT_MID, -100, 0);
     //--------------------------------------------------------------------------------
     screensaver = lv_obj_create(page);
     lv_obj_add_flag(screensaver, LV_OBJ_FLAG_HIDDEN);
