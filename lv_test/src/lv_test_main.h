@@ -82,8 +82,10 @@ extern "C"
     void lv_page_about_create(lv_obj_t *page);
     void lv_page_about_visible(const int visible);
     void lv_page_update_create(lv_obj_t *page);
+    void lv_page_update_visible(const int visible);
     void lv_page_reset_create(lv_obj_t *page);
 
+    void switch_value_state(lv_obj_t *sw, const char state);
     void recipe_cook_start(recipe_t *recipe, const int reserve_time);
     steamoven_mode_t *get_steamoven_mode(unsigned char mode_index);
     void production_mode(const char state);

@@ -174,7 +174,7 @@ static void page_update_StOvRealTemp(const int index, void *ptr)
     if (ptr != NULL)
         value = get_value_int(ptr);
     char buf[16];
-    sprintf(buf, "%dC", value);
+    sprintf(buf, "%d℃", value);
     lv_label_set_text(child[3], buf);
 }
 static void page_update_StOvSetTimerLeft(const int index, void *ptr)
@@ -309,7 +309,7 @@ static void page_update_StOvSetTemp_StOvSetTimer(const int index, void *ptr)
         child = right_child;
     }
     char buf[28];
-    sprintf(buf, "%dC  %d分钟", temp_value, time_value);
+    sprintf(buf, "%d℃  %d分钟", temp_value, time_value);
     lv_label_set_text(child[5], buf);
 }
 static void property_change_cb(const char *key, void *value)

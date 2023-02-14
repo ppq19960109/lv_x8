@@ -10,10 +10,13 @@
  *      DEFINES
  *********************/
 static recipe_t *cur_recipe = NULL;
+static int cook_pos = 0;
+static lv_obj_t *smart_recipes[2];
+static lv_obj_t *pos_btn[2];
 /**********************
  *  STATIC VARIABLES
  **********************/
-static void lv_get_recipes(lv_obj_t *parent, unsigned char recipeType);
+static void lv_get_recipes(lv_obj_t *parent, unsigned char recipeType, char cookPos);
 void recipe_cook_start(recipe_t *recipe, const int reserve_time)
 {
     if (recipe == NULL)
@@ -21,37 +24,43 @@ void recipe_cook_start(recipe_t *recipe, const int reserve_time)
         dzlog_error("recipe data is NULL\n");
         return;
     }
-    steamoven_t steamoven = {0};
-    steamoven.cookId = recipe->recipeid;
-    strcpy(steamoven.cookName, recipe->dishName);
+    if (recipe->cookPos == 0)
+    {
+        steamoven_t steamoven = {0};
+        steamoven.cookId = recipe->recipeid;
+        strcpy(steamoven.cookName, recipe->dishName);
 
-    cJSON *root = cJSON_Parse(recipe->cookSteps);
-    if (root == NULL)
-        return;
-    int arraySize = cJSON_GetArraySize(root);
-    if (arraySize == 0)
-    {
-        dzlog_error("attr arraySize is 0\n");
-        goto fail;
+        cJSON *root = cJSON_Parse(recipe->cookSteps);
+        if (root == NULL)
+            return;
+        int arraySize = cJSON_GetArraySize(root);
+        if (arraySize == 0)
+        {
+            dzlog_error("attr arraySize is 0\n");
+            goto fail;
+        }
+        steamoven.attr_len = arraySize;
+        cJSON *arraySub;
+        for (int i = 0; i < arraySize; i++)
+        {
+            arraySub = cJSON_GetArrayItem(root, i);
+            if (arraySub == NULL)
+                continue;
+            cJSON *mode = cJSON_GetObjectItem(arraySub, "mode");
+            cJSON *temp = cJSON_GetObjectItem(arraySub, "temp");
+            cJSON *time = cJSON_GetObjectItem(arraySub, "time");
+            steamoven.attr[i].mode = mode->valueint;
+            steamoven.attr[i].temp = temp->valueint;
+            steamoven.attr[i].time = time->valueint;
+        }
+        steamoven.orderTime = reserve_time;
+        set_cook_toServer(&steamoven);
+    fail:
+        cJSON_Delete(root);
     }
-    steamoven.attr_len = arraySize;
-    cJSON *arraySub;
-    for (int i = 0; i < arraySize; i++)
+    else
     {
-        arraySub = cJSON_GetArrayItem(root, i);
-        if (arraySub == NULL)
-            continue;
-        cJSON *mode = cJSON_GetObjectItem(arraySub, "mode");
-        cJSON *temp = cJSON_GetObjectItem(arraySub, "temp");
-        cJSON *time = cJSON_GetObjectItem(arraySub, "time");
-        steamoven.attr[i].mode = mode->valueint;
-        steamoven.attr[i].temp = temp->valueint;
-        steamoven.attr[i].time = time->valueint;
     }
-    steamoven.orderTime = reserve_time;
-    set_cook_toServer(&steamoven);
-fail:
-    cJSON_Delete(root);
 }
 static void recipe_click_checked(lv_obj_t *child, unsigned char checked)
 {
@@ -64,6 +73,7 @@ static void recipe_click_checked(lv_obj_t *child, unsigned char checked)
         lv_obj_add_state(child, LV_STATE_CHECKED);
         lv_obj_add_state(child0, LV_STATE_CHECKED);
         lv_obj_add_state(child0_0_0, LV_STATE_CHECKED);
+        cur_recipe = child->user_data;
     }
     else
     {
@@ -140,7 +150,7 @@ static void list_event_handler(lv_event_t *e)
             {
                 lv_obj_add_state(child, LV_STATE_CHECKED);
                 lv_obj_add_state(child0, LV_STATE_CHECKED);
-                lv_get_recipes(user_data, i + 1);
+                lv_get_recipes(user_data, i + 1, cook_pos);
             }
             else
             {
@@ -172,14 +182,18 @@ static lv_obj_t *lv_text_img_btn_create(lv_obj_t *parent, const char *text, void
     lv_obj_center(label);
     return btn1;
 }
-static lv_obj_t *lv_recipe_create(lv_obj_t *parent, const char *img_src, const char *text, void *arg)
+static lv_obj_t *lv_recipe_create(lv_obj_t *parent, const char *img_src, const char *text, const char cookPos, void *arg)
 {
     char imgUrl[256];
-    sprintf(imgUrl, "%s%s%s", recipesImagesPath, img_src, "/0.png");
+    if (cookPos == 0)
+        sprintf(imgUrl, "%s%s%s", recipesImagesPath, img_src, "/0.png");
+    else
+        sprintf(imgUrl, "%s%s%s", recipesImagesPath, img_src, ".png");
     LV_LOG_USER("img_src:%s text:%s imgUrl:%s", img_src, text, imgUrl);
 
     lv_obj_t *obj = lv_obj_create(parent);
     lv_obj_set_size(obj, 152, 210);
+    obj->user_data = arg;
     lv_obj_add_event_cb(obj, recipe_event_cb, LV_EVENT_CLICKED, arg);
 
     lv_obj_t *img = lv_img_create(obj);
@@ -207,18 +221,28 @@ static lv_obj_t *lv_recipe_create(lv_obj_t *parent, const char *img_src, const c
 
     return NULL;
 }
-static void lv_get_recipes(lv_obj_t *parent, unsigned char recipeType)
+static void lv_get_recipes(lv_obj_t *parent, unsigned char recipeType, char cookPos)
 {
     lv_obj_clean(parent);
     cur_recipe = NULL;
-    for (int i = 0; i < 40; ++i)
+    if (cookPos == 0)
     {
-        if (recipeType == g_recipes[i].recipeType)
+        for (int i = 0; i < 40; ++i)
         {
-            lv_recipe_create(parent, g_recipes[i].imgUrl, g_recipes[i].dishName, &g_recipes[i]);
-            if (cur_recipe == NULL)
+            // LV_LOG_USER("%s,recipeType:%d\n", __func__, g_recipes[i].recipeType);
+            if (recipeType == g_recipes[i].recipeType)
             {
-                cur_recipe = &g_recipes[i];
+                lv_recipe_create(parent, g_recipes[i].imgUrl, g_recipes[i].dishName, g_recipes[i].cookPos, &g_recipes[i]);
+            }
+        }
+    }
+    else
+    {
+        for (int i = 40; i < 60; ++i)
+        {
+            if (recipeType == g_recipes[i].recipeType)
+            {
+                lv_recipe_create(parent, g_recipes[i].imgUrl, g_recipes[i].dishName, g_recipes[i].cookPos, &g_recipes[i]);
             }
         }
     }
@@ -277,19 +301,52 @@ static void btn_array_event_cb(lv_event_t *e)
         lv_manual_reserve_dialog("左腔将在", reserve_dialog_event_cb);
     }
 }
-void lv_page_smartrecipes_init(lv_obj_t *page)
+static void cookPos_btn_array_event_cb(lv_event_t *e)
 {
-    LV_LOG_USER("%s...", __func__);
-    // lv_obj_clear_flag(page, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_t *back_bar = lv_page_back_bar_init(page, "智慧菜谱", NULL, NULL);
-    lv_page_top_bar_init(page, 2);
-
-    lv_obj_t *left_content = lv_obj_create(page);
-    lv_obj_t *right_content = lv_obj_create(page);
+    lv_obj_t *target = lv_event_get_target(e);
+    int user_data = (int)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    cook_pos = user_data;
+    lv_obj_t *parent;
+    if (user_data == 0)
+    {
+        lv_obj_add_flag(smart_recipes[1], LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(smart_recipes[0], LV_OBJ_FLAG_HIDDEN);
+        lv_obj_set_style_border_opa(pos_btn[0], LV_OPA_100, 0);
+        lv_obj_set_style_border_opa(pos_btn[1], LV_OPA_0, 0);
+        lv_obj_set_style_bg_opa(pos_btn[0], LV_OPA_100, 0);
+        lv_obj_set_style_bg_opa(pos_btn[1], LV_OPA_0, 0);
+        parent = smart_recipes[0]->user_data;
+    }
+    else
+    {
+        lv_obj_add_flag(smart_recipes[0], LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(smart_recipes[1], LV_OBJ_FLAG_HIDDEN);
+        lv_obj_set_style_border_opa(pos_btn[0], LV_OPA_0, 0);
+        lv_obj_set_style_border_opa(pos_btn[1], LV_OPA_100, 0);
+        lv_obj_set_style_bg_opa(pos_btn[0], LV_OPA_0, 0);
+        lv_obj_set_style_bg_opa(pos_btn[1], LV_OPA_100, 0);
+        parent = smart_recipes[1]->user_data;
+    }
+    int child_num = lv_obj_get_child_cnt(parent);
+    for (int i = 0; i < child_num; ++i)
+    {
+        lv_obj_t *child = lv_obj_get_child(parent, i);
+        if (lv_obj_has_state(child, LV_STATE_CHECKED))
+        {
+            recipe_click_checked(child, 1);
+        }
+    }
+}
+void left_recipes_create(lv_obj_t *parent)
+{
+    lv_obj_t *left_content = lv_obj_create(parent);
+    lv_obj_t *right_content = lv_obj_create(parent);
     lv_obj_clear_flag(right_content, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    parent->user_data = right_content;
 
     lv_obj_set_size(left_content, 156, 345);
-    lv_obj_align_to(left_content, back_bar, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+    lv_obj_align(left_content, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
     lv_obj_t *menulist = lv_img_create(left_content);
     lv_obj_set_size(menulist, LV_PCT(100), LV_PCT(100));
     lv_img_set_src(menulist, themesImagesPath "menulist_background.png");
@@ -312,7 +369,95 @@ void lv_page_smartrecipes_init(lv_obj_t *page)
 
     lv_obj_set_flex_flow(right_content, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(right_content, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_get_recipes(right_content, 1);
+    lv_get_recipes(right_content, 1, 0);
+}
+
+void right_recipes_create(lv_obj_t *parent)
+{
+    lv_obj_t *left_content = lv_obj_create(parent);
+    lv_obj_t *right_content = lv_obj_create(parent);
+    lv_obj_clear_flag(right_content, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    parent->user_data = right_content;
+
+    lv_obj_set_size(left_content, 156, 345);
+    lv_obj_align(left_content, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
+    lv_obj_t *menulist = lv_img_create(left_content);
+    lv_obj_set_size(menulist, LV_PCT(100), LV_PCT(100));
+    lv_img_set_src(menulist, themesImagesPath "menulist_background.png");
+
+    lv_obj_t *list = lv_list_create(left_content);
+
+    lv_obj_set_size(list, LV_PCT(100), LV_SIZE_CONTENT);
+    lv_obj_align(list, LV_ALIGN_TOP_MID, 0, 15);
+    lv_obj_t *first_btn = lv_text_img_btn_create(list, "油炸菜", right_content);
+    lv_text_img_btn_create(list, "水煮菜", right_content);
+    lv_text_img_btn_create(list, "香煎菜", right_content);
+    lv_text_img_btn_create(list, "清炒菜", right_content);
+
+    lv_obj_add_state(first_btn, LV_STATE_CHECKED);
+    lv_obj_add_state(lv_obj_get_child(first_btn, 0), LV_STATE_CHECKED);
+
+    lv_obj_set_size(right_content, 152 * 4 + 180 + 30, 258);
+    lv_obj_align_to(right_content, left_content, LV_ALIGN_OUT_RIGHT_TOP, 0, 26);
+
+    lv_obj_set_flex_flow(right_content, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(right_content, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_get_recipes(right_content, 1, 1);
+}
+void lv_page_smartrecipes_init(lv_obj_t *page)
+{
+    LV_LOG_USER("%s...", __func__);
+    // lv_obj_clear_flag(page, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_t *back_bar = lv_page_back_bar_init(page, "智慧菜谱", NULL, NULL);
+    lv_page_top_bar_init(page, 2);
+
+    smart_recipes[0] = lv_obj_create(page);
+    lv_obj_set_size(smart_recipes[0], LV_PCT(100), 345);
+    lv_obj_align_to(smart_recipes[0], back_bar, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+    left_recipes_create(smart_recipes[0]);
+
+    smart_recipes[1] = lv_obj_create(page);
+    lv_obj_set_size(smart_recipes[1], LV_PCT(100), 345);
+    lv_obj_align_to(smart_recipes[1], back_bar, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+    right_recipes_create(smart_recipes[1]);
+    lv_obj_add_flag(smart_recipes[1], LV_OBJ_FLAG_HIDDEN);
+
+    lv_obj_t *cont = lv_obj_create(page);
+    lv_obj_set_size(cont, 200 * 2, 40);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_bg_color(cont, lv_color_hex(themesTextColor2), 0);
+    lv_obj_set_style_bg_opa(cont, LV_OPA_100, 0);
+    lv_obj_set_style_radius(cont, 4, 0);
+
+    const char *pos_text[] = {"蒸烤菜(左腔)", "右灶菜"};
+
+    for (int i = 0; i < 2; ++i)
+    {
+        lv_obj_t *btn = lv_btn_create(cont);
+        lv_obj_set_size(btn, 200, LV_PCT(100));
+        lv_obj_set_style_bg_color(btn, lv_color_hex(0x3E2B21), 0);
+        lv_obj_set_style_bg_opa(btn, LV_OPA_0, 0);
+        lv_obj_set_style_radius(btn, 4, 0);
+        lv_obj_set_style_border_color(btn, lv_color_hex(themesTextColor), 0);
+        lv_obj_set_style_border_width(btn, 4, 0);
+        lv_obj_set_style_border_opa(btn, LV_OPA_0, 0);
+        lv_obj_set_style_outline_color(btn, lv_color_hex(themesTextColor), 0);
+        lv_obj_set_style_outline_width(btn, 4, 0);
+        lv_obj_set_style_outline_opa(btn, LV_OPA_0, 0);
+        lv_obj_add_event_cb(btn, cookPos_btn_array_event_cb, LV_EVENT_CLICKED, (void *)i);
+        pos_btn[i] = btn;
+
+        lv_obj_t *label = lv_label_create(btn);
+        lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_24, 0);
+        lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), 0);
+        lv_label_set_text(label, pos_text[i]);
+        lv_obj_center(label);
+    }
+    // lv_obj_set_style_outline_opa(pos_btn[0], LV_OPA_100, 0);
+    lv_obj_set_style_bg_opa(pos_btn[0], LV_OPA_100, 0);
+    lv_obj_set_style_border_opa(pos_btn[0], LV_OPA_100, 0);
+    lv_obj_align_to(cont, back_bar, LV_ALIGN_BOTTOM_MID, 0, 20);
     //------------------------------
     const char *text[] = {"启动", "预约"};
     lv_obj_t *btn_array = lv_custom_btn_array_create(page, text, 2, btn_array_event_cb);

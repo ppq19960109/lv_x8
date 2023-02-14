@@ -129,6 +129,7 @@ typedef struct
     int recipeid;
     int recipeType;
     int cookPos;
+    int temp;
 } recipe_t;
 
 typedef struct
@@ -142,7 +143,7 @@ typedef struct
     char reboot;
 } save_settings_t;
 
-extern recipe_t g_recipes[40];
+extern recipe_t g_recipes[];
 extern const char *workStateChineseEnum[];
 extern char wifi_connecting;
 extern save_settings_t g_save_settings;

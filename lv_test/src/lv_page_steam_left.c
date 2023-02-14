@@ -233,7 +233,7 @@ void lv_page_steam_left_init(lv_obj_t *page)
     lv_obj_t *temp_label = lv_label_create(temp_obj);
     lv_obj_set_style_text_font(temp_label, &lv_font_SiYuanHeiTi_Normal_34, 0);
     lv_obj_set_style_text_color(temp_label, lv_color_hex(themesTextColor), 0);
-    lv_label_set_text(temp_label, "C");
+    lv_label_set_text(temp_label, "℃");
     lv_obj_align(temp_label, LV_ALIGN_CENTER, 50, -6);
 
     roller2 = lv_roller_create(temp_obj);

@@ -46,6 +46,8 @@ static void tabview_event_cb(lv_event_t *e)
         lv_page_local_set_visible(1);
     else if (index == 2)
         lv_page_about_visible(1);
+    else if (index == 3)
+        lv_page_update_visible(1);
 
     if (index == 1)
         lv_page_wifi_visible(1);

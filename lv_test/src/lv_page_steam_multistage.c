@@ -61,7 +61,7 @@ static void multistage_update(void)
             lv_obj_clear_flag(child[7], LV_OBJ_FLAG_HIDDEN);
             lv_img_set_src(child[0], themesImagesPath "icon_round_checked.png");
             lv_label_set_text(child[3], workModeName(multistage_para[i].mode));
-            sprintf(buf, "%dC", multistage_para[i].temp);
+            sprintf(buf, "%d℃", multistage_para[i].temp);
             lv_label_set_text(child[4], buf);
             sprintf(buf, "%d分钟", multistage_para[i].time);
             lv_label_set_text(child[5], buf);
@@ -223,7 +223,7 @@ static void steam_left_roller_create(lv_obj_t *parent)
     lv_obj_t *temp_label = lv_label_create(temp_obj);
     lv_obj_set_style_text_font(temp_label, &lv_font_SiYuanHeiTi_Normal_34, 0);
     lv_obj_set_style_text_color(temp_label, lv_color_hex(themesTextColor), 0);
-    lv_label_set_text(temp_label, "C");
+    lv_label_set_text(temp_label, "℃");
     lv_obj_align(temp_label, LV_ALIGN_CENTER, 50, -6);
 
     roller2 = lv_roller_create(temp_obj);

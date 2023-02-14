@@ -3,7 +3,7 @@
 #include "uds_protocol.h"
 #include "lv_backlight.h"
 
-recipe_t g_recipes[40];
+recipe_t g_recipes[60];
 save_settings_t g_save_settings;
 char wifi_connecting = 0;
 static pthread_mutex_t mutex;
@@ -386,7 +386,52 @@ fail:
     cJSON_Delete(root);
     return NULL;
 }
+static void recipes_parse_array(recipe_t *recipes, cJSON *array)
+{
+    cJSON *arraySub;
+    int arraySize = cJSON_GetArraySize(array);
+    dzlog_info("%s,arraySize:%d\n", __func__, arraySize);
+    for (int i = 0; i < arraySize; ++i)
+    {
+        arraySub = cJSON_GetArrayItem(array, i);
+        if (arraySub == NULL)
+            continue;
+        cJSON *imgUrl = cJSON_GetObjectItem(arraySub, "imgUrl");
+        cJSON *ingredients = cJSON_GetObjectItem(arraySub, "ingredients");
+        cJSON *details = cJSON_GetObjectItem(arraySub, "details");
+        cJSON *recipeid = cJSON_GetObjectItem(arraySub, "recipeid");
+        cJSON *dishName = cJSON_GetObjectItem(arraySub, "dishName");
+        cJSON *cookSteps = cJSON_GetObjectItem(arraySub, "cookSteps");
+        cJSON *recipeType = cJSON_GetObjectItem(arraySub, "recipeType");
+        cJSON *cookPos = cJSON_GetObjectItem(arraySub, "cookPos");
+        cJSON *temp = cJSON_GetObjectItem(arraySub, "temp");
 
+        strncpy(recipes[i].imgUrl, imgUrl->valuestring, sizeof(recipes[i].imgUrl) - 1);
+        strncpy(recipes[i].ingredients, ingredients->valuestring, sizeof(recipes[i].ingredients) - 1);
+        if (cookSteps != NULL)
+            strncpy(recipes[i].cookSteps, cookSteps->valuestring, sizeof(recipes[i].cookSteps) - 1);
+        strncpy(recipes[i].dishName, dishName->valuestring, sizeof(recipes[i].dishName) - 1);
+        if (recipeid != NULL)
+            recipes[i].recipeid = recipeid->valueint;
+        recipes[i].recipeType = recipeType->valueint;
+        recipes[i].cookPos = cookPos->valueint;
+        if (temp != NULL)
+            recipes[i].temp = temp->valueint;
+
+        cJSON *detailSub;
+        recipes[i].details_count = cJSON_GetArraySize(details);
+        recipes[i].details = malloc(recipes[i].details_count * sizeof(char *));
+        for (int j = 0; j < recipes[i].details_count; ++j)
+        {
+            detailSub = cJSON_GetArrayItem(details, j);
+            if (detailSub == NULL)
+                continue;
+            // dzlog_info("recipes step:%d,value%s\n", j, detailSub->valuestring);
+            recipes[i].details[j] = malloc(strlen(detailSub->valuestring) + 1);
+            strcpy(recipes[i].details[j], detailSub->valuestring);
+        }
+    }
+}
 static void *recipes_parse_json(void *input, const char *str) // 启动时解析
 {
     cJSON *root = cJSON_Parse(str);
@@ -398,46 +443,17 @@ static void *recipes_parse_json(void *input, const char *str) // 启动时解析
     cJSON *recipes = cJSON_GetObjectItem(root, "recipes");
     if (recipes == NULL)
     {
-        dzlog_info("recipes is NULL\n");
+        dzlog_error("recipes is NULL\n");
         goto fail;
     }
-    cJSON *arraySub;
-    int arraySize = cJSON_GetArraySize(recipes);
-    for (int i = 0; i < arraySize; ++i)
+    recipes_parse_array(g_recipes, recipes);
+    cJSON *tempRecipes = cJSON_GetObjectItem(root, "tempRecipes");
+    if (tempRecipes == NULL)
     {
-        arraySub = cJSON_GetArrayItem(recipes, i);
-        if (arraySub == NULL)
-            continue;
-        cJSON *imgUrl = cJSON_GetObjectItem(arraySub, "imgUrl");
-        cJSON *ingredients = cJSON_GetObjectItem(arraySub, "ingredients");
-        cJSON *details = cJSON_GetObjectItem(arraySub, "details");
-        cJSON *recipeid = cJSON_GetObjectItem(arraySub, "recipeid");
-        cJSON *dishName = cJSON_GetObjectItem(arraySub, "dishName");
-        cJSON *cookSteps = cJSON_GetObjectItem(arraySub, "cookSteps");
-        cJSON *recipeType = cJSON_GetObjectItem(arraySub, "recipeType");
-        cJSON *cookPos = cJSON_GetObjectItem(arraySub, "cookPos");
-
-        strncpy(g_recipes[i].imgUrl, imgUrl->valuestring, sizeof(g_recipes[i].imgUrl) - 1);
-        strncpy(g_recipes[i].ingredients, ingredients->valuestring, sizeof(g_recipes[i].ingredients) - 1);
-        strncpy(g_recipes[i].cookSteps, cookSteps->valuestring, sizeof(g_recipes[i].cookSteps) - 1);
-        strncpy(g_recipes[i].dishName, dishName->valuestring, sizeof(g_recipes[i].dishName) - 1);
-        g_recipes[i].recipeid = recipeid->valueint;
-        g_recipes[i].recipeType = recipeType->valueint;
-        g_recipes[i].cookPos = cookPos->valueint;
-
-        cJSON *detailSub;
-        g_recipes[i].details_count = cJSON_GetArraySize(details);
-        g_recipes[i].details = malloc(g_recipes[i].details_count * sizeof(char *));
-        for (int j = 0; j < g_recipes[i].details_count; ++j)
-        {
-            detailSub = cJSON_GetArrayItem(details, j);
-            if (detailSub == NULL)
-                continue;
-            // dzlog_info("recipes step:%d,value%s\n", j, detailSub->valuestring);
-            g_recipes[i].details[j] = malloc(strlen(detailSub->valuestring) + 1);
-            strcpy(g_recipes[i].details[j], detailSub->valuestring);
-        }
+        dzlog_error("tempRecipes is NULL\n");
+        goto fail;
     }
+    recipes_parse_array(&g_recipes[40], tempRecipes);
 fail:
     cJSON_Delete(root);
     return NULL;

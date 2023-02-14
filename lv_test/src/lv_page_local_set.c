@@ -8,7 +8,7 @@
 /*********************
  *      DEFINES
  *********************/
-static lv_obj_t *sleep_slider_label;
+static lv_obj_t *sleep_slider_label, *sw, *sleep_obj;
 static lv_obj_t *cont_col, *screensaver;
 static lv_obj_t *light_slider;
 /**********************
@@ -19,6 +19,12 @@ void lv_page_local_set_visible(const int visible)
     LV_LOG_USER("%s,brightness:%d\n", __func__, g_save_settings.brightness);
     if (visible)
     {
+        switch_value_state(sw, g_save_settings.sleepSwitch);
+        if (g_save_settings.sleepSwitch)
+            lv_obj_clear_flag(sleep_obj, LV_OBJ_FLAG_HIDDEN);
+        else
+            lv_obj_add_flag(sleep_obj, LV_OBJ_FLAG_HIDDEN);
+
         lv_obj_scroll_to_y(cont_col, 0, LV_ANIM_OFF);
         lv_slider_set_value(light_slider, g_save_settings.brightness, LV_ANIM_OFF);
         lv_obj_clear_flag(cont_col, LV_OBJ_FLAG_HIDDEN);
@@ -62,18 +68,16 @@ static void switch_event_handler(lv_event_t *e)
         lv_obj_t *label1_sw = lv_obj_get_child(obj, 0);
         if (lv_obj_has_state(obj, LV_STATE_CHECKED))
         {
-            lv_obj_set_style_text_color(label1_sw, lv_color_hex(0xffffff), 0);
-            lv_label_set_text(label1_sw, "开");
-            lv_obj_align(label1_sw, LV_ALIGN_CENTER, -20, 0);
+            g_save_settings.sleepSwitch = 1;
             lv_obj_clear_flag(user_data, LV_OBJ_FLAG_HIDDEN);
         }
         else
         {
-            lv_obj_set_style_text_color(label1_sw, lv_color_hex(themesTextColor2), 0);
-            lv_label_set_text(label1_sw, "关");
-            lv_obj_align(label1_sw, LV_ALIGN_CENTER, 20, 0);
+            g_save_settings.sleepSwitch = 0;
             lv_obj_add_flag(user_data, LV_OBJ_FLAG_HIDDEN);
         }
+        switch_value_state(sw, g_save_settings.sleepSwitch);
+        H_Kv_Set("sleepSwitch", &g_save_settings.sleepSwitch, 1, 0);
     }
 }
 static void btn_event_cb(lv_event_t *e)
@@ -139,7 +143,7 @@ void lv_page_local_set_create(lv_obj_t *page)
     lv_obj_set_style_text_color(label_sleep_switch, lv_color_hex(0xffffff), 0);
     lv_obj_align(label_sleep_switch, LV_ALIGN_LEFT_MID, 10, 0);
 
-    lv_obj_t *sw = lv_switch_create(sleep_switch_obj);
+    sw = lv_switch_create(sleep_switch_obj);
     lv_obj_align(sw, LV_ALIGN_RIGHT_MID, -80, 0);
     lv_obj_set_size(sw, 100, 46);
 
@@ -154,7 +158,7 @@ void lv_page_local_set_create(lv_obj_t *page)
     lv_obj_add_style(sw, &switch_style_knob, LV_PART_KNOB);
 
     //-------------------------------------------------------------
-    lv_obj_t *sleep_obj = lv_obj_create(cont_col);
+    sleep_obj = lv_obj_create(cont_col);
     lv_obj_set_size(sleep_obj, LV_PCT(100), 100);
 
     lv_obj_add_event_cb(sw, switch_event_handler, LV_EVENT_VALUE_CHANGED, sleep_obj);

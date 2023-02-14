@@ -65,7 +65,10 @@ static void page_update_cb(void *user_data)
         lv_style_set_bg_opa(&scrollbar, LV_OPA_80);
         lv_obj_add_style(tab, &scrollbar, LV_PART_SCROLLBAR);
     }
-    sprintf(url, "%s%s%s", recipesImagesPath, cur_recipe->imgUrl, "/0.png");
+    if (cur_recipe->cookPos == 0)
+        sprintf(url, "%s%s%s", recipesImagesPath, cur_recipe->imgUrl, "/0.png");
+    else
+        sprintf(url, "%s%s%s", recipesImagesPath, cur_recipe->imgUrl, ".png");
     LV_LOG_USER("%s,img url:%s\n", __func__, url);
     lv_img_set_src(recipe_img, url);
 
@@ -84,7 +87,7 @@ static void tabview_event_cb(lv_event_t *e)
     int user_data = lv_event_get_user_data(e);
     unsigned short index = lv_tabview_get_tab_act(current_target);
     LV_LOG_USER("%s,index:%d user_data:%d\n", __func__, index, user_data);
-    char url[80];
+    char url[90];
     if (user_data == 0 && index == 0)
     {
         sprintf(url, "%s%s%s", recipesImagesPath, cur_recipe->imgUrl, "/0.png");
@@ -97,7 +100,8 @@ static void tabview_event_cb(lv_event_t *e)
         lv_obj_clear_flag(page_indicator, LV_OBJ_FLAG_HIDDEN);
         lv_page_indicator_check(page_indicator, index);
     }
-    lv_img_set_src(recipe_img, url);
+    if (cur_recipe->cookPos == 0)
+        lv_img_set_src(recipe_img, url);
 }
 static void dialog_event_cb(lv_event_t *e)
 {

@@ -131,7 +131,7 @@ static void lv_timer_cb(lv_timer_t *timer)
         }
     }
 }
-static void switch_value_state(const char state)
+void switch_value_state(lv_obj_t *sw, const char state)
 {
     lv_obj_t *label_sw = lv_obj_get_child(sw, 0);
     if (state)
@@ -165,7 +165,7 @@ static void switch_event_handler(lv_event_t *e)
         {
             g_save_settings.wifiEnable = 0;
         }
-        switch_value_state(g_save_settings.wifiEnable);
+        switch_value_state(sw, g_save_settings.wifiEnable);
         LV_LOG_USER("H_Kv_Set:%d", H_Kv_Set("wifiEnable", &g_save_settings.wifiEnable, 1, 0));
     }
 }
@@ -390,7 +390,7 @@ void lv_page_wifi_visible(const int visible)
         wifi_input_enable = 0;
         // set_num_toServer("WifiScan", -1);
 
-        switch_value_state(g_save_settings.wifiEnable);
+        switch_value_state(sw, g_save_settings.wifiEnable);
 #ifdef POSIXTimer
         get_toServer("WifiScanR");
         if (scan_count == 0)

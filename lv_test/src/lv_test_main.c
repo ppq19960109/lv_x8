@@ -426,11 +426,7 @@ static void home_bar_event_cb(lv_event_t *e)
     break;
     }
 }
-static void screen_event_cb(lv_event_t *e)
-{
-    LV_LOG_USER("-----------------------------------------------%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_target(e);
-}
+
 lv_obj_t *manual_scr = NULL, *main_scr = NULL;
 void lv_test_widgets(void)
 {
