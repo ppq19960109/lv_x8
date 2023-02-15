@@ -93,6 +93,8 @@ extern "C"
     void lv_page_production_main_init(lv_obj_t *page);
     void lv_page_screen_main_init(lv_obj_t *page);
     void lv_page_screen_line_init(lv_obj_t *page);
+    void lv_page_screen_lcd_init(lv_obj_t *page);
+    void lv_page_screen_touch_init(lv_obj_t *page);
     /**********************
      *      MACROS
      **********************/

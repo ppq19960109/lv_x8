@@ -21,9 +21,10 @@ static void btn_event_cb(lv_event_t *e)
     switch (user_data)
     {
     case 0:
+        lv_100ask_page_manager_set_open_page(NULL, "page_screen_lcd");
         break;
     case 1:
-
+        lv_100ask_page_manager_set_open_page(NULL, "page_screen_touch");
         break;
     case 2:
 

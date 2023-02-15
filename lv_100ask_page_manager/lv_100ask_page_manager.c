@@ -143,16 +143,6 @@ void lv_100ask_page_manager_set_open_page(lv_obj_t * obj, char *name)
     }
     else return;
     
-    if (lv_obj_get_child_cnt(obj) == 0)
-    {
-        page->init(obj);
-        
-        // if (page_manager->main_page != obj)
-        // {
-        //     lv_page_back_btn_create(obj);
-        // }
-    }
-    
     /* del a new node */
     lv_100ask_page_manager_history_t * act_hist = _lv_ll_get_head(history_ll);
     if(act_hist != NULL)       
@@ -163,6 +153,14 @@ void lv_100ask_page_manager_set_open_page(lv_obj_t * obj, char *name)
     new_node->page = obj;
     page_manager->cur_depth++;
     LV_LOG_USER("%s,cur_depth:%d", __func__, page_manager->cur_depth);
+    if (lv_obj_get_child_cnt(obj) == 0)
+    {
+        page->init(obj);
+        // if (page_manager->main_page != obj)
+        // {
+        //     lv_page_back_btn_create(obj);
+        // }
+    }
     if(page->open_page)
         page->open_page(obj);
 }
@@ -196,7 +194,10 @@ void lv_100ask_page_manager_set_close_page(lv_obj_t * obj, char *name)
     //page_manager->cur_depth--;
 
 }
-
+void lv_100ask_page_manager_clear_page(lv_obj_t * obj)
+{
+    // lv_obj_clean(obj);
+}
 void lv_100ask_page_manager_set_load_page_event(lv_obj_t * obj, lv_obj_t * page, char *name)
 {
     /* Make the object clickable */
@@ -414,6 +415,7 @@ void lv_page_back_previous_page(void)
     lv_100ask_page_manager_history_t * prev_hist = _lv_ll_get_next(history_ll, act_hist);
     if(prev_hist != NULL) {
         lv_100ask_page_manager_set_close_page(act_hist->page, NULL);
+        lv_100ask_page_manager_clear_page(act_hist->page);
         /* Previous page exists */
         /* Delete the current item from the history */
         _lv_ll_remove(history_ll, act_hist);
@@ -421,13 +423,16 @@ void lv_page_back_previous_page(void)
         page_manager->cur_depth--;
         /* Create the previous page.
         *  Remove it from the history because `lv_100ask_page_manager_set_open_page` will add it again */
-        // _lv_ll_remove(history_ll, prev_hist);
-        // page_manager->cur_depth--;
-        // lv_100ask_page_manager_set_open_page(prev_hist->page, NULL);
-        // lv_mem_free(prev_hist);
+       #if 0
+        _lv_ll_remove(history_ll, prev_hist);
+        page_manager->cur_depth--;
+        lv_100ask_page_manager_set_open_page(prev_hist->page, NULL);
+        lv_mem_free(prev_hist);
+        #else
         lv_100ask_page_manager_page_t * page=(lv_100ask_page_manager_page_t *)prev_hist->page;
         if(page->open_page)
             page->open_page(prev_hist->page);
+        #endif
     }
     LV_LOG_USER("%s,cur_depth:%d", __func__, page_manager->cur_depth);
 }
@@ -441,6 +446,7 @@ void lv_page_back_replace_page(lv_obj_t * obj, char *name)
     lv_100ask_page_manager_history_t * prev_hist = _lv_ll_get_next(history_ll, act_hist);
     if(prev_hist != NULL) {
         lv_100ask_page_manager_set_close_page(act_hist->page, NULL);
+        lv_100ask_page_manager_clear_page(act_hist->page);
         /* Previous page exists */
         /* Delete the current item from the history */
         _lv_ll_remove(history_ll, act_hist);
@@ -462,6 +468,7 @@ void lv_page_back_top_page(void)
     lv_100ask_page_manager_history_t * act_hist = _lv_ll_get_head(history_ll);
     lv_100ask_page_manager_set_close_page(act_hist->page, NULL);
     while(act_hist != NULL && page_manager->cur_depth > 1){
+        lv_100ask_page_manager_clear_page(act_hist->page);
         /* Previous page exists */
         /* Delete the current item from the history */
         _lv_ll_remove(history_ll, act_hist);
