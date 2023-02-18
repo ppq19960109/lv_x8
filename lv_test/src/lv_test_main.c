@@ -5,7 +5,7 @@
  *********************/
 #include <stdio.h>
 #include "lv_test_main.h"
-
+#include "wifi_list.h"
 /*********************
  *      DEFINES
  *********************/
@@ -437,7 +437,6 @@ void lv_test_widgets(void)
     // lv_100ask_page_manager_simple_test();
     // lv_100ask_demo_layer();
     // return 0;
-    lv_dev_init();
     init_style();
     clock_timer = POSIXTimerCreate(0, POSIXTimer_cb);
     POSIXTimerSet(clock_timer, 60, 10);

@@ -14,6 +14,7 @@ LDFLAGS ?= -lm -ldrm
 BIN = lv_X8app
 
 LINKTOOL_PATH:=liblinktool
+HV_PATH:=libhv
 CFLAGS += -I$(LINKTOOL_PATH)/include
 CFLAGS += -I$(LINKTOOL_PATH)/include/base64
 CFLAGS += -I$(LINKTOOL_PATH)/include/cJSON
@@ -22,9 +23,15 @@ CFLAGS += -I$(LINKTOOL_PATH)/include/tcp
 CFLAGS += -I$(LINKTOOL_PATH)/include/signal
 CFLAGS += -I$(LINKTOOL_PATH)/include/timer
 CFLAGS += -I$(LINKTOOL_PATH)/include/md5
+CFLAGS += -I$(HV_PATH)/include/hv
 LDFLAGS += -L$(LINKTOOL_PATH)/lib
-
+LDFLAGS += -L$(HV_PATH)/lib
 LDFLAGS += -L. -lvglfont -llinktool -lzlog -ldl -lm -lpthread -lrt
+
+LDFLAGS += -Wl,--start-group	\
+		-Wl,-Bstatic -lhv \
+		-Wl,-Bdynamic \
+		-Wl,--end-group
 #Collect the files to compile
 MAINSRC = ./main.c
 
@@ -56,6 +63,7 @@ all: default
 
 default: $(AOBJS) $(COBJS) $(MAINOBJ)
 	$(CC) -o $(BIN) $(MAINOBJ) $(AOBJS) $(COBJS) $(LDFLAGS)
+	$(STRIP) $(BIN)
 clean: 
 	rm -f $(BIN) $(AOBJS) $(COBJS) $(MAINOBJ) obj/*
 distclean: 

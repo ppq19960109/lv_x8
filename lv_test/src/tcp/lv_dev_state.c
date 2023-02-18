@@ -189,6 +189,7 @@ static int lv_dev_recv_event(cJSON *Data)
     dev_state_t *dev_state = g_dev_state;
     dev_attr_t *attr = dev_state->attr;
     dev_attr_t *ptr;
+    pthread_mutex_lock(&g_mutex);
     for (int i = 0; i < dev_state->attr_len; ++i)
     {
         ptr = &attr[i];
@@ -197,6 +198,7 @@ static int lv_dev_recv_event(cJSON *Data)
             lv_dev_set_value(Data, ptr);
         }
     }
+    pthread_mutex_unlock(&g_mutex);
     return 0;
 }
 
@@ -484,8 +486,6 @@ int lv_dev_init(void) // 初始化
     backlightEnable();
     save_settings_init();
 
-    uds_protocol_init();
-    uds_client_init();
     g_dev_state = get_dev_profile(".", NULL, PROFILE_NAME, profile_parse_json);
     if (g_dev_state == NULL)
     {
@@ -495,7 +495,7 @@ int lv_dev_init(void) // 初始化
     get_dev_profile(".", NULL, "RecipesDetails.json", recipes_parse_json);
 
     register_uds_json_recv_cb(lv_dev_recv_event);
-
+    uds_protocol_init();
     return 0;
 }
 

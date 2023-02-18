@@ -14,10 +14,9 @@ static lv_obj_t *label_version;
  **********************/
 static void btn_event_cb(lv_event_t *e)
 {
-    lv_obj_t *current_target = lv_event_get_current_target(e);
-    lv_obj_t *target = lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
     int user_data = lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d current_target:%p target:%p\n", __func__, e->code);
+    LV_LOG_USER("%s,code:%d\n", __func__, e->code);
     switch (user_data)
     {
     case 0:

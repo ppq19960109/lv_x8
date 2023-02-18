@@ -20,7 +20,7 @@ lv_obj_t *get_manual_layer()
 void clean_manual_layer()
 {
     lv_obj_t *layer = lv_scr_act();
-    LV_LOG_USER("%s,child_cnt:%d user_data:%d", __func__, lv_obj_get_child_cnt(layer), layer->user_data);
+    LV_LOG_USER("%s,child_cnt:%d user_data:%d", __func__, lv_obj_get_child_cnt(layer), (int)layer->user_data);
     if (layer->user_data > 0)
     {
         layer->user_data = 0;

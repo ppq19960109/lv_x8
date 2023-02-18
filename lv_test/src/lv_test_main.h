@@ -19,7 +19,6 @@ extern "C"
 #include "lv_backlight.h"
 #include "lv_dev_state.h"
 #include "uds_protocol.h"
-#include "wifi_list.h"
 
 #include "lv_custom_item.h"
 #include "lv_auto_dialog.h"

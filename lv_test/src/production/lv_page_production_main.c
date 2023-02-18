@@ -16,7 +16,7 @@
 static void btn_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
     int user_data = (int)lv_event_get_user_data(e);
     switch (user_data)
     {
@@ -73,16 +73,16 @@ void lv_page_production_main_init(lv_obj_t *page)
     lv_obj_align_to(cont, back_bar, LV_ALIGN_OUT_BOTTOM_MID, 0, 30);
     lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_BETWEEN, LV_GRID_ALIGN_SPACE_BETWEEN);
 
-    lv_obj_t *element_obj = lv_text_btn_create(cont, "屏幕检测", 0);
+    lv_obj_t *element_obj = lv_text_btn_create(cont, "屏幕检测", (void *)0);
     lv_obj_set_grid_cell(element_obj, LV_GRID_ALIGN_STRETCH, 0, 1,
                          LV_GRID_ALIGN_STRETCH, 0, 1);
-    element_obj = lv_text_btn_create(cont, "智能模块检测", 1);
+    element_obj = lv_text_btn_create(cont, "智能模块检测", (void *)1);
     lv_obj_set_grid_cell(element_obj, LV_GRID_ALIGN_STRETCH, 1, 1,
                          LV_GRID_ALIGN_STRETCH, 0, 1);
-    element_obj = lv_text_btn_create(cont, "输入输出检测", 2);
+    element_obj = lv_text_btn_create(cont, "输入输出检测", (void *)2);
     lv_obj_set_grid_cell(element_obj, LV_GRID_ALIGN_STRETCH, 0, 1,
                          LV_GRID_ALIGN_STRETCH, 1, 1);
-    element_obj = lv_text_btn_create(cont, "测试模式", 3);
+    element_obj = lv_text_btn_create(cont, "测试模式", (void *)3);
     lv_obj_set_grid_cell(element_obj, LV_GRID_ALIGN_STRETCH, 1, 1,
                          LV_GRID_ALIGN_STRETCH, 1, 1);
 }

@@ -185,7 +185,7 @@ void lv_page_local_set_create(lv_obj_t *page)
     lv_obj_add_style(sleep_slider, &slider_style_indicator, LV_PART_INDICATOR);
     lv_obj_add_style(sleep_slider, &slider_style_knob, LV_PART_KNOB);
 
-    lv_obj_add_event_cb(sleep_slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, 1);
+    lv_obj_add_event_cb(sleep_slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, (void *)1);
     // lv_obj_add_flag(sleep_slider, LV_OBJ_FLAG_ADV_HITTEST);
     // lv_slider_set_mode(sleep_slider, LV_SLIDER_MODE_NORMAL);
     sleep_slider_label = lv_label_create(sleep_obj);
@@ -218,7 +218,7 @@ void lv_page_local_set_create(lv_obj_t *page)
     lv_label_set_text(label_screen, "屏保");
     lv_obj_set_style_text_color(label_screen, lv_color_hex(0xffffff), 0);
     lv_obj_align(label_screen, LV_ALIGN_LEFT_MID, 10, 0);
-    lv_obj_add_event_cb(screen_obj, btn_event_cb, LV_EVENT_CLICKED, 1);
+    lv_obj_add_event_cb(screen_obj, btn_event_cb, LV_EVENT_CLICKED, (void *)1);
 
     lv_obj_t *label_screen2 = lv_label_create(screen_obj);
     lv_obj_set_style_text_font(label_screen2, &lv_font_SiYuanHeiTi_Normal_30, 0);
@@ -230,7 +230,7 @@ void lv_page_local_set_create(lv_obj_t *page)
     lv_obj_add_flag(screensaver, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_size(screensaver, LV_PCT(100), LV_PCT(100));
     lv_obj_t *back_button = lv_custom_back_button_create(screensaver, themesImagesPath "back_button_background.png", "屏保");
-    lv_obj_add_event_cb(back_button, btn_event_cb, LV_EVENT_CLICKED, 2);
+    lv_obj_add_event_cb(back_button, btn_event_cb, LV_EVENT_CLICKED, (void *)2);
     static lv_coord_t col_dsc[] = {438, 438, LV_GRID_TEMPLATE_LAST};
     static lv_coord_t row_dsc[] = {116, 116, LV_GRID_TEMPLATE_LAST};
 

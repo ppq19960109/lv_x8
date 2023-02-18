@@ -320,7 +320,7 @@ static void btn_array_event_cb(lv_event_t *e)
     }
 }
 
-static void page_update_cb(void)
+static void page_update_cb(void *arg)
 {
     memset(multistage_para, 0, sizeof(multistage_para));
     listLastIndex = 0;
@@ -338,7 +338,7 @@ static void add_click_event_cb(lv_event_t *e)
 }
 static void btn_click_event_cb(lv_event_t *e)
 {
-    lv_obj_t *target = lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
     int user_data = lv_event_get_user_data(e);
     int index = user_data / 2;
     LV_LOG_USER("%s,code:%d listLastIndex:%d index:%d\n", __func__, e->code, listLastIndex, index);

@@ -22,9 +22,7 @@ static char steps = 0;
 static void line_event_handler(lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t *current_target = lv_event_get_current_target(e);
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = lv_event_get_user_data(e);
+    // lv_obj_t *target = lv_event_get_target(e);
     // LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
 
     if (code == LV_EVENT_PRESSED)

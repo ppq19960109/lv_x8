@@ -5,6 +5,7 @@
  *********************/
 #include <stdio.h>
 #include "lv_test_main.h"
+#include "wifi_list.h"
 /*********************
  *      DEFINES
  *********************/
@@ -23,7 +24,7 @@ char scan_count;
 static lv_obj_t *wifi_list;
 static lv_obj_t *label_connect;
 static lv_obj_t *ta1, *sw;
-static scan_min_num = 2, wifi_input_enable = 0;
+static char scan_min_num = 2, wifi_input_enable = 0;
 static char *cur_ssid, *bssid;
 static char cur_flags;
 
@@ -131,22 +132,22 @@ static void lv_timer_cb(lv_timer_t *timer)
         }
     }
 }
-void switch_value_state(lv_obj_t *sw, const char state)
+void switch_value_state(lv_obj_t *sw_obj, const char state)
 {
-    lv_obj_t *label_sw = lv_obj_get_child(sw, 0);
+    lv_obj_t *label_sw = lv_obj_get_child(sw_obj, 0);
     if (state)
     {
         lv_obj_set_style_text_color(label_sw, lv_color_hex(0xffffff), 0);
         lv_label_set_text(label_sw, "开");
         lv_obj_align(label_sw, LV_ALIGN_CENTER, -20, 0);
-        lv_obj_add_state(sw, LV_STATE_CHECKED);
+        lv_obj_add_state(sw_obj, LV_STATE_CHECKED);
     }
     else
     {
         lv_obj_set_style_text_color(label_sw, lv_color_hex(themesTextColor2), 0);
         lv_label_set_text(label_sw, "关");
         lv_obj_align(label_sw, LV_ALIGN_CENTER, 20, 0);
-        lv_obj_clear_state(sw, LV_STATE_CHECKED);
+        lv_obj_clear_state(sw_obj, LV_STATE_CHECKED);
     }
 }
 static void switch_event_handler(lv_event_t *e)

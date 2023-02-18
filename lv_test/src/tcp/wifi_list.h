@@ -17,6 +17,7 @@ int signalLevel(int rssi);
 int encrypType(const char *flags);
 void wifi_list_add(wifi_node_t *cur);
 void wifi_list_clear(void);
+void wifi_list_del(wifi_node_t *ptr);
 void wifi_list_each(int (*cb)(void *));
-void get_wifi_list_flags(const char *ssid);
+int get_wifi_list_flags(const char *ssid);
 #endif

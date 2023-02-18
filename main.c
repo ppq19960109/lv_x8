@@ -70,26 +70,21 @@ int main(void)
     // lv_demo_stress();
     // lv_demo_benchmark();
     // lv_demo_keypad_encoder();
-    lv_test_widgets();
     /*Handle LitlevGL tasks (tickless mode)*/
     pthread_mutex_init(&g_mutex, NULL);
-    static char tcp_recv_count = 0;
+    lv_test_widgets();
+    lv_dev_init();
     while (1)
     {
         pthread_mutex_lock(&g_mutex);
         lv_timer_handler();
         pthread_mutex_unlock(&g_mutex);
-        usleep(5000);
-        if (++tcp_recv_count > 2)
-        {
-            tcp_recv_count = 0;
-            uds_client_task();
-        }
+        usleep(4000);
     }
     pthread_mutex_destroy(&g_mutex);
     return 0;
 }
-
+uint32_t custom_tick_get(void);
 /*Set in lv_conf.h as `LV_TICK_CUSTOM_SYS_TIME_EXPR`*/
 uint32_t custom_tick_get(void)
 {

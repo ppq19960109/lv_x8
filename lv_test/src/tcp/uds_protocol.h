@@ -15,7 +15,6 @@
 
 #define DATA "Data"
 
-void uds_protocol_task(void);
 int uds_protocol_init(void);
 void uds_protocol_deinit(void);
 int uds_protocol_recv(char *data, unsigned int len);

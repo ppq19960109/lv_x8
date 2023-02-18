@@ -16,8 +16,7 @@ static lv_obj_t *tv;
 static void event_handler(lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t *current_target = lv_event_get_current_target(e);
-    lv_obj_t *target = lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
 
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
 }

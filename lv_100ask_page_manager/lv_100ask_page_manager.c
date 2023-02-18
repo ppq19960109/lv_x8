@@ -194,7 +194,7 @@ void lv_100ask_page_manager_set_close_page(lv_obj_t * obj, char *name)
     //page_manager->cur_depth--;
 
 }
-void lv_100ask_page_manager_clear_page(lv_obj_t * obj)
+static void lv_100ask_page_manager_clear_page(lv_obj_t * obj)
 {
     // lv_obj_clean(obj);
 }
@@ -398,9 +398,9 @@ static void lv_page_back_btn_create(lv_obj_t * parent)
 }
 lv_100ask_page_manager_page_t * lv_page_get_page(char *name)
 {
-    return get_page(g_obj_page_manager, name);
+    return (lv_100ask_page_manager_page_t *)get_page(g_obj_page_manager, name);
 }
-int lv_page_get_page_depth()
+int lv_page_get_page_depth(void)
 {
     lv_100ask_page_manager_t * page_manager = (lv_100ask_page_manager_t *)(g_obj_page_manager);
     return page_manager->cur_depth;

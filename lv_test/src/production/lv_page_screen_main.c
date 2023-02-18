@@ -74,22 +74,22 @@ void lv_page_screen_main_init(lv_obj_t *page)
     lv_obj_align_to(cont, back_bar, LV_ALIGN_OUT_BOTTOM_MID, 0, 30);
     lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_BETWEEN, LV_GRID_ALIGN_SPACE_BETWEEN);
 
-    lv_obj_t *element_obj = lv_text_btn_create(cont, "LCD", 0);
+    lv_obj_t *element_obj = lv_text_btn_create(cont, "LCD", (void *)0);
     lv_obj_set_grid_cell(element_obj, LV_GRID_ALIGN_STRETCH, 0, 1,
                          LV_GRID_ALIGN_STRETCH, 0, 1);
-    element_obj = lv_text_btn_create(cont, "触摸", 1);
+    element_obj = lv_text_btn_create(cont, "触摸", (void *)1);
     lv_obj_set_grid_cell(element_obj, LV_GRID_ALIGN_STRETCH, 1, 1,
                          LV_GRID_ALIGN_STRETCH, 0, 1);
-    element_obj = lv_text_btn_create(cont, "背光", 2);
+    element_obj = lv_text_btn_create(cont, "背光", (void *)2);
     lv_obj_set_grid_cell(element_obj, LV_GRID_ALIGN_STRETCH, 2, 1,
                          LV_GRID_ALIGN_STRETCH, 0, 1);
-    element_obj = lv_text_btn_create(cont, "划线耐久", 3);
+    element_obj = lv_text_btn_create(cont, "划线耐久", (void *)3);
     lv_obj_set_grid_cell(element_obj, LV_GRID_ALIGN_STRETCH, 0, 1,
                          LV_GRID_ALIGN_STRETCH, 1, 1);
-    element_obj = lv_text_btn_create(cont, "点击耐久", 4);
+    element_obj = lv_text_btn_create(cont, "点击耐久", (void *)4);
     lv_obj_set_grid_cell(element_obj, LV_GRID_ALIGN_STRETCH, 1, 1,
                          LV_GRID_ALIGN_STRETCH, 1, 1);
-    element_obj = lv_text_btn_create(cont, "老化测试", 5);
+    element_obj = lv_text_btn_create(cont, "老化测试", (void *)5);
     lv_obj_set_grid_cell(element_obj, LV_GRID_ALIGN_STRETCH, 2, 1,
                          LV_GRID_ALIGN_STRETCH, 1, 1);
 }

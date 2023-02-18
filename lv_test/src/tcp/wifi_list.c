@@ -56,7 +56,6 @@ void wifi_list_add(wifi_node_t *cur)
 
 void wifi_list_each(int (*cb)(void *))
 {
-    int i = 0;
     wifi_node_t *ptr;
     list_for_each_entry(ptr, &WIFI_LIST, node)
     {
@@ -67,7 +66,7 @@ void wifi_list_each(int (*cb)(void *))
         //     break;
     }
 }
-void get_wifi_list_flags(const char *ssid)
+int get_wifi_list_flags(const char *ssid)
 {
     wifi_node_t *ptr, *next;
     list_for_each_entry_safe(ptr, next, &WIFI_LIST, node)

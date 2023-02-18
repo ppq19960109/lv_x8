@@ -1,11 +1,20 @@
 #include "main.h"
 
 #include "uds_protocol.h"
-#include "uds_client_task.h"
+
+#include "hloop.h"
+#include "hbase.h"
+#include "hlog.h"
+#include "nlog.h"
+#include "hsocket.h"
+#include "hssl.h"
+#include "hmain.h"
+#include "hthread.h"
 
 static pthread_mutex_t mutex;
 static char g_send_buf[3072];
 static int g_seqid = 0;
+static hio_t *mio = NULL;
 
 int (*uds_json_recv_cb)(cJSON *);
 void register_uds_json_recv_cb(int (*cb)(cJSON *))
@@ -25,7 +34,7 @@ int cJSON_Object_isNull(cJSON *object) // cJSON判断Object是否为空
     return 0;
 }
 
-unsigned char CheckSum(unsigned char *buf, int len) // 和校验算法
+static unsigned char CheckSum(unsigned char *buf, int len) // 和校验算法
 {
     int i;
     unsigned char ret = 0;
@@ -36,8 +45,14 @@ unsigned char CheckSum(unsigned char *buf, int len) // 和校验算法
     return ret;
 }
 
-static int send_to_uds(cJSON *root)
+int send_to_uds(cJSON *root)
 {
+    if (mio == NULL)
+    {
+        LOGW("%s,mio NULL", __func__);
+        cJSON_Delete(root);
+        return -1;
+    }
     char *json = cJSON_PrintUnformatted(root);
     if (json == NULL)
     {
@@ -70,8 +85,7 @@ static int send_to_uds(cJSON *root)
     send_buf[8 + len] = FRAME_TAIL;
     send_buf[9 + len] = FRAME_TAIL;
 
-    uds_send(send_buf, len + 10);
-
+    hio_write(mio, send_buf, len + 10);
     if (len + 10 > sizeof(g_send_buf))
     {
         free(send_buf);
@@ -145,6 +159,8 @@ static int uds_json_parse(char *value, unsigned int value_len) // uds接受的js
     }
     if (uds_json_recv_cb != NULL)
         uds_json_recv_cb(Data);
+    else
+        dzlog_error("uds_json_recv_cb is NULL\n");
 fail:
     cJSON_Delete(root);
     return -1;
@@ -188,20 +204,73 @@ int uds_protocol_recv(char *data, unsigned int len) // uds接受回调函数，�
     }
     return 0;
 }
+static void on_recv(hio_t *io, void *buf, int readbytes)
+{
+    printf("on_recv fd=%d readbytes=%d\n", hio_fd(io), readbytes);
+    char localaddrstr[SOCKADDR_STRLEN] = {0};
+    char peeraddrstr[SOCKADDR_STRLEN] = {0};
+    printf("[%s] <=> [%s]\n",
+           SOCKADDR_STR(hio_localaddr(io), localaddrstr),
+           SOCKADDR_STR(hio_peeraddr(io), peeraddrstr));
+    printf("< %.*s\n", readbytes, (char *)buf);
+    uds_protocol_recv((char *)buf, readbytes);
+}
+static int tcp_client_reconnect_create(hloop_t *loop);
+static void reconnect_timer_cb(htimer_t *timer)
+{
+    tcp_client_reconnect_create(hevent_loop(timer));
+}
+static void on_close(hio_t *io)
+{
+    printf("on_close fd=%d error=%d\n", hio_fd(io), hio_error(io));
+    mio = NULL;
+    hloop_t *loop = hevent_loop(io);
+    htimer_add(loop, reconnect_timer_cb, 2000, 1);
+}
+static void on_connect(hio_t *io)
+{
+    printf("on_connect fd=%d\n", hio_fd(io));
 
+    char localaddrstr[SOCKADDR_STRLEN] = {0};
+    char peeraddrstr[SOCKADDR_STRLEN] = {0};
+    printf("connect connfd=%d [%s] => [%s]\n", hio_fd(io),
+           SOCKADDR_STR(hio_localaddr(io), localaddrstr),
+           SOCKADDR_STR(hio_peeraddr(io), peeraddrstr));
+
+    hio_read_start(io);
+    // uncomment to test heartbeat
+    // hio_set_heartbeat(sockio, 3000, send_heartbeat);
+    send_getall_uds();
+}
+static int tcp_client_reconnect_create(hloop_t *loop)
+{
+    static char recvbuf[4096];
+    mio = hloop_create_tcp_client(loop, "/tmp/unix_server.domain", -1, on_connect, on_close);
+    if (mio == NULL)
+    {
+        return -20;
+    }
+    // hio_set_connect_timeout(mio, 20000);
+    hio_setcb_read(mio, on_recv);
+    hio_set_readbuf(mio, recvbuf, sizeof(recvbuf));
+    return 0;
+}
+static void *uds_protocol_task(void *arg)
+{
+    hloop_t *loop = hloop_new(0);
+    tcp_client_reconnect_create(loop);
+
+    hloop_run(loop);
+    hloop_free(&loop);
+    return NULL;
+}
 int uds_protocol_init(void) // uds协议相关初始化
 {
     pthread_mutex_init(&mutex, NULL);
+    hthread_create(uds_protocol_task, NULL);
     return 0;
 }
 void uds_protocol_deinit(void) // uds协议相关反初始化
 {
-    uds_client_close();
     pthread_mutex_destroy(&mutex);
-}
-void uds_protocol_task(void)
-{
-    pthread_t uds_tid;
-    pthread_create(&uds_tid, NULL, uds_client_task, NULL); // UI uds通信线程启动
-    pthread_detach(uds_tid);
 }
