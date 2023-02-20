@@ -17,12 +17,12 @@
 static void event_cb(lv_event_t * e)
 {
     // LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t * target      = lv_event_get_target(e);
-    const char * user_data = lv_event_get_user_data(e);
+    // lv_obj_t * target      = lv_event_get_target(e);
+    char * user_data = lv_event_get_user_data(e);
     lv_page_back_replace_page(NULL, user_data);
 }
 
-static lv_obj_t * lv_text_btn_create(lv_obj_t * parent, const char * text, const char * user_data, const int checkd)
+static lv_obj_t * lv_text_btn_create(lv_obj_t * parent, const char * text, char * user_data, const int checkd)
 {
     lv_obj_t * btn1 = lv_btn_create(parent);
     lv_obj_set_size(btn1, 150, LV_PCT(100));

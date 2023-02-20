@@ -14,9 +14,10 @@
  **********************/
 static void btn_event_cb(lv_event_t *e)
 {
-    lv_obj_t *current_target = lv_event_get_current_target(e);
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *current_target = lv_event_get_current_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
+
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
     switch (user_data)
     {

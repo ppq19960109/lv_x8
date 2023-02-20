@@ -166,7 +166,7 @@ lv_obj_t *lv_custom_btn_array_create(lv_obj_t *parent, const char *text[], const
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    for (int i = 0; i < count; ++i)
+    for (long i = 0; i < count; ++i)
     {
         lv_obj_t *btn = lv_btn_create(cont);
         lv_obj_set_size(btn, 140, 50);
@@ -199,7 +199,7 @@ lv_obj_t *lv_btn_array_create(lv_obj_t *parent, const char count, lv_event_cb_t 
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    for (int i = 0; i < count; ++i)
+    for (long i = 0; i < count; ++i)
     {
         lv_obj_t *btn = lv_btn_create(cont);
         lv_obj_set_size(btn, 140, 50);

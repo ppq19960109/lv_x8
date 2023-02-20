@@ -21,7 +21,7 @@ void recipe_cook_start(recipe_t *recipe, const int reserve_time)
 {
     if (recipe == NULL)
     {
-        dzlog_error("recipe data is NULL\n");
+        LV_LOG_ERROR("recipe data is NULL\n");
         return;
     }
     if (recipe->cookPos == 0)
@@ -36,7 +36,7 @@ void recipe_cook_start(recipe_t *recipe, const int reserve_time)
         int arraySize = cJSON_GetArraySize(root);
         if (arraySize == 0)
         {
-            dzlog_error("attr arraySize is 0\n");
+            LV_LOG_ERROR("attr arraySize is 0\n");
             goto fail;
         }
         steamoven.attr_len = arraySize;
@@ -92,7 +92,7 @@ static void recipe_event_cb(lv_event_t *e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t *current_target = lv_event_get_current_target(e);
     lv_obj_t *target = lv_event_get_target(e);
-    lv_obj_t *user_data = lv_event_get_user_data(e);
+    recipe_t *user_data = (recipe_t *)lv_event_get_user_data(e);
     LV_LOG_USER("%s,code:%d current_target:%p target:%p\n", __func__, e->code, current_target, target);
     if (code == LV_EVENT_CLICKED)
     {
@@ -252,8 +252,8 @@ static void lv_get_recipes(lv_obj_t *parent, unsigned char recipeType, char cook
 static void dialog_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *obj = lv_event_get_current_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *obj = lv_event_get_current_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -270,8 +270,8 @@ static void dialog_event_cb(lv_event_t *e)
 static void reserve_dialog_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *obj = lv_event_get_current_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *obj = lv_event_get_current_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -289,9 +289,9 @@ static void reserve_dialog_event_cb(lv_event_t *e)
 }
 static void btn_array_event_cb(lv_event_t *e)
 {
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%ld\n", __func__, e->code, user_data);
     if (user_data == 0)
     {
         lv_manual_cook_dialog("请将食物放入左腔,水箱中加满水", dialog_event_cb);
@@ -303,9 +303,9 @@ static void btn_array_event_cb(lv_event_t *e)
 }
 static void cookPos_btn_array_event_cb(lv_event_t *e)
 {
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%ld\n", __func__, e->code, user_data);
     cook_pos = user_data;
     lv_obj_t *parent;
     if (user_data == 0)
@@ -338,7 +338,7 @@ static void cookPos_btn_array_event_cb(lv_event_t *e)
         }
     }
 }
-void left_recipes_create(lv_obj_t *parent)
+static void left_recipes_create(lv_obj_t *parent)
 {
     lv_obj_t *left_content = lv_obj_create(parent);
     lv_obj_t *right_content = lv_obj_create(parent);
@@ -372,7 +372,7 @@ void left_recipes_create(lv_obj_t *parent)
     lv_get_recipes(right_content, 1, 0);
 }
 
-void right_recipes_create(lv_obj_t *parent)
+static void right_recipes_create(lv_obj_t *parent)
 {
     lv_obj_t *left_content = lv_obj_create(parent);
     lv_obj_t *right_content = lv_obj_create(parent);
@@ -432,7 +432,7 @@ void lv_page_smartrecipes_init(lv_obj_t *page)
 
     const char *pos_text[] = {"蒸烤菜(左腔)", "右灶菜"};
 
-    for (int i = 0; i < 2; ++i)
+    for (long i = 0; i < 2; ++i)
     {
         lv_obj_t *btn = lv_btn_create(cont);
         lv_obj_set_size(btn, 200, LV_PCT(100));

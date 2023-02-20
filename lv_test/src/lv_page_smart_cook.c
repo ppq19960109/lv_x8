@@ -86,7 +86,7 @@ static void property_change_cb(const char *key, void *value)
         page_update_RMovePotLowHeatSwitch(value);
     }
 }
-static void page_update_cb(void)
+static void page_update_cb(void *arg)
 {
     page_update_RAuxiliarySwitch(NULL);
     page_update_CookingCurveSwitch(NULL);
@@ -97,7 +97,7 @@ static void switch_event_handler(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
     lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     bool state = lv_obj_has_state(target, LV_STATE_CHECKED);
     switch (user_data)
     {
@@ -113,7 +113,7 @@ static void switch_event_handler(lv_event_t *e)
         break;
     }
 }
-lv_obj_t *lv_custom_switch_create(lv_obj_t *parent, int index)
+lv_obj_t *lv_custom_switch_create(lv_obj_t *parent, long index)
 {
     lv_obj_t *sw = lv_switch_create(parent);
     lv_obj_set_size(sw, 140, 50);
@@ -128,7 +128,7 @@ lv_obj_t *lv_custom_switch_create(lv_obj_t *parent, int index)
     lv_obj_add_style(sw, &switch_style_indicator_check, LV_PART_INDICATOR | LV_STATE_CHECKED);
     lv_obj_add_style(sw, &switch_style_knob, LV_PART_KNOB);
 
-    lv_obj_add_event_cb(sw, switch_event_handler, LV_EVENT_VALUE_CHANGED, index);
+    lv_obj_add_event_cb(sw, switch_event_handler, LV_EVENT_VALUE_CHANGED, (void *)index);
     return sw;
 }
 

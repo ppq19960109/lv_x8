@@ -16,8 +16,8 @@
 static void btn_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -40,7 +40,7 @@ static void btn_event_cb(lv_event_t *e)
         break;
     }
 }
-static lv_obj_t *lv_text_btn_create(lv_obj_t *parent, const char *text, const void *user_data)
+static lv_obj_t *lv_text_btn_create(lv_obj_t *parent, const char *text, void *user_data)
 {
     lv_obj_t *btn1 = lv_btn_create(parent);
     lv_obj_set_size(btn1, 200, 100);

@@ -21,8 +21,11 @@ static void feedback_cb(struct _lv_indev_drv_t *lv_indev_drv, uint8_t event_code
         lv_auto_screen_dialog4_close();
     }
 }
+
 int main(void)
 {
+    mlog_init();
+
     /*LittlevGL init*/
     lv_init();
 

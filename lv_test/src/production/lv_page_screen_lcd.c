@@ -15,27 +15,27 @@ static lv_obj_t *tv;
  **********************/
 static void event_handler(lv_event_t *e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
+    // lv_event_code_t code = lv_event_get_code(e);
     // lv_obj_t *target = lv_event_get_target(e);
 
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
 }
-static void page_update_cb(void)
+static void page_update_cb(void *arg)
 {
     lv_tabview_set_act(tv, 0, LV_ANIM_OFF);
 }
-void tv_tab_img_create(lv_obj_t *tv, const char *img_src)
+static void tv_tab_img_create(lv_obj_t *tabview, const char *img_src)
 {
-    lv_obj_t *tv_tab1 = lv_tabview_add_tab(tv, "");
+    lv_obj_t *tv_tab1 = lv_tabview_add_tab(tabview, "");
     lv_obj_t *img = lv_img_create(tv_tab1);
     lv_obj_set_size(img, LV_PCT(100), LV_PCT(100));
     lv_img_set_src(img, img_src);
 }
 static void btn_array_event_cb(lv_event_t *e)
 {
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%ld\n", __func__, e->code, user_data);
     lv_page_back_previous_page();
 }
 void lv_page_screen_lcd_init(lv_obj_t *page)

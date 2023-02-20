@@ -16,7 +16,7 @@ static char work_state[2];
 /**********************
  *  STATIC VARIABLES
  **********************/
-static void btn_array_update(const int index, const char *text[], const int count)
+static void btn_array_update(const int index, char *text[], const int count)
 {
     lv_obj_t *child;
     int i;
@@ -372,7 +372,7 @@ static void property_change_cb(const char *key, void *value)
         page_update_StOvSetTemp_StOvSetTimer(1, NULL);
     }
 }
-static void page_update_cb(void)
+static void page_update_cb(void *arg)
 {
     LV_LOG_USER("%s\n", __func__);
     page_update_StOvState(0, NULL);
@@ -391,29 +391,11 @@ static void page_update_cb(void)
     page_update_StOvSetTemp_StOvSetTimer(1, NULL);
 }
 
-static lv_obj_t *lv_text_btn_create(lv_obj_t *parent, const char *text, const void *user_data)
-{
-    lv_obj_t *btn1 = lv_btn_create(parent);
-    lv_obj_set_size(btn1, 90, 45);
-    lv_obj_set_style_bg_color(btn1, lv_color_hex(0x191919), 0);
-    lv_obj_set_style_bg_color(btn1, lv_color_hex(themesTextColor), LV_STATE_CHECKED);
-    lv_obj_set_style_bg_opa(btn1, LV_OPA_100, 0);
-    lv_obj_set_style_radius(btn1, 45, 0);
-    // lv_obj_add_event_cb(btn1, hood_speed_event_cb, LV_EVENT_CLICKED, user_data);
-
-    lv_obj_t *label = lv_label_create(btn1);
-    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_30, 0);
-    lv_obj_set_style_text_color(label, lv_color_hex(0x7C7C7C), 0);
-    lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_STATE_CHECKED);
-    lv_label_set_text(label, text);
-    lv_obj_center(label);
-    return btn1;
-}
 static void finish_back_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     if (user_data == 0)
     {
         set_num_toServer("LStOvOperation", WORK_OPERATION_CONFIRM);
@@ -423,7 +405,7 @@ static void finish_back_event_cb(lv_event_t *e)
         set_num_toServer("RStOvOperation", WORK_OPERATION_CONFIRM);
     }
 }
-static lv_obj_t *lv_steam_item_create(lv_obj_t *parent, const char index)
+static lv_obj_t *lv_steam_item_create(lv_obj_t *parent, const long index)
 {
     // lv_obj_t *obj = lv_obj_create(parent);
     lv_obj_t *obj = lv_img_create(parent);
@@ -509,7 +491,7 @@ static lv_obj_t *lv_steam_item_create(lv_obj_t *parent, const char index)
 }
 static void left_dialog1_event_cb(lv_event_t *e)
 {
-    int user_data = (int)lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -524,8 +506,8 @@ static void left_dialog1_event_cb(lv_event_t *e)
 static void left_btn_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -547,7 +529,7 @@ static void left_btn_event_cb(lv_event_t *e)
         }
         else
         {
-            lv_manual_dialog1("是否取消左腔烹饪？", "否", "是", left_dialog1_event_cb);
+            lv_manual_dialog1("是否取消左腔烹饪?", "否", "是", left_dialog1_event_cb);
         }
         break;
     case 2:
@@ -564,8 +546,8 @@ static void left_btn_event_cb(lv_event_t *e)
 static void right_btn_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:

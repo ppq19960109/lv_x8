@@ -79,7 +79,7 @@ static void property_change_cb(const char *key, void *value)
         page_update_HoodSpeed();
     }
 }
-static void page_update_cb(void)
+static void page_update_cb(void *arg)
 {
     page_update_SmartSmokeSwitch();
     page_update_HoodSpeed();
@@ -87,8 +87,8 @@ static void page_update_cb(void)
 static void event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_target(e); // lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *target = lv_event_get_target(e); // lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
 
     switch (user_data)
     {
@@ -108,7 +108,7 @@ static void hood_speed_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
     lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     if (lv_obj_has_state(target, LV_STATE_CHECKED))
         set_num_toServer("HoodSpeed", 0);
     else
@@ -139,7 +139,7 @@ static lv_obj_t *lv_hood_item_create(lv_obj_t *parent, const void *img_src, cons
     return item;
 }
 
-static lv_obj_t *lv_text_btn_create(lv_obj_t *parent, const char *text, const void *user_data)
+static lv_obj_t *lv_text_btn_create(lv_obj_t *parent, const char *text, void *user_data)
 {
     lv_obj_t *btn1 = lv_btn_create(parent);
     lv_obj_set_size(btn1, 90, 45);
@@ -180,7 +180,7 @@ void lv_page_hood_init(lv_obj_t *page)
 
     lv_obj_t *stir_fried =
         lv_hood_item_create(cont_row, themesImagesPath "stir_fried_background.png", "爆炒", &stir_fried_rotate);
-    lv_obj_add_event_cb(stir_fried, hood_speed_event_cb, LV_EVENT_CLICKED, 4);
+    lv_obj_add_event_cb(stir_fried, hood_speed_event_cb, LV_EVENT_CLICKED, (void *)4);
 
     lv_obj_t *hood_speed = lv_obj_create(cont_row);
     lv_obj_set_size(hood_speed, 200, LV_PCT(100));

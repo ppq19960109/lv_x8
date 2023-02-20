@@ -21,10 +21,10 @@ static lv_point_t line_point[2];
 static void line_event_handler(lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t *current_target = lv_event_get_current_target(e);
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    // lv_obj_t *current_target = lv_event_get_current_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%ld\n", __func__, e->code, user_data);
     if (user_data == 2)
     {
         if (code == LV_EVENT_CLICKED)
@@ -98,7 +98,7 @@ void lv_page_screen_line_init(lv_obj_t *page)
     lv_obj_align(col, LV_ALIGN_TOP_MID, 0, 0);
     lv_obj_set_style_bg_color(col, lv_color_hex(themesTextColor2), 0);
     lv_obj_set_style_bg_opa(col, LV_OPA_100, 0);
-    lv_obj_add_event_cb(col, line_event_handler, LV_EVENT_ALL, 1);
+    lv_obj_add_event_cb(col, line_event_handler, LV_EVENT_ALL, (void*)1);
 
     static char cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(CANVAS_WIDTH, 100)];
     row_canvas = lv_canvas_create(page);

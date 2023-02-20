@@ -12,22 +12,22 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-lv_obj_t *get_auto_layer()
+lv_obj_t *get_auto_layer(void)
 {
     return lv_layer_top();
 }
-void clean_auto_layer()
+void clean_auto_layer(void)
 {
     lv_obj_t *layer = lv_layer_top();
-    if (layer->user_data > 0)
+    if ((long)layer->user_data > 0)
     {
-        layer->user_data = 0;
+        layer->user_data = (void *)0;
     }
     lv_obj_clean(layer);
 }
 lv_obj_t *lv_dialog1(lv_obj_t *layer, const char *content, const char *cancel, const char *confirm, const char *top_img, lv_event_cb_t event_cb)
 {
-    layer->user_data = 1;
+    layer->user_data = (void *)1;
     lv_obj_t *bg = lv_obj_create(layer);
     lv_obj_set_size(bg, LV_PCT(100), LV_PCT(100));
     lv_obj_set_style_bg_opa(bg, LV_OPA_60, 0);
@@ -93,25 +93,25 @@ lv_obj_t *lv_auto_dialog1(const char *content, const char *cancel, const char *c
 static void hoodOff_dialog_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    int user_data = (int)lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     if (user_data == 2)
         set_num_toServer("HoodSpeed", 0);
     clean_auto_layer();
 }
-lv_obj_t *lv_auto_dialog3()
+lv_obj_t *lv_auto_dialog3(void)
 {
     clean_auto_layer();
     lv_obj_t *layer = get_auto_layer();
     lv_obj_t *obj = lv_auto_dialog1("烟机自动延时#E68855 3分钟#\n后关闭,清除余烟", "好的", "立即关闭#E68855 3分钟#", hoodOff_dialog_event_cb);
     lv_obj_t *confirm = lv_obj_get_child(obj, -1);
     lv_obj_set_width(confirm, 280);
-    layer->user_data = 3;
+    layer->user_data = (void *)3;
     return obj;
 }
 void lv_auto_dialog3_update(const char *content, const char *confirm)
 {
     lv_obj_t *layer = get_auto_layer();
-    if (layer->user_data != 3)
+    if ((long)layer->user_data != 3)
         return;
     lv_obj_t *obj = lv_obj_get_child(lv_obj_get_child(layer, 0), 0);
     lv_obj_t *content_text = lv_obj_get_child(obj, 2);
@@ -119,10 +119,10 @@ void lv_auto_dialog3_update(const char *content, const char *confirm)
     lv_obj_t *confirm_text = lv_obj_get_child(lv_obj_get_child(obj, -1), 0);
     lv_label_set_text(confirm_text, confirm);
 }
-void lv_auto_dialog3_close()
+void lv_auto_dialog3_close(void)
 {
     lv_obj_t *layer = get_auto_layer();
-    if (layer->user_data != 3)
+    if ((long)layer->user_data != 3)
         return;
     clean_auto_layer();
 }
@@ -137,14 +137,14 @@ void lv_auto_screen_dialog4(const char index)
     clean_auto_layer();
     lv_obj_t *layer = get_auto_layer();
     lv_screen_saver_dialog(layer);
-    layer->user_data = 4;
-    lv_obj_add_flag(layer,LV_OBJ_FLAG_CLICKABLE);
+    layer->user_data = (void *)4;
+    lv_obj_add_flag(layer, LV_OBJ_FLAG_CLICKABLE);
 }
-void lv_auto_screen_dialog4_close()
+void lv_auto_screen_dialog4_close(void)
 {
     lv_obj_t *layer = get_auto_layer();
-    if (layer->user_data != 4)
+    if ((long)layer->user_data != 4)
         return;
     clean_auto_layer();
-    lv_obj_clear_flag(layer,LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(layer, LV_OBJ_FLAG_CLICKABLE);
 }

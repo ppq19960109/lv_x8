@@ -13,22 +13,22 @@
  *  STATIC VARIABLES
  **********************/
 #if 1
-lv_obj_t *get_manual_layer()
+lv_obj_t *get_manual_layer(void)
 {
     return lv_scr_act();
 }
-void clean_manual_layer()
+void clean_manual_layer(void)
 {
     lv_obj_t *layer = lv_scr_act();
-    LV_LOG_USER("%s,child_cnt:%d user_data:%d", __func__, lv_obj_get_child_cnt(layer), (int)layer->user_data);
-    if (layer->user_data > 0)
+    LV_LOG_USER("%s,child_cnt:%d user_data:%ld", __func__, lv_obj_get_child_cnt(layer), (long)layer->user_data);
+    if ((long)layer->user_data > 0)
     {
-        layer->user_data = 0;
+        layer->user_data = (void *)0;
         lv_obj_del(lv_obj_get_child(layer, -1));
     }
 }
 #else
-lv_obj_t *get_manual_layer()
+lv_obj_t *get_manual_layer(void)
 {
     if (manual_scr == NULL)
         manual_scr = lv_obj_create(NULL);
@@ -36,7 +36,7 @@ lv_obj_t *get_manual_layer()
     lv_scr_load(manual_scr);
     return manual_scr;
 }
-void clean_manual_layer()
+void clean_manual_layer(void)
 {
     LV_LOG_USER("%s,manual_scr:%p main_scr:%p", __func__, manual_scr, main_scr);
     lv_scr_load(main_scr);
@@ -63,7 +63,7 @@ static void scroll_event_cb(lv_event_t *e)
 lv_obj_t *lv_manual_reserve_dialog(const char *content, lv_event_cb_t event_cb)
 {
     lv_obj_t *layer = get_manual_layer();
-    layer->user_data = 2;
+    layer->user_data = (void *)2;
     lv_obj_t *obj = lv_obj_create(layer);
     lv_obj_set_size(obj, 730, 350);
     lv_obj_center(obj);
@@ -151,10 +151,10 @@ lv_obj_t *lv_manual_reserve_dialog(const char *content, lv_event_cb_t event_cb)
     lv_obj_align(btn2, LV_ALIGN_BOTTOM_MID, 130, -25);
     return obj;
 }
-int lv_get_reserve_dialog_time()
+int lv_get_reserve_dialog_time(void)
 {
     lv_obj_t *layer = lv_scr_act();
-    if (layer->user_data != 2)
+    if ((long)layer->user_data != 2)
         return -1;
     lv_obj_t *reserve_dialog = lv_obj_get_child(layer, -1);
     lv_obj_t *hour_roller = lv_obj_get_child(lv_obj_get_child(reserve_dialog, -4), -1);

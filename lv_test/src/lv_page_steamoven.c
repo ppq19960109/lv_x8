@@ -64,7 +64,7 @@ static void property_change_cb(const char *key, void *value)
         page_update_RStOvState();
     }
 }
-static void page_update_cb(void)
+static void page_update_cb(void *arg)
 {
     page_update_LStOvState();
     page_update_RStOvState();
@@ -73,7 +73,7 @@ static void page_update_cb(void)
 static void event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_current_target(e); // lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_current_target(e); // lv_event_get_target(e);
 
     // static int run=1;
     // lv_obj_t * child = lv_obj_get_child(target, -1);

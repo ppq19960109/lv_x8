@@ -24,7 +24,7 @@ static void property_change_cb(const char *key, void *value)
     LV_LOG_USER("lv_page_set,key:%s\n", key);
     lv_wifi_property_change_cb(key, value);
 }
-static void page_update_cb(void)
+static void page_update_cb(void *arg)
 {
     unsigned short index = lv_tabview_get_tab_act(tabview);
     LV_LOG_USER("lv_page_set,%s index:%d\n", __func__, index);
@@ -38,7 +38,7 @@ static void page_update_cb(void)
 static void tabview_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
     lv_obj_t *current_target = lv_event_get_current_target(e);
     unsigned short index = lv_tabview_get_tab_act(current_target);
     LV_LOG_USER("%s,index:%d\n", __func__, index);

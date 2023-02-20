@@ -3,7 +3,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_test_main.h"
+#include "lv_backlight.h"
 
 #define SYSFS_BL_DIR "/sys/devices/platform/backlight/backlight/backlight"
 /*********************
@@ -18,13 +18,14 @@
  * @brief backlightEnable屏背光-打开
  * 屏背光低有效
  */
-int backlightEnable()
+int backlightEnable(void)
 {
-    LV_LOG_USER("backlightEnable");
+    printf("backlightEnable\n");
 
     int fd = -1;
-    fd     = open(SYSFS_BL_DIR "/bl_power", O_RDWR);
-    if(fd < 0) {
+    fd = open(SYSFS_BL_DIR "/bl_power", O_RDWR);
+    if (fd < 0)
+    {
         perror("Open Backlight bl_power Fail");
         return -1;
     }
@@ -34,18 +35,18 @@ int backlightEnable()
 
     return 0;
 }
-
 /**
  * @brief backlightDisable屏背光－关闭
  * 屏背光低有效
  */
-int backlightDisable()
+int backlightDisable(void)
 {
-    LV_LOG_USER("backlightDisable");
+    printf("backlightDisable\n");
 
     int fd = -1;
-    fd     = open(SYSFS_BL_DIR "/bl_power", O_RDWR);
-    if(fd < 0) {
+    fd = open(SYSFS_BL_DIR "/bl_power", O_RDWR);
+    if (fd < 0)
+    {
         perror("Open Backlight bl_power Fail");
         return -1;
     }
@@ -62,14 +63,15 @@ int backlightDisable()
  */
 int backlightSet(unsigned char value)
 {
-    LV_LOG_USER("backlightSet");
+    printf("backlightSet\n");
 
-    int fd      = -1;
+    int fd = -1;
     char buf[8] = {0};
 
     sprintf(buf, "%d", value);
     fd = open(SYSFS_BL_DIR "/brightness", O_WRONLY);
-    if(fd < 0) {
+    if (fd < 0)
+    {
         perror("Open Backlight brightness Fail");
         return -1;
     }
@@ -83,16 +85,17 @@ int backlightSet(unsigned char value)
  * @brief backlightGet 获取背光亮度
  * @return 　亮度值0~255
  */
-int backlightGet()
+int backlightGet(void)
 {
-    LV_LOG_USER("backlightGet");
+    printf("backlightGet\n");
     int value = 200; // 200为背光驱动初始值
 
-    int fd      = -1;
+    int fd = -1;
     char buf[8] = {0};
 
     fd = open(SYSFS_BL_DIR "/brightness", O_RDONLY);
-    if(fd < 0) {
+    if (fd < 0)
+    {
         perror("Open Backlight brightness Fail");
         return -1;
     }
@@ -101,4 +104,32 @@ int backlightGet()
     value = atoi(buf);
 
     return value;
+}
+
+void setClockTimestamp(long timestamp)
+{
+    printf("setClockTimestamp:%ld\n", timestamp);
+
+    struct timeval tv;
+    tv.tv_sec = timestamp;
+    tv.tv_usec = 0;
+    printf("settimeofday ret:%d\n", settimeofday(&tv, NULL));
+}
+void setClockTime(int hours, int minutes)
+{
+    printf("set hour:%d min:%d\n", hours, minutes);
+    time_t t;
+    time(&t);
+    struct tm *local_tm = localtime(&t);
+    printf("year:%d mon:%d day:%d\n", local_tm->tm_year, local_tm->tm_mon, local_tm->tm_mday);
+    printf("hour:%d min:%d sec:%d\n", local_tm->tm_hour, local_tm->tm_min, local_tm->tm_sec);
+    local_tm->tm_hour = hours;
+    local_tm->tm_min = minutes;
+    t = mktime(local_tm);
+    if (t < 0)
+    {
+        local_tm->tm_mon = 1;
+        t = mktime(local_tm);
+    }
+    setClockTimestamp(t);
 }

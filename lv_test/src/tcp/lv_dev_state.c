@@ -1,7 +1,23 @@
+#include "lv_test_main.h"
 #include "main.h"
 #include "lv_dev_state.h"
 #include "uds_protocol.h"
 #include "lv_backlight.h"
+#include "hlog.h"
+
+void mlog_hex(const void *buf, int len, const char *file, const int line, const char *func)
+{
+    unsigned char *data = (unsigned char *)buf;
+    printf("[%s:%d:%s]", __FILENAME__, __LINE__, __FUNCTION__);
+    for (int i = 0; i < len; ++i)
+    {
+        if (i % 16 == 0)
+            printf("\n");
+        printf("%02x ", data[i]);
+    }
+    printf("\n");
+}
+#define mlogHex(buf, buf_len) mlog_hex(buf, buf_len, __FILENAME__, __LINE__, __FUNCTION__)
 
 recipe_t g_recipes[60];
 save_settings_t g_save_settings;
@@ -9,7 +25,7 @@ char wifi_connecting = 0;
 static pthread_mutex_t mutex;
 static dev_state_t *g_dev_state = NULL;
 const char *workStateChineseEnum[] = {"停止", "预约中", "预热中", "运行中", "烹饪完成", "暂停中", "预约暂停中", "预热暂停中"};
-const char *workModeEnum[] = {"未设定", "经典蒸", "鲜嫩蒸", "高温蒸", "热风烧烤", "上下加热", "立体热风", "蒸汽嫩烤", "空气速炸", "解冻", "发酵", "保温"};
+static char *workModeEnum[] = {"未设定", "经典蒸", "鲜嫩蒸", "高温蒸", "热风烧烤", "上下加热", "立体热风", "蒸汽嫩烤", "空气速炸", "解冻", "发酵", "保温"};
 const char *workModeName(const char mode)
 {
     char *name;
@@ -96,22 +112,22 @@ int get_attr_value_int(const char *name)
     dev_attr_t *attr = get_attr_ptr(name);
     if (attr == NULL)
     {
-        dzlog_error("%s,attr name:%s not exits", __func__, name);
+        LOGE("%s,attr name:%s not exits", __func__, name);
         return -1;
     }
     return get_value_int(attr);
 }
-const char *get_value_string(dev_attr_t *attr)
+char *get_value_string(dev_attr_t *attr)
 {
     // return attr->value;
     return attr->value.p;
 }
-const char *get_attr_value_string(const char *name)
+char *get_attr_value_string(const char *name)
 {
     dev_attr_t *attr = get_attr_ptr(name);
     if (attr == NULL)
     {
-        dzlog_error("%s,attr name:%s not exits", __func__, name);
+        LOGE("%s,attr name:%s not exits", __func__, name);
         return NULL;
     }
     // return attr->value;
@@ -125,7 +141,7 @@ static void lv_dev_set_value(cJSON *Data, dev_attr_t *ptr)
     value = cJSON_GetObjectItem(Data, ptr->key);
     if (value == NULL || ptr == NULL)
     {
-        dzlog_error("%s,null", __func__);
+        LOGE("%s,null", __func__);
         return;
     }
     if (LINK_VALUE_TYPE_NUM == ptr->value_type)
@@ -204,7 +220,7 @@ static int lv_dev_recv_event(cJSON *Data)
 
 void set_num_toServer(const char *key, int value)
 {
-    dzlog_info("%s,key:%s value:%d", __func__, key, value);
+    LOGI("%s,key:%s value:%d", __func__, key, value);
     cJSON *root = cJSON_CreateObject();
     if (value < 0)
         cJSON_AddNullToObject(root, key);
@@ -214,7 +230,7 @@ void set_num_toServer(const char *key, int value)
 }
 void get_toServer(const char *key)
 {
-    dzlog_info("%s,key:%s", __func__, key);
+    LOGI("%s,key:%s", __func__, key);
     cJSON *root = cJSON_CreateObject();
     cJSON_AddNullToObject(root, key);
     send_get_uds(root);
@@ -318,27 +334,27 @@ static void *profile_parse_json(void *input, const char *str) // 启动时解析
     cJSON *DeviceCategory = cJSON_GetObjectItem(root, "DeviceCategory");
     if (DeviceCategory == NULL)
     {
-        dzlog_error("DeviceCategory is NULL\n");
+        LOGE("DeviceCategory is NULL\n");
         goto fail;
     }
     cJSON *attr = cJSON_GetObjectItem(root, "attr");
     if (attr == NULL)
     {
-        dzlog_error("attr is NULL\n");
+        LOGE("attr is NULL\n");
         goto fail;
     }
 
     int arraySize = cJSON_GetArraySize(attr);
     if (arraySize == 0)
     {
-        dzlog_error("attr arraySize is 0\n");
+        LOGE("attr arraySize is 0\n");
         goto fail;
     }
     int i;
     dev_state_t *dev_state = (dev_state_t *)malloc(sizeof(dev_state_t));
     if (dev_state == NULL)
     {
-        dzlog_error("malloc error\n");
+        LOGE("malloc error\n");
         goto fail;
     }
     memset(dev_state, 0, sizeof(dev_state_t));
@@ -346,7 +362,7 @@ static void *profile_parse_json(void *input, const char *str) // 启动时解析
     dev_state->attr = (dev_attr_t *)malloc(sizeof(dev_attr_t) * dev_state->attr_len);
     if (dev_state->attr == NULL)
     {
-        dzlog_error("malloc error\n");
+        LOGE("malloc error\n");
         goto fail;
     }
     memset(dev_state->attr, 0, sizeof(dev_attr_t) * dev_state->attr_len);
@@ -376,7 +392,7 @@ static void *profile_parse_json(void *input, const char *str) // 启动时解析
         //     dev_state->attr[i].value = (char *)malloc(dev_state->attr[i].value_len);
         //     if (dev_state->attr[i].value == NULL)
         //     {
-        //         dzlog_error("malloc error\n");
+        //         LOGE("malloc error\n");
         //         goto fail;
         //     }
         //     memset(dev_state->attr[i].value, 0, dev_state->attr[i].value_len);
@@ -392,7 +408,7 @@ static void recipes_parse_array(recipe_t *recipes, cJSON *array)
 {
     cJSON *arraySub;
     int arraySize = cJSON_GetArraySize(array);
-    dzlog_info("%s,arraySize:%d\n", __func__, arraySize);
+    LOGI("%s,arraySize:%d\n", __func__, arraySize);
     for (int i = 0; i < arraySize; ++i)
     {
         arraySub = cJSON_GetArrayItem(array, i);
@@ -428,7 +444,7 @@ static void recipes_parse_array(recipe_t *recipes, cJSON *array)
             detailSub = cJSON_GetArrayItem(details, j);
             if (detailSub == NULL)
                 continue;
-            // dzlog_info("recipes step:%d,value%s\n", j, detailSub->valuestring);
+            // LOGI("recipes step:%d,value%s\n", j, detailSub->valuestring);
             recipes[i].details[j] = malloc(strlen(detailSub->valuestring) + 1);
             strcpy(recipes[i].details[j], detailSub->valuestring);
         }
@@ -445,14 +461,14 @@ static void *recipes_parse_json(void *input, const char *str) // 启动时解析
     cJSON *recipes = cJSON_GetObjectItem(root, "recipes");
     if (recipes == NULL)
     {
-        dzlog_error("recipes is NULL\n");
+        LOGE("recipes is NULL\n");
         goto fail;
     }
     recipes_parse_array(g_recipes, recipes);
     cJSON *tempRecipes = cJSON_GetObjectItem(root, "tempRecipes");
     if (tempRecipes == NULL)
     {
-        dzlog_error("tempRecipes is NULL\n");
+        LOGE("tempRecipes is NULL\n");
         goto fail;
     }
     recipes_parse_array(&g_recipes[40], tempRecipes);
@@ -461,7 +477,7 @@ fail:
     return NULL;
 }
 
-void save_settings_init()
+static void save_settings_init(void)
 {
     int len = 1;
     H_Kv_Get("firstStartup", &g_save_settings.firstStartup, &len);
@@ -470,26 +486,24 @@ void save_settings_init()
     H_Kv_Get("screenSaverIndex", &g_save_settings.screenSaverIndex, &len);
     H_Kv_Get("brightness", &g_save_settings.brightness, &len);
     H_Kv_Get("wifiEnable", &g_save_settings.wifiEnable, &len);
-    LV_LOG_USER("%s,wifiEnable:%d brightness:%d\n", __func__, g_save_settings.wifiEnable, g_save_settings.brightness);
+    if (g_save_settings.brightness == 0)
+    {
+        g_save_settings.brightness = 200;
+        H_Kv_Set("brightness", &g_save_settings.brightness, 1, 0);
+    }
     backlightSet(g_save_settings.brightness);
 }
 int lv_dev_init(void) // 初始化
 {
     pthread_mutex_init(&mutex, NULL);
 
-    int rc = dzlog_init("zlog_lvgl.conf", "default"); // zlog初始化
-    if (rc)
-    {
-        printf("dzlog_init failed\n");
-        return -1;
-    }
     backlightEnable();
     save_settings_init();
 
     g_dev_state = get_dev_profile(".", NULL, PROFILE_NAME, profile_parse_json);
     if (g_dev_state == NULL)
     {
-        dzlog_error("cloud_init error\n");
+        LOGE("cloud_init error\n");
         return -1;
     }
     get_dev_profile(".", NULL, "RecipesDetails.json", recipes_parse_json);
@@ -512,7 +526,5 @@ void lv_dev_deinit(void) // 反初始化
     free(g_dev_state);
 
     uds_protocol_deinit();
-    zlog_fini();
-    dzlog_warn("%s...\n", __func__);
     pthread_mutex_destroy(&mutex);
 }

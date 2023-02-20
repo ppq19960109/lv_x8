@@ -1,5 +1,4 @@
 #include "main.h"
-
 #include "uds_protocol.h"
 
 #include "hloop.h"
@@ -45,7 +44,7 @@ static unsigned char CheckSum(unsigned char *buf, int len) // 和校验算法
     return ret;
 }
 
-int send_to_uds(cJSON *root)
+static int send_to_uds(cJSON *root)
 {
     if (mio == NULL)
     {
@@ -56,7 +55,7 @@ int send_to_uds(cJSON *root)
     char *json = cJSON_PrintUnformatted(root);
     if (json == NULL)
     {
-        dzlog_error("%s,cJSON_PrintUnformatted error", __func__);
+        LOGE("%s,cJSON_PrintUnformatted error", __func__);
         cJSON_Delete(root);
         return -1;
     }
@@ -101,7 +100,7 @@ int send_set_uds(cJSON *send)
     if (cJSON_Object_isNull(send))
     {
         cJSON_Delete(send);
-        dzlog_warn("%s,send NULL", __func__);
+        LOGE("%s,send NULL", __func__);
         return -1;
     }
 
@@ -121,7 +120,7 @@ int send_get_uds(cJSON *send)
     send_to_uds(root);
     return 0;
 }
-int send_getall_uds()
+int send_getall_uds(void)
 {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddStringToObject(root, TYPE, TYPE_GETALL);
@@ -136,31 +135,31 @@ static int uds_json_parse(char *value, unsigned int value_len) // uds接受的js
     cJSON *root = cJSON_Parse(value);
     if (root == NULL)
     {
-        dzlog_error("JSON Parse Error");
+        LOGE("JSON Parse Error");
         return -1;
     }
 
     // char * json = cJSON_PrintUnformatted(root);
-    // dzlog_debug("recv from comm-------------------------- json:%s", json);
+    // LOGI("recv from comm-------------------------- json:%s", json);
     // cJSON_free(json);
-    dzlog_debug("recv from UI--------------------------:%.*s", value_len, value);
+    LOGI("recv from UI--------------------------:%.*s", value_len, value);
 
     cJSON *Type = cJSON_GetObjectItem(root, TYPE);
     if (Type == NULL)
     {
-        dzlog_error("Type is NULL\n");
+        LOGE("Type is NULL\n");
         goto fail;
     }
     cJSON *Data = cJSON_GetObjectItem(root, DATA);
     if (Data == NULL)
     {
-        dzlog_error("Data is NULL\n");
+        LOGE("Data is NULL\n");
         goto fail;
     }
     if (uds_json_recv_cb != NULL)
         uds_json_recv_cb(Data);
     else
-        dzlog_error("uds_json_recv_cb is NULL\n");
+        LOGE("uds_json_recv_cb is NULL\n");
 fail:
     cJSON_Delete(root);
     return -1;
@@ -183,13 +182,13 @@ int uds_protocol_recv(char *data, unsigned int len) // uds接受回调函数，�
             {
                 continue;
             }
-            // hdzlog_info(&data[i], 6 + msg_len + 4);
-            dzlog_debug("uds_recv encry:%d seqid:%d msg_len:%d", encry, seqid, msg_len);
+            // mlogHex(&data[i], 6 + msg_len + 4);
+            LOGI("uds_recv encry:%d seqid:%d msg_len:%d", encry, seqid, msg_len);
             verify = data[i + 6 + msg_len + 1];
             unsigned char verify_check = CheckSum((unsigned char *)&data[i + 2], msg_len + 5);
             if (verify_check != verify)
             {
-                dzlog_error("CheckSum error:%d,%d", verify_check, verify);
+                LOGE("CheckSum error:%d,%d", verify_check, verify);
                 // continue;
             }
             if (msg_len > 0)
@@ -242,6 +241,7 @@ static void on_connect(hio_t *io)
     // hio_set_heartbeat(sockio, 3000, send_heartbeat);
     send_getall_uds();
 }
+
 static int tcp_client_reconnect_create(hloop_t *loop)
 {
     static char recvbuf[4096];
@@ -255,18 +255,44 @@ static int tcp_client_reconnect_create(hloop_t *loop)
     hio_set_readbuf(mio, recvbuf, sizeof(recvbuf));
     return 0;
 }
+static void mlogger(int loglevel, const char *buf, int len)
+{
+    if (loglevel >= LOG_LEVEL_ERROR)
+    {
+        stderr_logger(loglevel, buf, len);
+    }
+    else
+        stdout_logger(loglevel, buf, len);
+    if (loglevel >= LOG_LEVEL_INFO)
+    {
+        file_logger(loglevel, buf, len);
+    }
+    // network_logger(loglevel, buf, len);
+}
 static void *uds_protocol_task(void *arg)
 {
     hloop_t *loop = hloop_new(0);
+
     tcp_client_reconnect_create(loop);
 
     hloop_run(loop);
     hloop_free(&loop);
     return NULL;
 }
+void mlog_init(void)
+{
+    hlog_set_handler(mlogger);
+    hlog_set_file("LVGLX8.log");
+    hlog_set_max_filesize(512000);
+    hlog_set_format(DEFAULT_LOG_FORMAT);
+    hlog_set_level(LOG_LEVEL_DEBUG);
+    hlog_set_remain_days(1);
+    logger_enable_color(hlog, 1);
+}
 int uds_protocol_init(void) // uds协议相关初始化
 {
     pthread_mutex_init(&mutex, NULL);
+
     hthread_create(uds_protocol_task, NULL);
     return 0;
 }

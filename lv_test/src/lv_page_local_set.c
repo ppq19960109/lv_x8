@@ -41,9 +41,9 @@ void lv_page_local_set_visible(const int visible)
 static void slider_event_cb(lv_event_t *e)
 {
     lv_obj_t *slider = lv_event_get_target(e);
-    int user_data = lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     int slider_value = lv_slider_get_value(slider);
-    LV_LOG_USER("%s,code:%d slider value:%d user_data:%d\n", __func__, e->code, slider_value, user_data);
+    LV_LOG_USER("%s,code:%d slider value:%d user_data:%ld\n", __func__, e->code, slider_value, user_data);
     if (user_data == 0)
     {
         g_save_settings.brightness = slider_value;
@@ -65,7 +65,6 @@ static void switch_event_handler(lv_event_t *e)
     if (code == LV_EVENT_VALUE_CHANGED)
     {
         // LV_LOG_USER("State: %s\n", lv_obj_has_state(obj, LV_STATE_CHECKED) ? "On" : "Off");
-        lv_obj_t *label1_sw = lv_obj_get_child(obj, 0);
         if (lv_obj_has_state(obj, LV_STATE_CHECKED))
         {
             g_save_settings.sleepSwitch = 1;
@@ -83,8 +82,8 @@ static void switch_event_handler(lv_event_t *e)
 static void btn_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:

@@ -74,7 +74,7 @@ static void page_update_cb(void *user_data)
 
     if (page_indicator != NULL)
         lv_obj_del(page_indicator);
-    page_indicator = lv_page_indicator_create(page, cur_recipe->details_count);
+    page_indicator = lv_page_indicator_create((lv_obj_t *)page, cur_recipe->details_count);
     lv_obj_align(page_indicator, LV_ALIGN_BOTTOM_MID, 0, -10);
     lv_page_indicator_check(page_indicator, 0);
     lv_obj_add_flag(page_indicator, LV_OBJ_FLAG_HIDDEN);
@@ -82,11 +82,11 @@ static void page_update_cb(void *user_data)
 static void tabview_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_target(e);
     lv_obj_t *current_target = lv_event_get_current_target(e);
-    int user_data = lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     unsigned short index = lv_tabview_get_tab_act(current_target);
-    LV_LOG_USER("%s,index:%d user_data:%d\n", __func__, index, user_data);
+    LV_LOG_USER("%s,index:%d user_data:%ld\n", __func__, index, user_data);
     char url[90];
     if (user_data == 0 && index == 0)
     {
@@ -106,8 +106,7 @@ static void tabview_event_cb(lv_event_t *e)
 static void dialog_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *obj = lv_event_get_current_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -124,8 +123,7 @@ static void dialog_event_cb(lv_event_t *e)
 static void reserve_dialog_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *obj = lv_event_get_current_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -143,9 +141,9 @@ static void reserve_dialog_event_cb(lv_event_t *e)
 }
 static void btn_array_event_cb(lv_event_t *e)
 {
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%ld\n", __func__, e->code, user_data);
     if (user_data == 0)
     {
         lv_manual_cook_dialog("请将食物放入左腔,水箱中加满水", dialog_event_cb);

@@ -21,13 +21,13 @@ extern "C"
     /**********************
      * GLOBAL PROTOTYPES
      ***********************/
-    lv_obj_t *get_manual_layer();
-    void clean_manual_layer();
+    lv_obj_t *get_manual_layer(void);
+    void clean_manual_layer(void);
 
     lv_obj_t *lv_manual_cook_dialog(const char *content, lv_event_cb_t event_cb);
     lv_obj_t *lv_manual_dialog1(const char *content, const char *cancel, const char *confirm, lv_event_cb_t event_cb);
     lv_obj_t *lv_manual_reserve_dialog(const char *content, lv_event_cb_t event_cb);
-    int lv_get_reserve_dialog_time();
+    int lv_get_reserve_dialog_time(void);
     /**********************
      *      MACROS
      **********************/

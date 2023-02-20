@@ -14,10 +14,9 @@ static lv_obj_t *about_list;
  **********************/
 static void about_bind_event_cb(lv_event_t *e)
 {
-    lv_obj_t *current_target = lv_event_get_current_target(e);
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d current_target:%p target:%p\n", __func__, e->code);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d\n", __func__, e->code);
     switch (user_data)
     {
     case 0:
@@ -25,7 +24,7 @@ static void about_bind_event_cb(lv_event_t *e)
     }
     clean_auto_layer();
 }
-lv_obj_t *lv_about_bind_dialog(const char *topText, const char *centerText)
+static lv_obj_t *lv_about_bind_dialog(const char *topText, const char *centerText)
 {
     clean_auto_layer();
     lv_obj_t *layer = get_auto_layer();
@@ -77,7 +76,7 @@ lv_obj_t *lv_about_bind_dialog(const char *topText, const char *centerText)
 static void about_event_handler(lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t *current_target = lv_event_get_current_target(e);
+    // lv_obj_t *current_target = lv_event_get_current_target(e);
     lv_obj_t *target = lv_event_get_target(e);
     // const char *user_data = lv_event_get_user_data(e);
     int index = lv_obj_get_index(target);
@@ -105,7 +104,7 @@ static void about_event_handler(lv_event_t *e)
     }
 }
 
-lv_obj_t *lv_about_list_create(const char *key, const char *value)
+static lv_obj_t *lv_about_list_create(const char *key, const char *value)
 {
     lv_obj_t *obj = lv_obj_create(about_list);
     lv_obj_set_size(obj, LV_PCT(100), 65);
@@ -129,7 +128,7 @@ lv_obj_t *lv_about_list_create(const char *key, const char *value)
     return obj;
 }
 
-lv_obj_t *lv_about2_list_create(const char *key)
+static lv_obj_t *lv_about2_list_create(const char *key)
 {
     lv_obj_t *obj = lv_btn_create(about_list);
     lv_obj_set_size(obj, LV_PCT(100), 70);

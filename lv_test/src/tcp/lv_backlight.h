@@ -1,8 +1,3 @@
-/**
- * @file lv_test_main.h
- *
- */
-
 #ifndef LV_BACKLIGHT_H
 #define LV_BACKLIGHT_H
 
@@ -13,8 +8,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_test.h"
-
+#include "main.h"
 /*********************
  *      DEFINES
  *********************/
@@ -30,10 +24,12 @@ extern "C" {
 /**********************
  *      MACROS
  **********************/
-int backlightEnable();
-int backlightDisable();
+int backlightEnable(void);
+int backlightDisable(void);
 int backlightSet(unsigned char value);
-int backlightGet();
+int backlightGet(void);
+void setClockTimestamp(long timestamp);
+void setClockTime(int hours, int minutes);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

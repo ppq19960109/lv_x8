@@ -38,7 +38,7 @@ lv_obj_t *lv_custom_back_button_create(lv_obj_t *parent, const void *img_src, co
 static void default_event_cb(lv_event_t *e)
 {
     // LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_current_target(e); // lv_event_get_target(e);
+    // lv_obj_t *target = lv_event_get_current_target(e); // lv_event_get_target(e);
     lv_page_back_previous_page();
     // lv_page_back_top_page();
 }

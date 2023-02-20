@@ -15,7 +15,7 @@ static char timing_state[2];
 /**********************
  *  STATIC VARIABLES
  **********************/
-static void btn_array_update(const int index, const char *text[], const int count)
+static void btn_array_update(const int index, char *text[], const int count)
 {
     lv_obj_t *child;
     int i;
@@ -29,7 +29,7 @@ static void btn_array_update(const int index, const char *text[], const int coun
 static void page_update_StoveTimingState(const int index, void *ptr)
 {
     int value;
-    lv_obj_t **child;
+    lv_obj_t *child;
     if (index == 0)
     {
         if (ptr == NULL)
@@ -59,29 +59,12 @@ static void property_change_cb(const char *key, void *value)
         page_update_StoveTimingState(1, value);
     }
 }
-static void page_update_cb(void)
+static void page_update_cb(void* arg)
 {
     page_update_StoveTimingState(0, NULL);
     page_update_StoveTimingState(1, NULL);
 }
-static void switch_event_handler(lv_event_t *e)
-{
-    LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
 
-    switch (user_data)
-    {
-    case 0:
-    {
-    }
-    break;
-    case 1:
-        break;
-    case 2:
-        break;
-    }
-}
 static lv_obj_t *lv_custom_heat_create(lv_obj_t *parent, int index)
 {
     lv_obj_t *obj = lv_img_create(parent);
@@ -124,7 +107,7 @@ static lv_obj_t *lv_custom_heat_create(lv_obj_t *parent, int index)
 }
 static void left_dialog1_event_cb(lv_event_t *e)
 {
-    int user_data = (int)lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -138,7 +121,7 @@ static void left_dialog1_event_cb(lv_event_t *e)
 }
 static void right_dialog1_event_cb(lv_event_t *e)
 {
-    int user_data = (int)lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -153,8 +136,8 @@ static void right_dialog1_event_cb(lv_event_t *e)
 static void left_btn_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -175,7 +158,7 @@ static void right_btn_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
     lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:

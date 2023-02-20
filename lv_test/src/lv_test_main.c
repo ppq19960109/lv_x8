@@ -81,29 +81,7 @@ static void close_page_anim(lv_obj_t *obj)
 }
 #endif
 //-------------------------------------------------
-void setClockTimestamp(long timestamp)
-{
-    LV_LOG_USER("setClockTimestamp:%ld", timestamp);
-
-    struct timeval tv;
-    tv.tv_sec = timestamp;
-    tv.tv_usec = 0;
-    LV_LOG_USER("settimeofday ret:%d", settimeofday(&tv, NULL));
-}
-void setClockTime(int hours, int minutes)
-{
-    LV_LOG_USER("set hour:%d min:%d", hours, minutes);
-    time_t t;
-    time(&t);
-    struct tm *local_tm = localtime(&t);
-    LV_LOG_USER("year:%d mon:%d day:%d", local_tm->tm_year, local_tm->tm_mon, local_tm->tm_mday);
-    LV_LOG_USER("hour:%d min:%d sec:%d", local_tm->tm_hour, local_tm->tm_min, local_tm->tm_sec);
-    local_tm->tm_hour = hours;
-    local_tm->tm_min = minutes;
-    t = mktime(local_tm);
-    setClockTimestamp(t);
-}
-void getCurrentTime()
+static void getCurrentTime()
 {
     time_t t;
     time(&t);
@@ -396,9 +374,9 @@ static void init_style()
 }
 static void home_bar_event_cb(lv_event_t *e)
 {
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%ld\n", __func__, e->code, user_data);
     switch (user_data)
     {
     case 0:
@@ -481,7 +459,7 @@ void lv_test_widgets(void)
     lv_obj_t *icon_set = lv_img_create(set_obj);
     lv_img_set_src(icon_set, themesImagesPath "icon_set.png");
     lv_obj_align(icon_set, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_add_event_cb(set_obj, home_bar_event_cb, LV_EVENT_CLICKED, 1);
+    lv_obj_add_event_cb(set_obj, home_bar_event_cb, LV_EVENT_CLICKED, (void *)1);
 
     lv_obj_t *alarm_obj = lv_obj_create(home_bar);
     lv_obj_set_size(alarm_obj, LV_PCT(100), 86);
@@ -498,7 +476,7 @@ void lv_test_widgets(void)
     // lv_obj_set_style_text_color(icon_alarm_time, lv_color_hex(themesTextColor), 0);
     // lv_label_set_text(icon_alarm_time, "01:02:03");
     // lv_obj_align(icon_alarm_time, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_add_event_cb(alarm_obj, home_bar_event_cb, LV_EVENT_CLICKED, 2);
+    lv_obj_add_event_cb(alarm_obj, home_bar_event_cb, LV_EVENT_CLICKED, (void *)2);
 
     lv_obj_t *standby_obj = lv_obj_create(home_bar);
     lv_obj_set_size(standby_obj, LV_PCT(100), 86);
@@ -510,7 +488,7 @@ void lv_test_widgets(void)
     icon_standby = lv_img_create(standby_obj);
     lv_img_set_src(icon_standby, themesImagesPath "icon_standby.png");
     lv_obj_align(icon_standby, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_add_event_cb(standby_obj, home_bar_event_cb, LV_EVENT_CLICKED, 3);
+    lv_obj_add_event_cb(standby_obj, home_bar_event_cb, LV_EVENT_CLICKED, (void *)3);
 
     //****************************************************
     home = lv_obj_create(lv_scr_act());

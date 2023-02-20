@@ -62,14 +62,14 @@ wifi_list_item(void *arg)
     }
     return 0;
 }
-static void *wifi_update_task(void *arg)
-{
-    pthread_mutex_lock(&g_mutex);
-    bssid = get_attr_value_string("bssid");
-    lv_wifi_list_clean();
-    wifi_list_each(wifi_list_item);
-    pthread_mutex_unlock(&g_mutex);
-}
+// static void *wifi_update_task(void *arg)
+// {
+//     pthread_mutex_lock(&g_mutex);
+//     bssid = get_attr_value_string("bssid");
+//     lv_wifi_list_clean();
+//     wifi_list_each(wifi_list_item);
+//     pthread_mutex_unlock(&g_mutex);
+// }
 static void wifi_update()
 {
     // pthread_t tid;
@@ -175,7 +175,7 @@ static void wifi_input_event_handler(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
     lv_obj_t *target = lv_event_get_target(e);
-    int user_data = lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -184,7 +184,7 @@ static void wifi_input_event_handler(lv_event_t *e)
         break;
     case 1:
     {
-        char *ta_text = lv_textarea_get_text(ta1);
+        const char *ta_text = lv_textarea_get_text(ta1);
         int ta_text_len = strlen(ta_text);
         if (ta_text_len >= 8)
         {
@@ -236,13 +236,13 @@ static void ta_event_cb(lv_event_t *e)
 }
 LV_FONT_DECLARE(lv_font_source_han_sans_normal_16);
 
-static lv_obj_t *lv_wifi_input_dialog5(const char *ssid, const int flags)
+static lv_obj_t *lv_wifi_input_dialog5(char *ssid, const int flags)
 {
     cur_ssid = ssid;
     cur_flags = flags;
     wifi_input_enable = 1;
     lv_obj_t *layer = get_manual_layer();
-    layer->user_data = 1;
+    layer->user_data = (void *)1;
     lv_obj_t *obj = lv_obj_create(layer);
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_set_style_bg_opa(obj, LV_OPA_100, 0);
@@ -332,7 +332,7 @@ static void wifi_event_handler(lv_event_t *e)
 {
     lv_obj_t *current_target = lv_event_get_current_target(e);
     lv_obj_t *target = lv_event_get_target(e);
-    const char *user_data = lv_event_get_user_data(e);
+    char *user_data = lv_event_get_user_data(e);
     LV_LOG_USER("%s,code:%d current_target:%p target:%p\n", __func__, e->code, current_target, target);
     lv_wifi_input_dialog5(user_data, 1);
 }
@@ -379,7 +379,7 @@ lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const int flags)
         lv_img_set_src(img_encryp, themesImagesPath "wifi/wifi_lock.png");
     }
 
-    lv_obj_add_event_cb(obj, wifi_event_handler, LV_EVENT_CLICKED, ssid);
+    lv_obj_add_event_cb(obj, wifi_event_handler, LV_EVENT_CLICKED, (void *)ssid);
     return obj;
 }
 void lv_page_wifi_visible(const int visible)

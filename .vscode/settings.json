@@ -27,6 +27,7 @@
         "lvgl.h": "c",
         "wifi_list.h": "c",
         "lv_auto_dialog.h": "c",
-        "cjson.h": "c"
+        "cjson.h": "c",
+        "kv_linux.h": "c"
     }
 }

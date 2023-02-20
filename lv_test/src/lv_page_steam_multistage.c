@@ -92,9 +92,9 @@ static void multistage_update(void)
 }
 static void roller_click_event_cb(lv_event_t *e)
 {
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%ld\n", __func__, e->code, user_data);
     switch (user_data)
     {
     case 0:
@@ -268,8 +268,8 @@ static void steam_left_roller_create(lv_obj_t *parent)
 static void dialog_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *obj = lv_event_get_current_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *obj = lv_event_get_current_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -286,8 +286,8 @@ static void dialog_event_cb(lv_event_t *e)
 static void reserve_dialog_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *obj = lv_event_get_current_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *obj = lv_event_get_current_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -307,9 +307,9 @@ static void reserve_dialog_event_cb(lv_event_t *e)
 
 static void btn_array_event_cb(lv_event_t *e)
 {
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%ld\n", __func__, e->code, user_data);
     if (user_data == 0)
     {
         lv_manual_cook_dialog("请将食物放入左腔,水箱中加满水", dialog_event_cb);
@@ -328,8 +328,8 @@ static void page_update_cb(void *arg)
 }
 static void add_click_event_cb(lv_event_t *e)
 {
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = lv_event_get_user_data(e);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     if (user_data == listLastIndex)
     {
         listResetIndex = -1;
@@ -339,7 +339,7 @@ static void add_click_event_cb(lv_event_t *e)
 static void btn_click_event_cb(lv_event_t *e)
 {
     // lv_obj_t *target = lv_event_get_target(e);
-    int user_data = lv_event_get_user_data(e);
+    long user_data = (long)lv_event_get_user_data(e);
     int index = user_data / 2;
     LV_LOG_USER("%s,code:%d listLastIndex:%d index:%d\n", __func__, e->code, listLastIndex, index);
     if (user_data % 2 == 0)
@@ -372,7 +372,7 @@ void lv_page_multistage_init(lv_obj_t *page)
 
     //------------------------------
     char buf[12];
-    for (int i = 0; i < 3; ++i)
+    for (long i = 0; i < 3; ++i)
     {
         lv_obj_t *first_obj = lv_obj_create(page_cont_row);
         lv_obj_set_size(first_obj, 250, LV_PCT(100));
@@ -387,7 +387,7 @@ void lv_page_multistage_init(lv_obj_t *page)
         lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_24, 0);
         lv_obj_set_style_text_color(label, lv_color_hex(0xDF932F), 0);
         lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 166);
-        sprintf(buf, "第%d段", i + 1);
+        sprintf(buf, "第%ld段", i + 1);
         lv_label_set_text(label, buf);
         //-------------------------------------------------------
         label = lv_label_create(first_obj); // 3

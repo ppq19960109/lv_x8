@@ -148,14 +148,17 @@ extern const char *workStateChineseEnum[];
 extern char wifi_connecting;
 extern save_settings_t g_save_settings;
 
+void mlog_hex(const void *buf, int len, const char *file, const int line, const char *func);
+#define mlogHex(buf, buf_len) mlog_hex(buf, buf_len, __FILENAME__, __LINE__, __FUNCTION__)
+
 int lv_dev_init(void);
 void lv_dev_deinit(void);
 dev_state_t *get_dev_state(void);
 dev_attr_t *get_attr_ptr(const char *name);
 int get_attr_value_int(const char *name);
 int get_value_int(dev_attr_t *attr);
-const char *get_attr_value_string(const char *name);
-const char *get_value_string(dev_attr_t *attr);
+char *get_attr_value_string(const char *name);
+char *get_value_string(dev_attr_t *attr);
 const char *workModeName(const char mode);
 
 void register_property_change_cb(void (*cb)(const char *key, void *value));

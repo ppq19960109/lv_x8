@@ -118,8 +118,8 @@ static void mode_change(char mode_index)
 static void dialog_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *obj = lv_event_get_current_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *obj = lv_event_get_current_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -136,8 +136,8 @@ static void dialog_event_cb(lv_event_t *e)
 static void reserve_dialog_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-    lv_obj_t *obj = lv_event_get_current_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
+    // lv_obj_t *obj = lv_event_get_current_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
@@ -156,9 +156,9 @@ static void reserve_dialog_event_cb(lv_event_t *e)
 
 static void btn_array_event_cb(lv_event_t *e)
 {
-    lv_obj_t *target = lv_event_get_target(e);
-    int user_data = (int)lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    // lv_obj_t *target = lv_event_get_target(e);
+    long user_data = (long)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%ld\n", __func__, e->code, user_data);
     if (user_data == 0)
     {
         lv_manual_cook_dialog("请将食物放入左腔,水箱中加满水", dialog_event_cb);
