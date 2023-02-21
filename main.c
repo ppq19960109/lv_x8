@@ -21,9 +21,36 @@ static void feedback_cb(struct _lv_indev_drv_t *lv_indev_drv, uint8_t event_code
         lv_auto_screen_dialog4_close();
     }
 }
-
+#ifdef DEBUG
+#include <execinfo.h>
+#define MAX_STACK_DEPTH (20)
+static void handle_sig(int sig)
+{
+    printf("sig recv:%d\n", sig);
+    if (sig == SIGSEGV || sig == SIGABRT)
+    {
+        void *buffer[MAX_STACK_DEPTH];
+        int depth = backtrace(buffer, MAX_STACK_DEPTH);
+        printf("Depth: %d\n", depth);
+        char **func_names = backtrace_symbols(buffer, depth);
+        for (int i = 0; i < depth; i++)
+        {
+            printf("Depth: %d, func name: %s\n", i, func_names[i]);
+        }
+        exit(-1);
+    }
+}
+#endif
 int main(void)
 {
+#ifdef DEBUG
+    struct sigaction act;
+    act.sa_flags = SA_RESTART;
+    act.sa_handler = handle_sig;
+    sigemptyset(&act.sa_mask);
+    sigaction(SIGSEGV, &act, NULL);
+    sigaction(SIGABRT, &act, NULL);
+#endif
     mlog_init();
 
     /*LittlevGL init*/
