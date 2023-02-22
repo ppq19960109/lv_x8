@@ -120,7 +120,7 @@ lv_obj_t *lv_rotate_anim(lv_obj_t *obj, const int run)
             lv_anim_set_var(&a, obj);
             lv_anim_set_exec_cb(&a, set_angle);
             lv_anim_set_values(&a, 0, 3600);
-            lv_anim_set_time(&a, 6000);
+            lv_anim_set_time(&a, 8000);
             lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
             lv_anim_start(&a);
         }

@@ -165,7 +165,7 @@ static void btn_array_event_cb(lv_event_t *e)
     }
     else
     {
-        lv_manual_reserve_dialog("左腔将在", reserve_dialog_event_cb);
+        lv_manual_reserve_dialog("左腔将在","后启动", "预约", 12, reserve_dialog_event_cb);
     }
 }
 static void scroll_event_cb(lv_event_t *e)

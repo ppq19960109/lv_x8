@@ -165,6 +165,7 @@ void register_property_change_cb(void (*cb)(const char *key, void *value));
 
 void set_num_toServer(const char *key, int value);
 void get_toServer(const char *key);
+void set_stoveTiming_toServer(const int index, const int time);
 void set_cook_toServer(steamoven_t *steamoven);
 void connectWiFi(const char *ssid, const char *psk, int encryp);
 #endif

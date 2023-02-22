@@ -60,7 +60,7 @@ static void scroll_event_cb(lv_event_t *e)
         lv_obj_add_flag(user_data, LV_OBJ_FLAG_HIDDEN);
     }
 }
-lv_obj_t *lv_manual_reserve_dialog(const char *content, lv_event_cb_t event_cb)
+lv_obj_t *lv_manual_reserve_dialog(const char *text_before, const char *text_after, const char *text_confirm, const int hour, lv_event_cb_t event_cb)
 {
     lv_obj_t *layer = get_manual_layer();
     layer->user_data = (void *)2;
@@ -83,13 +83,13 @@ lv_obj_t *lv_manual_reserve_dialog(const char *content, lv_event_cb_t event_cb)
     lv_obj_t *label_content = lv_label_create(obj);
     lv_obj_set_style_text_font(label_content, &lv_font_SiYuanHeiTi_Normal_30, 0);
     lv_obj_set_style_text_color(label_content, lv_color_hex(0xffffff), 0);
-    lv_label_set_text(label_content, content);
+    lv_label_set_text(label_content, text_before);
     lv_obj_align(label_content, LV_ALIGN_TOP_LEFT, 32, 140);
 
     lv_obj_t *label_content2 = lv_label_create(obj);
     lv_obj_set_style_text_font(label_content2, &lv_font_SiYuanHeiTi_Normal_30, 0);
     lv_obj_set_style_text_color(label_content2, lv_color_hex(0xffffff), 0);
-    lv_label_set_text(label_content2, "后启动");
+    lv_label_set_text(label_content2, text_after);
     lv_obj_align(label_content2, LV_ALIGN_TOP_RIGHT, -45, 140);
 
     lv_obj_t *time_obj = lv_obj_create(obj);
@@ -124,7 +124,7 @@ lv_obj_t *lv_manual_reserve_dialog(const char *content, lv_event_cb_t event_cb)
     lv_obj_set_size(roller1, LV_PCT(100), LV_PCT(100));
     lv_roller_set_visible_row_count(roller1, 3);
     lv_obj_add_event_cb(roller1, scroll_event_cb, LV_EVENT_ALL, time_img);
-    const char *options = temp_roller_options(0, 12);
+    const char *options = temp_roller_options(0, hour);
     lv_roller_set_options(roller1,
                           options,
                           LV_ROLLER_MODE_INFINITE);
@@ -146,7 +146,7 @@ lv_obj_t *lv_manual_reserve_dialog(const char *content, lv_event_cb_t event_cb)
     lv_obj_add_event_cb(btn1, event_cb, LV_EVENT_CLICKED, (void *)1);
     lv_obj_align(btn1, LV_ALIGN_BOTTOM_MID, -130, -25);
 
-    lv_obj_t *btn2 = lv_custom_text_btn_create(obj, "预约");
+    lv_obj_t *btn2 = lv_custom_text_btn_create(obj, text_confirm);
     lv_obj_add_event_cb(btn2, event_cb, LV_EVENT_CLICKED, (void *)2);
     lv_obj_align(btn2, LV_ALIGN_BOTTOM_MID, 130, -25);
     return obj;

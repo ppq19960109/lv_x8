@@ -248,6 +248,21 @@ void connectWiFi(const char *ssid, const char *psk, int encryp)
     // cJSON_AddItemToObject(Data, "WifiConnect", wifiConnectInfo);
     // send_set_uds(Data);
 }
+void set_stoveTiming_toServer(const int index, const int time)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (index == 0)
+    {
+        cJSON_AddNumberToObject(root, "LStoveTimingOpera", TIMING_OPERATION_START);
+        cJSON_AddNumberToObject(root, "LStoveTimingSet", time);
+    }
+    else
+    {
+        cJSON_AddNumberToObject(root, "RStoveTimingOpera", TIMING_OPERATION_START);
+        cJSON_AddNumberToObject(root, "RStoveTimingSet", time);
+    }
+    send_set_uds(root);
+}
 void set_cook_toServer(steamoven_t *steamoven)
 {
     cJSON *root = cJSON_CreateObject();
@@ -323,6 +338,10 @@ void set_cook_toServer(steamoven_t *steamoven)
         }
     }
     send_set_uds(root);
+    if (lv_page_exist_page("page_steaming"))
+    {
+        lv_page_back_page("page_steaming");
+    }
 }
 
 static void *profile_parse_json(void *input, const char *str) // 启动时解析转换配置文件

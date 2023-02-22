@@ -503,6 +503,20 @@ static void left_dialog1_event_cb(lv_event_t *e)
     }
     clean_manual_layer();
 }
+static void right_dialog1_event_cb(lv_event_t *e)
+{
+    long user_data = (long)lv_event_get_user_data(e);
+    switch (user_data)
+    {
+    case 0:
+    case 1:
+        break;
+    case 2:
+        set_num_toServer("RStOvOperation", WORK_OPERATION_CANCEL);
+        break;
+    }
+    clean_manual_layer();
+}
 static void left_btn_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
@@ -513,8 +527,9 @@ static void left_btn_event_cb(lv_event_t *e)
     case 0:
         if (work_state[0] == WORK_STATE_STOP)
         {
+            lv_100ask_page_manager_set_open_page(NULL, "page_steam_left");
         }
-        else if (work_state[0] == WORK_STATE_PAUSE || work_state[0] == WORK_STATE_PAUSE_RESERVE)
+        else if (work_state[0] == WORK_STATE_PAUSE || work_state[0] == WORK_STATE_PAUSE_RESERVE || work_state[0] == WORK_STATE_PREHEAT_RESERVE)
         {
             set_num_toServer("LStOvOperation", WORK_OPERATION_START);
         }
@@ -553,8 +568,9 @@ static void right_btn_event_cb(lv_event_t *e)
     case 0:
         if (work_state[1] == WORK_STATE_STOP)
         {
+            lv_100ask_page_manager_set_open_page(NULL, "page_steam_right");
         }
-        else if (work_state[1] == WORK_STATE_PAUSE || work_state[1] == WORK_STATE_PAUSE_RESERVE)
+        else if (work_state[1] == WORK_STATE_PAUSE || work_state[1] == WORK_STATE_PAUSE_RESERVE || work_state[1] == WORK_STATE_PREHEAT_RESERVE)
         {
             set_num_toServer("RStOvOperation", WORK_OPERATION_START);
         }
@@ -569,7 +585,7 @@ static void right_btn_event_cb(lv_event_t *e)
         }
         else
         {
-            set_num_toServer("RStOvOperation", WORK_OPERATION_CANCEL);
+            lv_manual_dialog1("是否取消右腔烹饪?", "否", "是", right_dialog1_event_cb);
         }
         break;
     case 2:
