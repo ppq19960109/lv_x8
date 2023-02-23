@@ -212,6 +212,7 @@ static void on_recv(hio_t *io, void *buf, int readbytes)
            SOCKADDR_STR(hio_localaddr(io), localaddrstr),
            SOCKADDR_STR(hio_peeraddr(io), peeraddrstr));
     printf("< %.*s\n", readbytes, (char *)buf);
+
     uds_protocol_recv((char *)buf, readbytes);
 }
 static int tcp_client_reconnect_create(hloop_t *loop);
@@ -244,7 +245,7 @@ static void on_connect(hio_t *io)
 
 static int tcp_client_reconnect_create(hloop_t *loop)
 {
-    static char recvbuf[4096];
+    static char recvbuf[5120];
     mio = hloop_create_tcp_client(loop, "/tmp/unix_server.domain", -1, on_connect, on_close);
     if (mio == NULL)
     {

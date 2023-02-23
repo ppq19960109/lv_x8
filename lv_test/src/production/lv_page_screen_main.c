@@ -33,10 +33,10 @@ static void btn_event_cb(lv_event_t *e)
         lv_100ask_page_manager_set_open_page(NULL, "page_screen_line");
         break;
     case 4:
-
+        lv_100ask_page_manager_set_open_page(NULL, "page_screen_click");
         break;
     case 5:
-
+        lv_100ask_page_manager_set_open_page(NULL, "page_screen_aging");
         break;
     }
 }
