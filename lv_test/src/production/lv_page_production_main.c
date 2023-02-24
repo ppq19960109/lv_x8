@@ -24,7 +24,7 @@ static void btn_event_cb(lv_event_t *e)
         lv_100ask_page_manager_set_open_page(NULL, "page_screen_main");
         break;
     case 1:
-
+        lv_100ask_page_manager_set_open_page(NULL, "page_smart_test");
         break;
     case 2:
 

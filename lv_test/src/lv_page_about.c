@@ -95,11 +95,11 @@ static void about_event_handler(lv_event_t *e)
     {
         if (index == 0)
         {
+        }
+        else if (index == 1)
+        {
             production_mode(1);
             lv_100ask_page_manager_set_open_page(NULL, "page_production_main");
-        }
-        else if (index == 0)
-        {
         }
     }
 }

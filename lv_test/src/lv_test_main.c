@@ -528,6 +528,7 @@ void lv_test_widgets(void)
     lv_obj_t *page_screen_touch = lv_100ask_page_manager_page_create(page_manager, "page_screen_touch");
     lv_obj_t *page_screen_click = lv_100ask_page_manager_page_create(page_manager, "page_screen_click");
     lv_obj_t *page_screen_aging = lv_100ask_page_manager_page_create(page_manager, "page_screen_aging");
+    lv_obj_t *page_smart_test = lv_100ask_page_manager_page_create(page_manager, "page_smart_test");
 
     lv_100ask_page_manager_set_page_init(main_page, init_main_page);
     lv_100ask_page_manager_set_page_init(page_hood, lv_page_hood_init);
@@ -549,6 +550,7 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_page_init(page_screen_touch, lv_page_screen_touch_init);
     lv_100ask_page_manager_set_page_init(page_screen_click, lv_page_screen_click_init);
     lv_100ask_page_manager_set_page_init(page_screen_aging, lv_page_screen_aging_init);
+    lv_100ask_page_manager_set_page_init(page_smart_test, lv_page_smart_test_init);
 #if LV_100ASK_PAGE_MANAGER_COSTOM_ANIMARION
     lv_100ask_page_manager_set_open_page_anim(main_page, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(main_page, close_page_anim);
@@ -590,6 +592,8 @@ void lv_test_widgets(void)
     lv_100ask_page_manager_set_close_page_anim(page_screen_click, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_screen_aging, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_screen_aging, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_smart_test, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_smart_test, close_page_anim);
 #endif
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");

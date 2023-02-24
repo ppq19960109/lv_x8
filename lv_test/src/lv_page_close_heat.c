@@ -56,7 +56,8 @@ static void page_update_StoveTimingState(const int index, void *ptr)
         lv_obj_align(child[1], LV_ALIGN_TOP_MID, 0, 157);
         lv_label_set_text(child[1], "定时关火");
 
-        
+        lv_obj_add_flag(child[2], LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(child[3], LV_OBJ_FLAG_HIDDEN);
     }
     else
     {
@@ -68,9 +69,37 @@ static void page_update_StoveTimingState(const int index, void *ptr)
             lv_label_set_text(child[0], "右灶将在");
         lv_obj_align(child[1], LV_ALIGN_TOP_MID, 0, 188);
         lv_label_set_text(child[1], "后关火");
+
+        lv_obj_clear_flag(child[2], LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(child[3], LV_OBJ_FLAG_HIDDEN);
     }
 }
+static void page_update_StoveTimingLeft(const int index, void *ptr)
+{
+    int value, set_time;
+    lv_obj_t **child;
+    if (index == 0)
+    {
+        set_time = get_attr_value_int("LStoveTimingSet");
+        if (ptr == NULL)
+            value = get_attr_value_int("LStoveTimingLeft");
+        child = left_heat;
+    }
+    else
+    {
+        set_time = get_attr_value_int("RStoveTimingSet");
+        if (ptr == NULL)
+            value = get_attr_value_int("RStoveTimingLeft");
+        child = right_heat;
+    }
+    if (ptr != NULL)
+        value = get_value_int(ptr);
 
+    char buf[10];
+    sprintf(buf, "%d:%d", value / 60, value % 60);
+    lv_label_set_text(child[2], buf);
+    lv_arc_set_value(child[3], (value / set_time) * 100);
+}
 static void property_change_cb(const char *key, void *value)
 {
     LV_LOG_USER("key:%s\n", key);
@@ -82,11 +111,21 @@ static void property_change_cb(const char *key, void *value)
     {
         page_update_StoveTimingState(1, value);
     }
+    else if (strcmp("LStoveTimingLeft", key) == 0)
+    {
+        page_update_StoveTimingLeft(0, value);
+    }
+    else if (strcmp("RStoveTimingLeft", key) == 0)
+    {
+        page_update_StoveTimingLeft(1, value);
+    }
 }
 static void page_update_cb(void *arg)
 {
     page_update_StoveTimingState(0, NULL);
     page_update_StoveTimingState(1, NULL);
+    page_update_StoveTimingLeft(0, NULL);
+    page_update_StoveTimingLeft(1, NULL);
 }
 static void left_reserve_dialog_event_cb(lv_event_t *e)
 {
