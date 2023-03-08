@@ -15,10 +15,10 @@ pthread_mutex_t g_mutex;
 
 static void feedback_cb(struct _lv_indev_drv_t *lv_indev_drv, uint8_t event_code)
 {
-    if (LV_EVENT_CLICKED == event_code)
+    if (LV_EVENT_CLICKED == event_code || LV_EVENT_PRESSED == event_code || LV_EVENT_RELEASED == event_code)
     {
-        printf("%s,code:%d.............\n", __func__, event_code);
-        lv_auto_screen_dialog4_close();
+        printf("%s,code:%d............\n", __func__, event_code);
+        lv_sleep_wakeup();
     }
 }
 #ifdef DEBUG

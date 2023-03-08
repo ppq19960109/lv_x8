@@ -19,6 +19,7 @@ static lv_obj_t *home, *home_bar;
 char LStOvState = 0, RStOvState = 0;
 char LStoveStatus = 0, RStoveStatus = 0;
 static lv_obj_t *gif;
+static lv_timer_t *sleep_timer;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -75,7 +76,7 @@ static void close_page_anim(lv_obj_t *obj)
 {
     /*Do something with LVGL*/
     lv_100ask_page_manager_page_t *page = (lv_100ask_page_manager_page_t *)obj;
-    LV_LOG_USER("close page anim. name:%s", page->name);
+    LV_LOG_USER("close page anim. name:%s page_close_cb:%p", page->name, page->page_close_cb);
     if (page->page_close_cb != NULL)
         page->page_close_cb(page);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
@@ -405,7 +406,19 @@ static void home_bar_event_cb(lv_event_t *e)
     break;
     }
 }
-
+static void lv_sleep_timer_cb(lv_timer_t *timer)
+{
+    LV_LOG_USER("%s,sleep...", __func__);
+    lv_timer_pause(sleep_timer);
+    lv_auto_screen_dialog4(0);
+}
+void lv_sleep_wakeup(void)
+{
+    // LV_LOG_USER("%s,wakeup...", __func__);
+    lv_timer_reset(sleep_timer);
+    lv_timer_resume(sleep_timer);
+    lv_auto_screen_dialog4_close();
+}
 lv_obj_t *manual_scr = NULL, *main_scr = NULL;
 void lv_test_widgets(void)
 {
@@ -419,6 +432,8 @@ void lv_test_widgets(void)
     init_style();
     clock_timer = POSIXTimerCreate(0, POSIXTimer_cb);
     POSIXTimerSet(clock_timer, 60, 10);
+    sleep_timer = lv_timer_create(lv_sleep_timer_cb, 60000, NULL);
+
     signal(SIGRTMIN, signalHandler);
 
     lv_obj_t *win_bg = lv_img_create(lv_scr_act());

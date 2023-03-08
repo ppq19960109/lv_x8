@@ -54,6 +54,7 @@ extern "C"
      **********************/
     void register_page_property_change_cb(void (*cb)(const char *key, void *value));
     void lv_test_widgets(void);
+    void lv_sleep_wakeup(void);
 
     lv_obj_t *lv_page_back_bar_init(lv_obj_t *parent, const char *name, const char *title, lv_event_cb_t event_cb);
     lv_obj_t *lv_custom_back_button_create(lv_obj_t *parent, const void *img_src, const char *text);

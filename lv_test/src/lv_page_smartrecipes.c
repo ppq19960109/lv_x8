@@ -298,7 +298,7 @@ static void btn_array_event_cb(lv_event_t *e)
     }
     else
     {
-        lv_manual_reserve_dialog("左腔将在","后启动", "预约", 12, reserve_dialog_event_cb);
+        lv_manual_reserve_dialog("左腔将在", "后启动", "预约", 12, reserve_dialog_event_cb);
     }
 }
 static void cookPos_btn_array_event_cb(lv_event_t *e)
@@ -312,8 +312,10 @@ static void cookPos_btn_array_event_cb(lv_event_t *e)
     {
         lv_obj_add_flag(smart_recipes[1], LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(smart_recipes[0], LV_OBJ_FLAG_HIDDEN);
-        lv_obj_set_style_border_opa(pos_btn[0], LV_OPA_100, 0);
-        lv_obj_set_style_border_opa(pos_btn[1], LV_OPA_0, 0);
+        // lv_obj_set_style_border_opa(pos_btn[0], LV_OPA_100, 0);
+        // lv_obj_set_style_border_opa(pos_btn[1], LV_OPA_0, 0);
+        lv_obj_set_style_text_color(lv_obj_get_child(pos_btn[0], 0), lv_color_hex(themesTextColor), 0);
+        lv_obj_set_style_text_color(lv_obj_get_child(pos_btn[1], 0), lv_color_hex(0xffffff), 0);
         lv_obj_set_style_bg_opa(pos_btn[0], LV_OPA_100, 0);
         lv_obj_set_style_bg_opa(pos_btn[1], LV_OPA_0, 0);
         parent = smart_recipes[0]->user_data;
@@ -322,8 +324,10 @@ static void cookPos_btn_array_event_cb(lv_event_t *e)
     {
         lv_obj_add_flag(smart_recipes[0], LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(smart_recipes[1], LV_OBJ_FLAG_HIDDEN);
-        lv_obj_set_style_border_opa(pos_btn[0], LV_OPA_0, 0);
-        lv_obj_set_style_border_opa(pos_btn[1], LV_OPA_100, 0);
+        // lv_obj_set_style_border_opa(pos_btn[0], LV_OPA_0, 0);
+        // lv_obj_set_style_border_opa(pos_btn[1], LV_OPA_100, 0);
+        lv_obj_set_style_text_color(lv_obj_get_child(pos_btn[1], 0), lv_color_hex(themesTextColor), 0);
+        lv_obj_set_style_text_color(lv_obj_get_child(pos_btn[0], 0), lv_color_hex(0xffffff), 0);
         lv_obj_set_style_bg_opa(pos_btn[0], LV_OPA_0, 0);
         lv_obj_set_style_bg_opa(pos_btn[1], LV_OPA_100, 0);
         parent = smart_recipes[1]->user_data;
@@ -369,6 +373,9 @@ static void left_recipes_create(lv_obj_t *parent)
 
     lv_obj_set_flex_flow(right_content, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(right_content, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    // lv_obj_set_scroll_dir(right_content, LV_DIR_HOR); 
+    // lv_obj_set_scroll_snap_x(right_content, LV_SCROLL_SNAP_CENTER);
+    // lv_obj_set_scrollbar_mode(right_content, LV_SCROLLBAR_MODE_OFF);
     lv_get_recipes(right_content, 1, 0);
 }
 
@@ -439,9 +446,9 @@ void lv_page_smartrecipes_init(lv_obj_t *page)
         lv_obj_set_style_bg_color(btn, lv_color_hex(0x3E2B21), 0);
         lv_obj_set_style_bg_opa(btn, LV_OPA_0, 0);
         lv_obj_set_style_radius(btn, 4, 0);
-        lv_obj_set_style_border_color(btn, lv_color_hex(themesTextColor), 0);
-        lv_obj_set_style_border_width(btn, 4, 0);
-        lv_obj_set_style_border_opa(btn, LV_OPA_0, 0);
+        // lv_obj_set_style_border_color(btn, lv_color_hex(themesTextColor), 0);
+        // lv_obj_set_style_border_width(btn, 4, 0);
+        // lv_obj_set_style_border_opa(btn, LV_OPA_0, 0);
         lv_obj_set_style_outline_color(btn, lv_color_hex(themesTextColor), 0);
         lv_obj_set_style_outline_width(btn, 4, 0);
         lv_obj_set_style_outline_opa(btn, LV_OPA_0, 0);
@@ -456,8 +463,9 @@ void lv_page_smartrecipes_init(lv_obj_t *page)
     }
     // lv_obj_set_style_outline_opa(pos_btn[0], LV_OPA_100, 0);
     lv_obj_set_style_bg_opa(pos_btn[0], LV_OPA_100, 0);
-    lv_obj_set_style_border_opa(pos_btn[0], LV_OPA_100, 0);
-    lv_obj_align_to(cont, back_bar, LV_ALIGN_BOTTOM_MID, 0, 20);
+    // lv_obj_set_style_border_opa(pos_btn[0], LV_OPA_100, 0);
+    lv_obj_set_style_text_color(lv_obj_get_child(pos_btn[0], 0), lv_color_hex(themesTextColor), 0);
+    lv_obj_align_to(cont, back_bar, LV_ALIGN_BOTTOM_MID, 0, 10);
     //------------------------------
     const char *text[] = {"启动", "预约"};
     lv_obj_t *btn_array = lv_custom_btn_array_create(page, text, 2, btn_array_event_cb);

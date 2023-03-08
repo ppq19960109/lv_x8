@@ -300,6 +300,8 @@ static void lv_100ask_page_manager_page_constructor(const lv_obj_class_t * class
 #endif
     page->page_property_change_cb = NULL;
     page->page_update_cb = NULL;
+    page->page_close_cb = NULL;
+    page->user_data = NULL;
 }
 
 static void lv_100ask_page_manager_page_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)

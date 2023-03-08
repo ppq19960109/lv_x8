@@ -29,6 +29,8 @@
         "lv_auto_dialog.h": "c",
         "cjson.h": "c",
         "kv_linux.h": "c",
-        "execinfo.h": "c"
+        "execinfo.h": "c",
+        "xf86drmmode.h": "c",
+        "xf86drm.h": "c"
     }
 }
