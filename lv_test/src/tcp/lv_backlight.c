@@ -4,7 +4,7 @@
  *      INCLUDES
  *********************/
 #include "lv_backlight.h"
-
+#include "lv_test_main.h"
 #define SYSFS_BL_DIR "/sys/devices/platform/backlight/backlight/backlight"
 /*********************
  *      DEFINES
@@ -109,11 +109,16 @@ int backlightGet(void)
 void setClockTimestamp(long timestamp)
 {
     printf("setClockTimestamp:%ld\n", timestamp);
+    //pthread_mutex_lock(&g_mutex);
+    struct timeval tv_now;
+    gettimeofday(&tv_now, NULL);
 
     struct timeval tv;
     tv.tv_sec = timestamp;
-    tv.tv_usec = 0;
+    tv.tv_usec = tv_now.tv_usec;
     printf("settimeofday ret:%d\n", settimeofday(&tv, NULL));
+    custom_tick_update(&tv);
+    //pthread_mutex_unlock(&g_mutex);
 }
 void setClockTime(int hours, int minutes)
 {

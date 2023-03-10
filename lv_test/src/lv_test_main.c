@@ -408,7 +408,9 @@ static void home_bar_event_cb(lv_event_t *e)
 }
 static void lv_sleep_timer_cb(lv_timer_t *timer)
 {
-    LV_LOG_USER("%s,sleep...", __func__);
+    uint32_t tick = lv_tick_get();
+    LV_LOG_USER("%s,sleep...tick:%u", __func__, tick);
+
     lv_timer_pause(sleep_timer);
     lv_auto_screen_dialog4(0);
 }

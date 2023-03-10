@@ -15,7 +15,7 @@ pthread_mutex_t g_mutex;
 
 static void feedback_cb(struct _lv_indev_drv_t *lv_indev_drv, uint8_t event_code)
 {
-    if (LV_EVENT_CLICKED == event_code || LV_EVENT_PRESSED == event_code || LV_EVENT_RELEASED == event_code)
+    if (LV_EVENT_CLICKED == event_code || LV_EVENT_RELEASED == event_code) //|| LV_EVENT_PRESSED == event_code
     {
         printf("%s,code:%d............\n", __func__, event_code);
         lv_sleep_wakeup();
@@ -114,20 +114,34 @@ int main(void)
     pthread_mutex_destroy(&g_mutex);
     return 0;
 }
+static uint64_t start_ms = 0;
+static uint64_t now_ms = 0;
+static uint32_t time_ms = 0;
+void custom_tick_update(struct timeval *tv)
+{
+    now_ms = tv->tv_sec * 1000 + tv->tv_usec * 0.001;
+    if (now_ms > time_ms)
+        start_ms = now_ms - time_ms;
+}
 uint32_t custom_tick_get(void);
 /*Set in lv_conf.h as `LV_TICK_CUSTOM_SYS_TIME_EXPR`*/
 uint32_t custom_tick_get(void)
 {
     struct timeval tv_now;
-    static uint64_t start_ms = 0;
     if (start_ms == 0)
     {
         gettimeofday(&tv_now, NULL);
-        start_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) * 0.001;
+        start_ms = tv_now.tv_sec * 1000 + tv_now.tv_usec * 0.001;
+        return 0;
     }
     gettimeofday(&tv_now, NULL);
-    static uint64_t now_ms;
     now_ms = tv_now.tv_sec * 1000 + tv_now.tv_usec * 0.001;
-    // uint32_t time_ms = now_ms - start_ms;
-    return now_ms - start_ms;
+    // if (now_ms < start_ms)
+    // {
+    //     printf("%s,%u %u %d\n", __func__, start_ms, now_ms);
+    //     start_ms = now_ms;
+    //     return 0;
+    // }
+    time_ms = now_ms - start_ms;
+    return time_ms;
 }
