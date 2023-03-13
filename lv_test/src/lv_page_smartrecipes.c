@@ -17,6 +17,7 @@ static lv_obj_t *pos_btn[2];
  *  STATIC VARIABLES
  **********************/
 static void lv_get_recipes(lv_obj_t *parent, unsigned char recipeType, char cookPos);
+static void scroll_change(lv_obj_t *cont, int cur_index);
 void recipe_cook_start(recipe_t *recipe, const int reserve_time)
 {
     if (recipe == NULL)
@@ -66,7 +67,7 @@ static void recipe_click_checked(lv_obj_t *child, unsigned char checked)
 {
     if (checked)
     {
-        lv_obj_set_size(child, 180, 258);
+        lv_obj_set_size(child, 184, 258);
         lv_obj_t *child0 = lv_obj_get_child(child, 0);
         lv_obj_t *child0_0 = lv_obj_get_child(child0, 0);
         lv_obj_t *child0_0_0 = lv_obj_get_child(child0_0, 0);
@@ -77,7 +78,7 @@ static void recipe_click_checked(lv_obj_t *child, unsigned char checked)
     }
     else
     {
-        lv_obj_set_size(child, 152, 210);
+        lv_obj_set_size(child, 164, 210);
         lv_obj_t *child0 = lv_obj_get_child(child, 0);
         lv_obj_t *child0_0 = lv_obj_get_child(child0, 0);
         lv_obj_t *child0_0_0 = lv_obj_get_child(child0_0, 0);
@@ -104,6 +105,7 @@ static void recipe_event_cb(lv_event_t *e)
             lv_100ask_page_manager_set_open_page(NULL, "page_cook_details");
             return;
         }
+        return;
         lv_obj_t *parent = lv_obj_get_parent(current_target);
 
         int child_num = lv_obj_get_child_cnt(parent);
@@ -191,8 +193,8 @@ static lv_obj_t *lv_recipe_create(lv_obj_t *parent, const char *img_src, const c
         sprintf(imgUrl, "%s%s%s", recipesImagesPath, img_src, ".png");
     LV_LOG_USER("img_src:%s text:%s imgUrl:%s", img_src, text, imgUrl);
 
-    lv_obj_t *obj = lv_obj_create(parent);
-    lv_obj_set_size(obj, 152, 210);
+    lv_obj_t *obj = lv_btn_create(parent);
+    lv_obj_set_size(obj, 164, 210);
     obj->user_data = arg;
     lv_obj_add_event_cb(obj, recipe_event_cb, LV_EVENT_CLICKED, arg);
 
@@ -235,6 +237,8 @@ static void lv_get_recipes(lv_obj_t *parent, unsigned char recipeType, char cook
                 lv_recipe_create(parent, g_recipes[i].imgUrl, g_recipes[i].dishName, g_recipes[i].cookPos, &g_recipes[i]);
             }
         }
+        scroll_change(parent, 0);
+        return;
     }
     else
     {
@@ -342,6 +346,79 @@ static void cookPos_btn_array_event_cb(lv_event_t *e)
         }
     }
 }
+static void scroll_change(lv_obj_t *cont, int cur_index)
+{
+    uint32_t child_cnt = lv_obj_get_child_cnt(cont); // 获取子界面的数量
+    int mid_btn_index = (child_cnt - 1) / 2;         // 如果界面为偶数，将中间数向下取整的界面设置为中间界面
+
+    int roll_direction = cur_index - mid_btn_index; // 确定滚动方向
+
+    /* 通过循环将指定界面移到中心位置 */
+    for (int i = 0; i < LV_ABS(roll_direction); ++i)
+    {
+        if (roll_direction < 0)
+        {
+            lv_obj_move_to_index(lv_obj_get_child(cont, child_cnt - 1), 0); // 将最后一个界面的索引更改为 0 （移至第一个界面）
+        }
+        else
+        {
+            lv_obj_move_to_index(lv_obj_get_child(cont, 0), child_cnt - 1); // 将第一个界面的索引值改为最大值（移至最后一个界面）
+        }
+    }
+    /*当按钮数为偶数时，确保按钮居中*/
+    lv_obj_scroll_to_view(lv_obj_get_child(cont, mid_btn_index), LV_ANIM_OFF); // 滚动到一个对象，直到它在其父对象上可见
+}
+static void scroll_end_event(lv_event_t *e)
+{
+    lv_obj_t *cont = lv_event_get_target(e); // 获取事件的初始对象
+    
+    if (e->code != LV_EVENT_SCROLL_END)
+        return;
+
+    LV_LOG_USER("%s,code:%d", __func__, e->code);
+    /* 获取事件的事件代码 */
+    /* 判断是否在滚动中 */
+    if (lv_obj_is_scrolling(cont))
+    {
+        return;
+    }
+    lv_coord_t child_cnt = lv_obj_get_child_cnt(cont); // 获取子界面的数量
+    lv_coord_t mid_btn_index = (child_cnt - 1) / 2;    // 中间界面的位置
+
+    /* 获取父对象y轴的中心坐标值 */
+    lv_area_t cont_a;
+    lv_obj_get_coords(cont, &cont_a);                                      // 将cont对象的坐标复制到cont_a
+    lv_coord_t cont_x_center = cont_a.x1 + lv_area_get_width(&cont_a) / 2; // 获取界面的宽像素大小/2
+
+    /* 遍历子界面 */
+    for (lv_coord_t i = 0; i < child_cnt; i++)
+    {
+        lv_obj_t *child = lv_obj_get_child(cont, i); // 通过索引获取子对象
+
+        /* 获取子对象y轴的中心坐标值 */
+        lv_area_t child_a;
+        lv_obj_get_coords(child, &child_a);
+        lv_coord_t child_x_center = child_a.x1 + lv_area_get_width(&child_a) / 2; // 获取界面中按钮宽像素值的大小/2
+        /* 子界面的坐标与父界面的坐标相等时，说明当前界面在父界面中显示 */
+        if (child_x_center == cont_x_center)
+        {
+
+            /* 当前显示界面的索引 */
+            lv_coord_t current_btn_index = lv_obj_get_index(child);
+            LV_LOG_USER("%s,code:%d current_btn_index:%d mid_btn_index:%d\n", __func__, e->code, current_btn_index, mid_btn_index);
+            /* 判断界面移动的数数据，并将当前界面的索引改为中间位置 */
+            /* 因为是在滑动结束后实现的，建议界面较多的情况下使用此方式，当界面较少，一次滑动太多界面时，容易滑倒边界出现卡顿现象 */
+
+            scroll_change(cont, current_btn_index);
+            /* 保证界面居中显示 */
+            recipe_click_checked(child, 1);
+        }
+        else
+        {
+            recipe_click_checked(child, 0);
+        }
+    }
+}
 static void left_recipes_create(lv_obj_t *parent)
 {
     lv_obj_t *left_content = lv_obj_create(parent);
@@ -373,9 +450,13 @@ static void left_recipes_create(lv_obj_t *parent)
 
     lv_obj_set_flex_flow(right_content, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(right_content, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    // lv_obj_set_scroll_dir(right_content, LV_DIR_HOR); 
-    // lv_obj_set_scroll_snap_x(right_content, LV_SCROLL_SNAP_CENTER);
-    // lv_obj_set_scrollbar_mode(right_content, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_scroll_dir(right_content, LV_DIR_HOR);
+    lv_obj_set_scroll_snap_x(right_content, LV_SCROLL_SNAP_CENTER);
+    lv_obj_set_scrollbar_mode(right_content, LV_SCROLLBAR_MODE_OFF);
+    // lv_obj_clear_flag(right_content, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    // lv_obj_clear_flag(right_content, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    lv_obj_add_event_cb(right_content, scroll_end_event, LV_EVENT_ALL, NULL);
+    lv_obj_set_style_pad_column(right_content, 100,0);
     lv_get_recipes(right_content, 1, 0);
 }
 

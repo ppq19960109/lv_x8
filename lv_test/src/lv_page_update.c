@@ -91,7 +91,7 @@ static void scroll_event_cb(lv_event_t *e)
 static void scroll_change(lv_obj_t *cont, int cur_index)
 {
     uint32_t child_cnt = lv_obj_get_child_cnt(cont); // 获取子界面的数量
-    int mid_btn_index = (child_cnt - 1) / 2;    // 如果界面为偶数，将中间数向下取整的界面设置为中间界面
+    int mid_btn_index = (child_cnt - 1) / 2;         // 如果界面为偶数，将中间数向下取整的界面设置为中间界面
 
     int roll_direction = cur_index - mid_btn_index; // 确定滚动方向
 
@@ -110,11 +110,14 @@ static void scroll_change(lv_obj_t *cont, int cur_index)
     /*当按钮数为偶数时，确保按钮居中*/
     lv_obj_scroll_to_view(lv_obj_get_child(cont, mid_btn_index), LV_ANIM_OFF); // 滚动到一个对象，直到它在其父对象上可见
 }
+
 static void scroll_end_event(lv_event_t *e)
 {
-
     lv_obj_t *cont = lv_event_get_target(e); // 获取事件的初始对象
+    if (e->code != LV_EVENT_SCROLL_END)
+        return;
 
+    LV_LOG_USER("%s,code:%d\n", __func__, e->code);
     /* 获取事件的事件代码 */
     /* 判断是否在滚动中 */
     if (lv_obj_is_scrolling(cont))
@@ -192,7 +195,7 @@ static void lv_example_scroll(lv_obj_t *parent)
     // lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     /// 对象的特性
     // 1.添加事件 // Link---<!>----------------------------------->>>>>>>>>>>>
-    lv_obj_add_event_cb(cont, scroll_end_event, LV_EVENT_SCROLL_END, NULL); // 给cont添加event，事件的回调函数、事件类型（Scroll）
+    lv_obj_add_event_cb(cont, scroll_end_event, LV_EVENT_ALL, NULL); // 给cont添加event，事件的回调函数、事件类型（Scroll）
     // 2.设置样式
     // lv_obj_set_style_radius(cont, LV_RADIUS_CIRCLE, 0);     // 设置矩形圆角 LV_RADIUS_CIRCLE：圆角最大化
     // lv_obj_set_style_clip_corner(cont, true, 0);            // 儿子超出部分隐藏
