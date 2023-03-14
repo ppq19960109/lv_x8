@@ -455,6 +455,7 @@ static void left_recipes_create(lv_obj_t *parent)
     lv_obj_set_scrollbar_mode(right_content, LV_SCROLLBAR_MODE_OFF);
     // lv_obj_clear_flag(right_content, LV_OBJ_FLAG_SCROLL_ELASTIC);
     // lv_obj_clear_flag(right_content, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    lv_obj_clear_flag(right_content, LV_OBJ_FLAG_SCROLL_CHAIN);
     lv_obj_add_event_cb(right_content, scroll_end_event, LV_EVENT_ALL, NULL);
     lv_obj_set_style_pad_column(right_content, 100,0);
     lv_get_recipes(right_content, 1, 0);

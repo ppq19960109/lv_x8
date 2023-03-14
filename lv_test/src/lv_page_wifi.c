@@ -385,6 +385,7 @@ lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const int flags)
 void lv_page_wifi_visible(const int visible)
 {
     LV_LOG_USER("%s...visible:%d", __func__, visible);
+    lv_obj_scroll_to_view(lv_obj_get_child(wifi_list, 0), LV_ANIM_OFF);
     if (visible)
     {
         // scan_count = 0;
@@ -410,6 +411,9 @@ void lv_page_wifi_visible(const int visible)
 #else
         lv_timer_pause(wifi_timer);
 #endif
+        // lv_obj_scroll_to_x(wifi_list, 10, LV_ANIM_OFF);
+        // lv_obj_scroll_to_y(wifi_list, 10, LV_ANIM_OFF);
+        // lv_obj_scroll_by(wifi_list, 0, 50, LV_ANIM_OFF);
     }
 }
 void lv_page_wifi_create(lv_obj_t *page)
@@ -423,14 +427,14 @@ void lv_page_wifi_create(lv_obj_t *page)
     lv_timer_pause(wifi_timer);
 #endif
     lv_obj_t *head = lv_obj_create(page);
-    lv_obj_set_size(head, LV_PCT(100), 140);
+    lv_obj_set_size(head, LV_PCT(100), 80);
     lv_obj_align(head, LV_ALIGN_TOP_MID, 0, 0);
     lv_obj_t *content = lv_list_create(page);
     lv_obj_set_size(content, LV_PCT(100), 260);
     lv_obj_align(content, LV_ALIGN_BOTTOM_MID, 0, 0);
 
     lv_obj_t *divider = lv_divider_create(head);
-    lv_obj_align(divider, LV_ALIGN_TOP_MID, 0, 80);
+    lv_obj_align(divider, LV_ALIGN_BOTTOM_MID, 0, 0);
     lv_obj_t *label = lv_label_create(head);
     lv_obj_set_style_text_font(label, &lv_font_montserrat_30, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), 0);
@@ -455,9 +459,11 @@ void lv_page_wifi_create(lv_obj_t *page)
 
     wifi_list = lv_list_create(content);
     lv_obj_clear_flag(content, LV_OBJ_FLAG_SCROLL_ELASTIC);
-    lv_obj_set_size(wifi_list, LV_PCT(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(wifi_list, LV_PCT(100), LV_PCT(100));
     lv_obj_align(wifi_list, LV_ALIGN_TOP_MID, 0, 0);
 
+    lv_obj_set_scroll_dir(wifi_list, LV_DIR_VER);
+    lv_obj_set_scroll_snap_y(wifi_list, LV_SCROLL_SNAP_START);
     // lv_wifi_list_create("abc", -66, 2);
     // lv_wifi_list_create("QWER", -46, 1);
     wifi_update();
