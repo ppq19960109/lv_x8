@@ -394,6 +394,16 @@
             "cloudKey": "UpdateLog",
             "valueType": 2,
             "uartByteLen": 180
+        },
+        {
+            "cloudKey": "OTAState",
+            "valueType": 0,
+            "uartByteLen": 1
+        },
+        {
+            "cloudKey": "OTAPowerState",
+            "valueType": 0,
+            "uartByteLen": 1
         }
     ],
     "event": [],

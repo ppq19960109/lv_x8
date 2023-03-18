@@ -151,7 +151,7 @@ static void lv_dev_set_value(cJSON *Data, dev_attr_t *ptr)
         //     memcpy(ptr->value, &value->valueint, ptr->value_len);
         //     change = 1;
         // }
-        if (ptr->value.n != value->valueint || strcmp("HoodOffRemind", ptr->key) == 0)
+        if (ptr->value.n != value->valueint || strcmp("HoodOffRemind", ptr->key) == 0 || strcmp("OTAState", ptr->key) == 0 || strcmp("OTAPowerState", ptr->key) == 0)
         {
             ptr->value.n = value->valueint;
             change = 1;

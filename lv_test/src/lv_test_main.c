@@ -284,6 +284,44 @@ static void property_change_cb(const char *key, void *value)
             break;
         }
     }
+    if (strcmp("OTAState", key) == 0)
+    {
+        int data = get_value_int(value);
+        if (data == OTA_STATE_NO_FIRMWARE)
+        {
+            if (g_versionCheckState > 0)
+            {
+                --g_versionCheckState;
+                if (g_versionCheckState == 0)
+                {
+                    lv_update_state(2);
+                }
+            }
+        }
+        else
+        {
+            g_versionCheckState = 0;
+        }
+    }
+    else if (strcmp("OTAPowerState", key) == 0)
+    {
+        int data = get_value_int(value);
+        if (data == OTA_STATE_NO_FIRMWARE)
+        {
+            if (g_versionCheckState > 0)
+            {
+                --g_versionCheckState;
+                if (g_versionCheckState == 0)
+                {
+                    lv_update_state(2);
+                }
+            }
+        }
+        else
+        {
+            g_versionCheckState = 0;
+        }
+    }
     if (page_property_change_cb != NULL)
         page_property_change_cb(key, value);
 }

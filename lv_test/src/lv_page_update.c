@@ -8,10 +8,59 @@
 /*********************
  *      DEFINES
  *********************/
-static lv_obj_t *label_version;
+char g_versionCheckState = 0;
+static lv_obj_t *label_version, *label_checkStatus, *check_btn;
 /**********************
  *  STATIC VARIABLES
  **********************/
+void lv_update_state(int index)
+{
+    switch (index)
+    {
+    case 0:
+        g_versionCheckState = 0;
+        lv_obj_set_style_opa(label_checkStatus, LV_OPA_0, 0);
+        break;
+    case 1:
+        g_versionCheckState = 2;
+        lv_label_set_text(label_checkStatus, "正在检查...");
+        lv_obj_set_style_opa(label_checkStatus, LV_OPA_100, 0);
+        lv_obj_set_style_bg_opa(check_btn, LV_OPA_0, 0);
+        lv_obj_set_style_text_color(lv_obj_get_child(check_btn, 0), lv_color_hex(themesTextColor2), 0);
+        lv_obj_clear_flag(check_btn, LV_OBJ_FLAG_CLICKABLE);
+        set_num_toServer("OTARquest", 0);
+        set_num_toServer("OTAPowerRquest", 0);
+        break;
+    case 2:
+        lv_label_set_text(label_checkStatus, "已经是最新版本");
+        lv_obj_set_style_bg_opa(check_btn, LV_OPA_100, 0);
+        lv_obj_set_style_text_color(lv_obj_get_child(check_btn, 0), lv_color_hex(0x00), 0);
+        lv_obj_add_flag(check_btn, LV_OBJ_FLAG_CLICKABLE);
+        set_num_toServer("OtaCmdPushType", 0);
+        break;
+    }
+}
+void lv_update_property_change_cb(const char *key, void *value)
+{
+    LV_LOG_USER("%s,key:%s\n", __func__, key);
+    int state;
+    if (strcmp("OTAState", key) == 0)
+    {
+        state = get_value_int(value);
+        if (state != OTA_STATE_NO_FIRMWARE)
+        {
+            lv_obj_set_style_opa(label_checkStatus, LV_OPA_0, 0);
+        }
+    }
+    else if (strcmp("OTAPowerState", key) == 0)
+    {
+        state = get_value_int(value);
+        if (state != OTA_STATE_NO_FIRMWARE)
+        {
+            lv_obj_set_style_opa(label_checkStatus, LV_OPA_0, 0);
+        }
+    }
+}
 static void btn_event_cb(lv_event_t *e)
 {
     // lv_obj_t *target = lv_event_get_target(e);
@@ -20,6 +69,7 @@ static void btn_event_cb(lv_event_t *e)
     switch (user_data)
     {
     case 0:
+        lv_update_state(1);
         break;
     }
 }
@@ -28,6 +78,8 @@ void lv_page_update_visible(const int visible)
     char buf[80];
     sprintf(buf, "当前版本 %s", get_attr_value_string("ComSWVersion"));
     lv_label_set_text(label_version, buf);
+    if (g_versionCheckState == 0)
+        lv_update_state(0);
 }
 static void scroll_event_cb(lv_event_t *e)
 {
@@ -255,20 +307,28 @@ void lv_page_update_create(lv_obj_t *page)
     lv_obj_set_style_text_color(label_version, lv_color_hex(0xffffff), 0);
     lv_label_set_text(label_version, "当前版本 1.0.1");
     lv_obj_align(label_version, LV_ALIGN_CENTER, -10, 0);
-
     img = lv_img_create(btn);
     lv_img_set_src(img, themesImagesPath "icon_more.png");
     lv_obj_align(img, LV_ALIGN_RIGHT_MID, -20, 0);
 
-    btn = lv_btn_create(page);
-    lv_obj_set_size(btn, 180, 50);
-    lv_obj_align(btn, LV_ALIGN_BOTTOM_MID, 0, -35);
-    lv_obj_set_style_bg_color(btn, lv_color_hex(themesTextColor2), 0);
-    lv_obj_set_style_bg_opa(btn, LV_OPA_100, 0);
-    lv_obj_set_style_radius(btn, LV_RADIUS_CIRCLE, 0);
-    lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, (void *)0);
+    label_checkStatus = lv_label_create(page);
+    lv_obj_set_style_text_font(label_checkStatus, &lv_font_SiYuanHeiTi_Normal_34, 0);
+    lv_obj_set_style_text_color(label_checkStatus, lv_color_hex(0xffffff), 0);
+    lv_obj_set_style_opa(label_checkStatus, LV_OPA_0, 0);
+    lv_label_set_text(label_checkStatus, "正在检查...");
+    lv_obj_align(label_checkStatus, LV_ALIGN_TOP_MID, 0, 195);
 
-    lv_obj_t *label = lv_label_create(btn);
+    check_btn = lv_btn_create(page);
+    lv_obj_set_size(check_btn, 180, 50);
+    lv_obj_align(check_btn, LV_ALIGN_BOTTOM_MID, 0, -35);
+    lv_obj_set_style_bg_color(check_btn, lv_color_hex(themesTextColor2), 0);
+    lv_obj_set_style_bg_opa(check_btn, LV_OPA_100, 0);
+    lv_obj_set_style_radius(check_btn, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_border_color(check_btn, lv_color_hex(themesTextColor2), 0);
+    lv_obj_set_style_border_width(check_btn, 2, 0);
+    lv_obj_add_event_cb(check_btn, btn_event_cb, LV_EVENT_CLICKED, (void *)0);
+
+    lv_obj_t *label = lv_label_create(check_btn);
     lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_30, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(0), 0);
     lv_label_set_text(label, "检查更新");
@@ -295,15 +355,5 @@ void lv_page_update_create(lv_obj_t *page)
     // lv_obj_set_style_bg_opa(obj, LV_OPA_100, 0);
     // lv_obj_align(btn_test, LV_ALIGN_TOP_RIGHT, -20, 0);
 
-    // lv_obj_t *arc = lv_arc_create(page);
-    // lv_obj_set_size(arc, 240, 240);
-    // lv_arc_set_rotation(arc, 270);
-    // lv_arc_set_bg_angles(arc, 0, 360);
-    // lv_arc_set_value(arc, 50);
-    // lv_obj_set_style_arc_color(arc, lv_color_hex(themesTextColor), LV_PART_INDICATOR);
-    // lv_obj_set_style_arc_width(arc, 20, LV_PART_INDICATOR);
-    // lv_obj_align(arc, LV_ALIGN_TOP_LEFT, 0, 0);
-    // lv_obj_add_style(arc, &style, LV_PART_INDICATOR);
-
-    lv_example_scroll(page);
+    // lv_example_scroll(page);
 }

@@ -49,6 +49,7 @@ extern "C"
     extern pthread_mutex_t g_mutex;
     extern lv_obj_t *manual_scr, *main_scr;
     extern char scan_count;
+    extern char g_versionCheckState;
     /**********************
      * GLOBAL PROTOTYPES
      **********************/
@@ -80,6 +81,8 @@ extern "C"
     void lv_page_wifi_create(lv_obj_t *page);
     void lv_page_wifi_visible(const int visible);
     void lv_wifi_property_change_cb(const char *key, void *value);
+    void lv_update_property_change_cb(const char *key, void *value);
+    void lv_update_state(int index);
     void lv_page_about_create(lv_obj_t *page);
     void lv_page_about_visible(const int visible);
     void lv_page_update_create(lv_obj_t *page);

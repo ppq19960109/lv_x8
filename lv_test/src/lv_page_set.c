@@ -23,6 +23,7 @@ static void property_change_cb(const char *key, void *value)
 {
     LV_LOG_USER("lv_page_set,key:%s\n", key);
     lv_wifi_property_change_cb(key, value);
+    lv_update_property_change_cb(key, value);
 }
 static void page_update_cb(void *arg)
 {
