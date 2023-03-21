@@ -9,17 +9,17 @@
 /*********************
  *      DEFINES
  *********************/
+
+wifi_info_t g_wifi_info = {0};
+char g_wifiPageStatus = 0;
+
 #define POSIXTimer
-typedef struct
-{
-    char ssid[33];
-    int flags;
-} wifi_info_t;
 #ifdef POSIXTimer
 static timer_t *wifi_timer;
 #else
 static lv_timer_t *wifi_timer;
 #endif
+static timer_t *wifi_connecting_timer;
 char scan_count;
 static lv_obj_t *wifi_list;
 static lv_obj_t *label_connect;
@@ -78,6 +78,60 @@ static void wifi_update()
     bssid = get_attr_value_string("bssid");
     lv_wifi_list_clean();
     wifi_list_each(wifi_list_item);
+    if (lv_obj_get_child_cnt(wifi_list) <= 1)
+    {
+        lv_obj_t *obj = lv_obj_create(wifi_list);
+        lv_obj_set_size(obj, LV_PCT(100), 70);
+        lv_obj_t *img_indicator = lv_img_create(obj);
+        lv_obj_align(img_indicator, LV_ALIGN_TOP_LEFT, 0, 30);
+        lv_img_set_src(img_indicator, themesImagesPath "icon_loading_small.png");
+    }
+}
+static void wifi_scan_timer_reset()
+{
+    LV_LOG_USER("%s...\n", __func__);
+    get_toServer("WifiCurConnected");
+    set_num_toServer("WifiScan", -1);
+    scan_count = 0;
+    wifi_input_enable = 0;
+    POSIXTimerSet(wifi_timer, 3, 3);
+}
+void wifi_connecting_change(char state)
+{
+    if (g_wifiPageStatus == 0)
+        return;
+    if (state > 0)
+    {
+        POSIXTimerSet(wifi_connecting_timer, 0, 60);
+    }
+    else
+    {
+        if (POSIXTimerGet(wifi_connecting_timer) > 0)
+            POSIXTimerSet(wifi_connecting_timer, 0, 0);
+        else
+        {
+        }
+        wifi_scan_timer_reset();
+    }
+}
+static void wifi_fail_dialog_event_cb(lv_event_t *e)
+{
+    long user_data = (long)lv_event_get_user_data(e);
+    switch (user_data)
+    {
+    case 0:
+    case 1:
+        break;
+    case 2:
+        break;
+    }
+    clean_manual_layer();
+}
+static void lv_wifi_fail_dialog(const char *info)
+{
+    clean_manual_layer();
+    lv_obj_t *layer = get_manual_layer();
+    lv_dialog1(layer, info, NULL, "好的", themesImagesPath "icon_wifi_warn.png", wifi_fail_dialog_event_cb);
 }
 void lv_wifi_property_change_cb(const char *key, void *value)
 {
@@ -89,6 +143,43 @@ void lv_wifi_property_change_cb(const char *key, void *value)
             wifi_update();
         }
     }
+    else if (strcmp("WifiState", key) == 0)
+    {
+        if (g_wifi_state == RK_WIFI_State_CONNECTFAILED || g_wifi_state == RK_WIFI_State_DISCONNECTED)
+        {
+            lv_wifi_fail_dialog("网络连接失败，请重试");
+        }
+        else if (g_wifi_state == RK_WIFI_State_CONNECTED)
+        {
+            systemRun("(wpa_cli list_networks | tail -n +3 | grep -v 'CURRENT' | awk '{system(\"wpa_cli disable_network \" $1)}') &");
+        }
+        else if (g_wifi_state == RK_WIFI_State_LINK_CONNECTED)
+        {
+            lv_about_bind_dialog("连接成功", "下载火粉APP   绑定设备\n海量智慧菜谱  一键烹饪");
+        }
+    }
+    else if (strcmp("ssid", key) == 0)
+    {
+        if (g_wifi_state >= RK_WIFI_State_CONNECTED && strlen(g_wifi_info.ssid) > 0)
+        {
+            char *data = get_value_string(value);
+            if (strcmp(g_wifi_info.ssid, data) == 0)
+            {
+                lv_obj_t *layer = get_manual_layer();
+                if ((long)layer->user_data == 5)
+                {
+                    clean_manual_layer();
+                }
+            }
+        }
+        if (strlen(g_wifi_info.ssid) > 0)
+            memset(g_wifi_info.ssid, 0, sizeof(g_wifi_info.ssid));
+    }
+}
+static void POSIXTimer_connecting_cb(union sigval val)
+{
+    wifi_connecting = 0;
+    wifi_connecting_change(wifi_connecting);
 }
 #ifdef POSIXTimer
 static void POSIXTimer_cb(union sigval val)
@@ -101,13 +192,15 @@ static void lv_timer_cb(lv_timer_t *timer)
     ++scan_count;
     if (scan_count <= scan_min_num)
     {
+        if (wifi_connecting == 0 && wifi_input_enable == 0)
+            get_toServer("WifiScanR");
         if (scan_count == 1)
         {
             if (wifi_connecting == 0 && wifi_input_enable == 0)
             {
                 get_toServer("WifiCurConnected");
+                set_num_toServer("WifiScan", -1);
             }
-            set_num_toServer("WifiScan", -1);
         }
         else if (scan_count == scan_min_num)
         {
@@ -117,8 +210,6 @@ static void lv_timer_cb(lv_timer_t *timer)
             lv_timer_set_period(wifi_timer, 10000);
 #endif
         }
-        if (wifi_connecting == 0 && wifi_input_enable == 0)
-            get_toServer("WifiScanR");
     }
     else
     {
@@ -235,14 +326,13 @@ static void ta_event_cb(lv_event_t *e)
     }
 }
 LV_FONT_DECLARE(lv_font_source_han_sans_normal_16);
-
 static lv_obj_t *lv_wifi_input_dialog5(char *ssid, const int flags)
 {
     cur_ssid = ssid;
     cur_flags = flags;
     wifi_input_enable = 1;
     lv_obj_t *layer = get_manual_layer();
-    layer->user_data = (void *)1;
+    layer->user_data = (void *)5;
     lv_obj_t *obj = lv_obj_create(layer);
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_set_style_bg_opa(obj, LV_OPA_100, 0);
@@ -385,6 +475,7 @@ lv_obj_t *lv_wifi_list_create(const char *ssid, const int rssi, const int flags)
 void lv_page_wifi_visible(const int visible)
 {
     LV_LOG_USER("%s...visible:%d", __func__, visible);
+    g_wifiPageStatus = visible;
     lv_obj_scroll_to_view(lv_obj_get_child(wifi_list, 0), LV_ANIM_OFF);
     if (visible)
     {
@@ -393,8 +484,12 @@ void lv_page_wifi_visible(const int visible)
         // set_num_toServer("WifiScan", -1);
 
         switch_value_state(sw, g_save_settings.wifiEnable);
+        if (wifi_connecting == 0)
+        {
+            systemRun("(wpa_cli list_networks | tail -n +3 | grep -v 'CURRENT' | awk '{system(\"wpa_cli disable_network \" $1)}') &");
+            get_toServer("WifiScanR");
+        }
 #ifdef POSIXTimer
-        get_toServer("WifiScanR");
         if (scan_count == 0)
             POSIXTimerSet(wifi_timer, 3, 3);
         else
@@ -414,18 +509,28 @@ void lv_page_wifi_visible(const int visible)
         // lv_obj_scroll_to_x(wifi_list, 10, LV_ANIM_OFF);
         // lv_obj_scroll_to_y(wifi_list, 10, LV_ANIM_OFF);
         // lv_obj_scroll_by(wifi_list, 0, 50, LV_ANIM_OFF);
+        if (wifi_connecting == 0)
+        {
+            systemRun("(wpa_cli enable_network all) &");
+        }
     }
 }
 void lv_page_wifi_create(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
+    if (wifi_timer == NULL)
+    {
 #ifdef POSIXTimer
-    wifi_timer = POSIXTimerCreate(0, POSIXTimer_cb);
+        wifi_timer = POSIXTimerCreate(0, POSIXTimer_cb);
 #else
-    wifi_timer = lv_timer_create_basic();
-    lv_timer_set_cb(wifi_timer, lv_timer_cb);
-    lv_timer_pause(wifi_timer);
+        wifi_timer = lv_timer_create_basic();
+        lv_timer_set_cb(wifi_timer, lv_timer_cb);
+        lv_timer_pause(wifi_timer);
 #endif
+    }
+    if (wifi_connecting_timer == NULL)
+        wifi_connecting_timer = POSIXTimerCreate(0, POSIXTimer_connecting_cb);
+
     lv_obj_t *head = lv_obj_create(page);
     lv_obj_set_size(head, LV_PCT(100), 80);
     lv_obj_align(head, LV_ALIGN_TOP_MID, 0, 0);

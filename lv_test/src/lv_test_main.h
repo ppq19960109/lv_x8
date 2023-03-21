@@ -23,6 +23,7 @@ extern "C"
 #include "lv_custom_item.h"
 #include "lv_auto_dialog.h"
 #include "lv_manual_dialog.h"
+#include "hv_http_client.h"
     /*********************
      *      DEFINES
      *********************/
@@ -35,6 +36,14 @@ extern "C"
     /**********************
      *      TYPEDEFS
      **********************/
+    typedef struct
+    {
+        char ssid[40];
+        char psk[40];
+        int encryp;
+    } wifi_info_t;
+    extern wifi_info_t g_wifi_info;
+
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_20);
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_24);
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_26);
@@ -50,6 +59,7 @@ extern "C"
     extern lv_obj_t *manual_scr, *main_scr;
     extern char scan_count;
     extern char g_versionCheckState;
+    extern char g_wifiPageStatus;
     /**********************
      * GLOBAL PROTOTYPES
      **********************/
@@ -81,6 +91,8 @@ extern "C"
     void lv_page_wifi_create(lv_obj_t *page);
     void lv_page_wifi_visible(const int visible);
     void lv_wifi_property_change_cb(const char *key, void *value);
+    void wifi_connecting_change(char state);
+    lv_obj_t *lv_about_bind_dialog(const char *topText, const char *centerText);
     void lv_update_property_change_cb(const char *key, void *value);
     void lv_update_state(int index);
     void lv_page_about_create(lv_obj_t *page);

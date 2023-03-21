@@ -141,7 +141,7 @@ static void lv_dev_set_value(cJSON *Data, dev_attr_t *ptr)
     value = cJSON_GetObjectItem(Data, ptr->key);
     if (value == NULL || ptr == NULL)
     {
-        LOGE("%s,null", __func__);
+        LOGE("%s,null key:%s", __func__, ptr->key);
         return;
     }
     if (LINK_VALUE_TYPE_NUM == ptr->value_type)
@@ -238,15 +238,21 @@ void get_toServer(const char *key)
 void connectWiFi(const char *ssid, const char *psk, int encryp)
 {
     wifi_connecting = 1;
-    // cJSON *Data = cJSON_CreateObject();
-    // cJSON *wifiConnectInfo = cJSON_CreateObject();
+    wifi_connecting_change(wifi_connecting);
 
-    // cJSON_AddStringToObject(wifiConnectInfo, "ssid", ssid);
-    // cJSON_AddStringToObject(wifiConnectInfo, "psk", psk);
-    // cJSON_AddNumberToObject(wifiConnectInfo, "encryp", encryp);
+    strcpy(g_wifi_info.ssid, ssid);
+    strcpy(g_wifi_info.psk, psk);
+    g_wifi_info.encryp = encryp;
 
-    // cJSON_AddItemToObject(Data, "WifiConnect", wifiConnectInfo);
-    // send_set_uds(Data);
+    cJSON *Data = cJSON_CreateObject();
+    cJSON *wifiConnectInfo = cJSON_CreateObject();
+
+    cJSON_AddStringToObject(wifiConnectInfo, "ssid", ssid);
+    cJSON_AddStringToObject(wifiConnectInfo, "psk", psk);
+    cJSON_AddNumberToObject(wifiConnectInfo, "encryp", encryp);
+
+    cJSON_AddItemToObject(Data, "WifiConnect", wifiConnectInfo);
+    send_set_uds(Data);
 }
 void set_stoveTiming_toServer(const int index, const int time)
 {
@@ -400,7 +406,7 @@ static void *profile_parse_json(void *input, const char *str) // 启动时解析
         }
         valueType = cJSON_GetObjectItem(arraySub, "valueType");
         dev_state->attr[i].value_type = valueType->valueint;
-
+        LV_LOG_USER("cloudKey:%s\n", dev_state->attr[i].key);
         // if (cJSON_HasObjectItem(arraySub, "uartByteLen"))
         // {
         //     uartByteLen = cJSON_GetObjectItem(arraySub, "uartByteLen");
@@ -512,6 +518,7 @@ static void save_settings_init(void)
     }
     backlightSet(g_save_settings.brightness);
 }
+
 int lv_dev_init(void) // 初始化
 {
     pthread_mutex_init(&mutex, NULL);
@@ -529,6 +536,7 @@ int lv_dev_init(void) // 初始化
 
     register_uds_json_recv_cb(lv_dev_recv_event);
     uds_protocol_init();
+
     return 0;
 }
 

@@ -55,20 +55,20 @@ static void tabview_event_cb(lv_event_t *e)
     else
         lv_page_wifi_visible(0);
 }
-static void back_bar_event_cb(lv_event_t *e)
+
+static void page_close_cb(void *arg)
 {
     lv_page_wifi_visible(0);
-    lv_page_back_previous_page();
 }
-
 void lv_page_set_init(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
     lv_100ask_page_manager_page_t *manager_page = (lv_100ask_page_manager_page_t *)page;
     manager_page->page_property_change_cb = property_change_cb;
     manager_page->page_update_cb = page_update_cb;
+    manager_page->page_close_cb = page_close_cb;
 
-    lv_obj_t *back_bar = lv_page_back_bar_init(page, "设置", NULL, back_bar_event_cb);
+    lv_obj_t *back_bar = lv_page_back_bar_init(page, "设置", NULL, NULL);
 
     tabview = lv_tabview_create(page, LV_DIR_LEFT, 200);
     lv_obj_set_size(tabview, LV_PCT(100), 340);

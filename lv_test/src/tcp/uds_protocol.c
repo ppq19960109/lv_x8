@@ -290,10 +290,15 @@ void mlog_init(void)
     hlog_set_remain_days(1);
     logger_enable_color(hlog, 1);
 }
+static void on_reload(void *userdata)
+{
+    hlogi("reload confile [%s]", g_main_ctx.confile);
+    // parse_confile(g_main_ctx.confile);
+}
 int uds_protocol_init(void) // uds协议相关初始化
 {
     pthread_mutex_init(&mutex, NULL);
-
+    signal_init(on_reload, NULL);
     hthread_create(uds_protocol_task, NULL);
     return 0;
 }

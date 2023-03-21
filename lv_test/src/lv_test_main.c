@@ -225,18 +225,48 @@ static void property_change_cb(const char *key, void *value)
     else if (strcmp("WifiState", key) == 0)
     {
         g_wifi_state = get_value_int(value);
-        wifi_connecting = 0;
-        if (g_wifi_state == RK_WIFI_State_CONNECTED)
+        if (g_wifi_state == RK_WIFI_State_CONNECTING)
         {
-            lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_half_connect.png");
-        }
-        else if (g_wifi_state == RK_WIFI_State_LINK_CONNECTED)
-        {
-            lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_connected.png");
         }
         else
         {
-            lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_disconnect.png");
+            wifi_connecting = 0;
+            wifi_connecting_change(wifi_connecting);
+            if (g_wifi_state == RK_WIFI_State_CONNECTED)
+            {
+                lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_half_connect.png");
+            }
+            else if (g_wifi_state == RK_WIFI_State_LINK_CONNECTED)
+            {
+                lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_connected.png");
+            }
+            else
+            {
+                lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_disconnect.png");
+            }
+            if (g_wifiPageStatus == 0)
+            {
+                get_toServer("WifiCurConnected");
+            }
+        }
+    }
+    else if (strcmp("ssid", key) == 0)
+    {
+        if (g_wifi_state >= RK_WIFI_State_CONNECTED && strlen(g_wifi_info.ssid) > 0)
+        {
+            char *data = get_value_string(value);
+            if (strcmp(g_wifi_info.ssid, data) == 0)
+            {
+                char buf[200];
+                sprintf(buf, "(wpa_cli list_networks | tail -n +3 | grep \'%s\' | grep -v 'CURRENT' | awk '{system(\"wpa_cli remove_network \" $1)}' && wpa_cli save_config) &", data);
+                LV_LOG_USER("ssid:%s buf:%s\n", data, buf);
+                systemRun(buf);
+            }
+        }
+        if (g_wifiPageStatus == 0)
+        {
+            if (strlen(g_wifi_info.ssid) > 0)
+                memset(g_wifi_info.ssid, 0, sizeof(g_wifi_info.ssid));
         }
     }
     else if (strcmp("NtpTimestamp", key) == 0)
@@ -459,6 +489,11 @@ void lv_sleep_wakeup(void)
     lv_timer_resume(sleep_timer);
     lv_auto_screen_dialog4_close();
 }
+int http_weather_get_cb(int code, const char *body)
+{
+    LV_LOG_USER("code:%d body:%s", code, body);
+    return 0;
+}
 lv_obj_t *manual_scr = NULL, *main_scr = NULL;
 void lv_test_widgets(void)
 {
@@ -470,6 +505,8 @@ void lv_test_widgets(void)
     // lv_100ask_demo_layer();
     // return 0;
     init_style();
+
+    http_async_client_get("http://mcook.marssenger.com/application/weather/day", http_weather_get_cb);
     clock_timer = POSIXTimerCreate(0, POSIXTimer_cb);
     POSIXTimerSet(clock_timer, 60, 10);
     sleep_timer = lv_timer_create(lv_sleep_timer_cb, 60000, NULL);

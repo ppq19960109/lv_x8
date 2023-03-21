@@ -22,13 +22,13 @@ static void about_bind_event_cb(lv_event_t *e)
     case 0:
         break;
     }
-    clean_auto_layer();
+    clean_manual_layer();
 }
-static lv_obj_t *lv_about_bind_dialog(const char *topText, const char *centerText)
+lv_obj_t *lv_about_bind_dialog(const char *topText, const char *centerText)
 {
-    clean_auto_layer();
-    lv_obj_t *layer = get_auto_layer();
-
+    clean_manual_layer();
+    lv_obj_t *layer = get_manual_layer();
+    layer->user_data = (void *)1;
     lv_obj_t *obj = lv_obj_create(layer);
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_set_style_bg_opa(obj, LV_OPA_60, 0);
