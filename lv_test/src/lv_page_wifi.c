@@ -131,7 +131,7 @@ static void lv_wifi_fail_dialog(const char *info)
 {
     clean_manual_layer();
     lv_obj_t *layer = get_manual_layer();
-    lv_dialog1(layer, info, NULL, "好的", themesImagesPath "icon_wifi_warn.png", wifi_fail_dialog_event_cb);
+    lv_dialog1(layer, info, NULL, "好的", themesImagesPath "icon_wifi_warn.png", NULL, wifi_fail_dialog_event_cb);
 }
 void lv_wifi_property_change_cb(const char *key, void *value)
 {

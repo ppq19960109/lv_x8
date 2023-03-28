@@ -314,9 +314,29 @@ static void property_change_cb(const char *key, void *value)
             break;
         }
     }
-    if (strcmp("OTAState", key) == 0)
+    else if (strcmp("OTAState", key) == 0)
     {
         int data = get_value_int(value);
+        if (data == OTA_STATE_NEW_FIRMWARE)
+        {
+            if (g_versionCheckState > 0)
+            {
+                char *ver = get_attr_value_string("OTANewVersion");
+                lv_auto_upgrade_confirm_dialog6(ver);
+            }
+        }
+        else if (data == OTA_STATE_DOWNLOAD_START)
+        {
+            lv_auto_upgrade_dialog5("通讯板");
+        }
+        else if (data == OTA_STATE_DOWNLOAD_FAIL)
+        {
+            // loaderUpdateResultShow("通讯板升级失败");
+        }
+        else if (data == OTA_STATE_INSTALL_SUCCESS)
+        {
+        }
+
         if (data == OTA_STATE_NO_FIRMWARE)
         {
             if (g_versionCheckState > 0)
@@ -336,6 +356,26 @@ static void property_change_cb(const char *key, void *value)
     else if (strcmp("OTAPowerState", key) == 0)
     {
         int data = get_value_int(value);
+        if (data == OTA_STATE_NEW_FIRMWARE)
+        {
+            if (g_versionCheckState > 0)
+            {
+                char *ver = get_attr_value_string("OTAPowerNewVersion");
+                lv_auto_upgrade_confirm_dialog6(ver);
+            }
+        }
+        else if (data == OTA_STATE_DOWNLOAD_START)
+        {
+            lv_auto_upgrade_dialog5("电源板");
+        }
+        else if (data == OTA_STATE_DOWNLOAD_FAIL)
+        {
+            // loaderUpdateResultShow("通讯板升级失败");
+        }
+        else if (data == OTA_STATE_INSTALL_SUCCESS)
+        {
+        }
+
         if (data == OTA_STATE_NO_FIRMWARE)
         {
             if (g_versionCheckState > 0)
@@ -351,6 +391,16 @@ static void property_change_cb(const char *key, void *value)
         {
             g_versionCheckState = 0;
         }
+    }
+    else if (strcmp("OTAProgress", key) == 0)
+    {
+        int data = get_value_int(value);
+        lv_auto_upgrade_dialog5_progress(data, "通讯板");
+    }
+    else if (strcmp("OTAPowerProgress", key) == 0)
+    {
+        int data = get_value_int(value);
+        lv_auto_upgrade_dialog5_progress(data, "电源板");
     }
     if (page_property_change_cb != NULL)
         page_property_change_cb(key, value);

@@ -13,7 +13,11 @@ extern "C"
     /*********************
      *      DEFINES
      *********************/
-
+    enum MANUAL_INDEX_ENUM
+    {
+        MANUAL_INDEX_GENERAL = 0x01,
+        MANUAL_INDEX_RESERVE,
+    };
     /**********************
      *      TYPEDEFS
      **********************/

@@ -63,7 +63,7 @@ static void scroll_event_cb(lv_event_t *e)
 lv_obj_t *lv_manual_reserve_dialog(const char *text_before, const char *text_after, const char *text_confirm, const int hour, lv_event_cb_t event_cb)
 {
     lv_obj_t *layer = get_manual_layer();
-    layer->user_data = (void *)2;
+    layer->user_data = (void *)MANUAL_INDEX_RESERVE;
     lv_obj_t *obj = lv_obj_create(layer);
     lv_obj_set_size(obj, 730, 350);
     lv_obj_center(obj);
@@ -154,7 +154,7 @@ lv_obj_t *lv_manual_reserve_dialog(const char *text_before, const char *text_aft
 int lv_get_reserve_dialog_time(void)
 {
     lv_obj_t *layer = lv_scr_act();
-    if ((long)layer->user_data != 2)
+    if ((long)layer->user_data != MANUAL_INDEX_RESERVE)
         return -1;
     lv_obj_t *reserve_dialog = lv_obj_get_child(layer, -1);
     lv_obj_t *hour_roller = lv_obj_get_child(lv_obj_get_child(reserve_dialog, -4), -1);
@@ -167,13 +167,14 @@ int lv_get_reserve_dialog_time(void)
 lv_obj_t *lv_manual_cook_dialog(const char *content, lv_event_cb_t event_cb)
 {
     lv_obj_t *layer = get_manual_layer();
-    lv_obj_t *obj = lv_dialog1(layer, content, "取消", "开始", NULL, event_cb);
+    lv_obj_t *obj = lv_dialog1(layer, content, "取消", "开始", NULL, NULL, event_cb);
     lv_obj_t *radio_btn = radiobutton_create(obj, "下次不再提示");
     lv_obj_align(radio_btn, LV_ALIGN_TOP_MID, 0, 212);
     return obj;
 }
-lv_obj_t *lv_manual_dialog1(const char *content, const char *cancel, const char *confirm, lv_event_cb_t event_cb)
+lv_obj_t *
+lv_manual_dialog1(const char *content, const char *cancel, const char *confirm, lv_event_cb_t event_cb)
 {
     lv_obj_t *layer = get_manual_layer();
-    return lv_dialog1(layer, content, cancel, confirm, NULL, event_cb);
+    return lv_dialog1(layer, content, cancel, confirm, NULL, NULL, event_cb);
 }
