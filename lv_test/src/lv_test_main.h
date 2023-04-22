@@ -63,7 +63,6 @@ extern "C"
     /**********************
      * GLOBAL PROTOTYPES
      **********************/
-    void custom_tick_update(struct timeval *tv);
     void register_page_property_change_cb(void (*cb)(const char *key, void *value));
     void lv_test_widgets(void);
     void lv_sleep_wakeup(void);

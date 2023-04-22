@@ -39,16 +39,6 @@ public:
         ping_interval = ms;
     }
 
-    // NOTE: call before open
-    void setHttpRequest(const HttpRequestPtr& req) {
-        http_req_ = req;
-    }
-
-    // NOTE: call when onopen
-    const HttpResponsePtr& getHttpResponse() {
-        return http_resp_;
-    }
-
 private:
     enum State {
         CONNECTING,

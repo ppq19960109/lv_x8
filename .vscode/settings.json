@@ -67,6 +67,10 @@
         "tuple": "cpp",
         "utility": "cpp",
         "valarray": "cpp",
-        "lv_manual_dialog.h": "c"
+        "lv_manual_dialog.h": "c",
+        "uartcfg.h": "c",
+        "curl.h": "c",
+        "base64.h": "c",
+        "types.h": "c"
     }
 }

@@ -117,7 +117,6 @@ void setClockTimestamp(long timestamp)
     tv.tv_sec = timestamp;
     tv.tv_usec = tv_now.tv_usec;
     printf("settimeofday ret:%d\n", settimeofday(&tv, NULL));
-    custom_tick_update(&tv);
     //pthread_mutex_unlock(&g_mutex);
 }
 void setClockTime(int hours, int minutes)

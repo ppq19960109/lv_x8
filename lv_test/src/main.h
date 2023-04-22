@@ -22,7 +22,6 @@
 #include <arpa/inet.h>
 #include <sys/un.h>
 
-#include "zlog.h"
 
 #include "cJSON.h"
 #include "base64.h"
@@ -31,7 +30,7 @@
 #include "cmd_run.h"
 #include "commonFunc.h"
 #include "networkFunc.h"
-#include "signalQuit.h"
+// #include "signalQuit.h"
 #include "POSIXTimer.h"
 #include "UartCfg.h"
 

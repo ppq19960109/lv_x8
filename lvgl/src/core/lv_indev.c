@@ -353,7 +353,7 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
         data->point.y = data->point.x;
         data->point.x = disp->driver->ver_res - tmp - 1;
     }
-
+    // printf("%s 2,rotated:%u,hor_res:%d,ver_res:%d,x:%d,y:%d\n",__func__,disp->driver->rotated,lv_disp_get_hor_res(i->driver->disp),lv_disp_get_ver_res(i->driver->disp),data->point.x ,data->point.y);
     /*Simple sanity check*/
     if(data->point.x < 0) {
         LV_LOG_WARN("X is %d which is smaller than zero", data->point.x);
