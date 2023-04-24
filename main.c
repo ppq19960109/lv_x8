@@ -7,8 +7,7 @@
 #include <pthread.h>
 #include <time.h>
 #include <sys/time.h>
-
-#include "lv_test/lv_test.h"
+#include "lv_roki/lv_roki.h"
 
 #define DISP_BUF_SIZE (480 * 854)
 pthread_mutex_t g_mutex;
@@ -56,7 +55,6 @@ int main(void)
 
     /*Linux frame buffer device init*/
     fbdev_init();
-    // drm_init();
 
     /*A small buffer for LittlevGL to draw the screen's content*/
     static lv_color_t buf[DISP_BUF_SIZE];
@@ -93,16 +91,10 @@ int main(void)
     // lv_img_set_src(cursor_obj, &mouse_cursor_icon);      /*Set the image source*/
     // lv_indev_set_cursor(mouse_indev, cursor_obj);        /*Connect the image  object to the driver*/
 
-    // lv_disp_set_rotation(NULL, LV_DISP_ROT_270);
-    /*Create a Demo*/
-    // lv_demo_widgets();
-    // lv_demo_stress();
-    // lv_demo_benchmark();
-    // lv_demo_keypad_encoder();
     /*Handle LitlevGL tasks (tickless mode)*/
     pthread_mutex_init(&g_mutex, NULL);
-    lv_test_widgets();
-    // lv_dev_init();
+    lv_roki_widgets();
+    lv_dev_init();
     while(1) {
         pthread_mutex_lock(&g_mutex);
         lv_timer_handler();
@@ -112,8 +104,6 @@ int main(void)
     pthread_mutex_destroy(&g_mutex);
     return 0;
 }
-
-uint32_t custom_tick_get(void);
 /*Set in lv_conf.h as `LV_TICK_CUSTOM_SYS_TIME_EXPR`*/
 uint32_t custom_tick_get(void)
 {

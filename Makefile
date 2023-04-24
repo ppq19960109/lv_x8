@@ -8,7 +8,7 @@ CXX = @echo "G++ $@"; $(CROSS_COMPILE)g++
 LVGL_DIR_NAME ?= lvgl
 LVGL_DIR ?= ${shell pwd}
 
-BIN = lv_X8app
+BIN = lv_rokiapp
 
 LINKTOOL_PATH:=liblinktool
 HV_PATH:=libhv
@@ -21,12 +21,12 @@ CFLAGS += -g -rdynamic -funwind-tables -ffunction-sections -lmcheck -DDEBUG
 endif
 
 CFLAGS += -I$(LINKTOOL_PATH)/include
-# CFLAGS += -I$(LINKTOOL_PATH)/include/base64
 CFLAGS += -I$(LINKTOOL_PATH)/include/cJSON
+CFLAGS += -I$(LINKTOOL_PATH)/include/timer
 # CFLAGS += -I$(LINKTOOL_PATH)/include/tcp
 # CFLAGS += -I$(LINKTOOL_PATH)/include/signal
-CFLAGS += -I$(LINKTOOL_PATH)/include/timer
 # CFLAGS += -I$(LINKTOOL_PATH)/include/md5
+# CFLAGS += -I$(LINKTOOL_PATH)/include/base64
 CFLAGS += -I$(HV_PATH)/include/hv
 
 LDFLAGS += -lm -latomic -Wl,-rpath=./
@@ -36,14 +36,14 @@ LDFLAGS += -L. -ldl -lm -lpthread -lrt
 
 LDFLAGS += -Wl,--start-group	\
 		-Wl,-Bstatic -lhv -llinktool \
-		-Wl,-Bdynamic -lfreetype -lvglfont \
+		-Wl,-Bdynamic -lavcodec -lavformat -lavutil -lswresample -lswscale -lcurl -lfreetype -lvglfont \
 		-Wl,--end-group
 
 CXXFLAGS += $(CFLAGS) -std=c++11
 #Collect the files to compile
 MAINSRC = ./main.c
 
-include $(LVGL_DIR)/lv_test/lv_test.mk
+include $(LVGL_DIR)/lv_roki/lv_roki.mk
 include $(LVGL_DIR)/lv_100ask_page_manager/lv_page_manager.mk
 include $(LVGL_DIR)/lv_100ask_pinyin_ime/lv_pinyin_ime.mk
 include $(LVGL_DIR)/lvgl/lvgl.mk
@@ -61,7 +61,6 @@ MAINOBJ = $(MAINSRC:.c=$(OBJEXT))
 
 SRCS = $(ASRCS) $(CSRCS) $(MAINSRC)
 OBJS = $(AOBJS) $(COBJS) 
-
 
 all: default
 

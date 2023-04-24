@@ -71,6 +71,8 @@
         "uartcfg.h": "c",
         "curl.h": "c",
         "base64.h": "c",
-        "types.h": "c"
+        "types.h": "c",
+        "lv_cycle_scroll.h": "c",
+        "lv_roki.h": "c"
     }
 }
