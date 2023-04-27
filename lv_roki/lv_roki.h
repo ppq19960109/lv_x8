@@ -57,6 +57,7 @@ extern "C"
 #include "tcp/hv_http_client.h"
 
 #include "custom_item/lv_custom_item.h"
+#include "custom_item/lv_cycle_scroll.h"
 #include "dialog/lv_auto_dialog.h"
 #include "dialog/lv_manual_dialog.h"
     /*********************
@@ -73,6 +74,31 @@ extern "C"
     /**********************
      *      TYPEDEFS
      **********************/
+    typedef struct
+    {
+        lv_ft_info_t FZLTHC_80;
+        lv_ft_info_t FZLTHC_66;
+        lv_ft_info_t FZLTHC_60;
+        lv_ft_info_t FZLTHC_54;
+        lv_ft_info_t FZLTHC_48;
+        lv_ft_info_t FZLTHC_44;
+        lv_ft_info_t FZLTHC_40;
+        lv_ft_info_t FZLTHC_32;
+        lv_ft_info_t FZLTHC_30;
+        lv_ft_info_t FZLTHJW_48;
+        lv_ft_info_t FZLTHJW_44;
+        lv_ft_info_t FZLTHJW_40;
+        lv_ft_info_t FZLTHJW_36;
+        lv_ft_info_t FZLTHJW_32;
+        lv_ft_info_t FZLTHJW_30;
+        lv_ft_info_t FZLTHJW_16;
+    } TYPE_FONT_T;
+    typedef struct
+    {
+        unsigned int color1[2];
+    } COLOR_FONT_T;
+    extern TYPE_FONT_T g_robam_font;
+
     typedef struct
     {
         char ssid[40];
@@ -101,10 +127,15 @@ extern "C"
      * GLOBAL PROTOTYPES
      **********************/
     void register_page_property_change_cb(void (*cb)(const char *key, void *value));
-    void lv_roki_widgets(void);
+    const char *getImagePath(const char *directory, const char *file);
+    const char *getThemesPath(const char *file);
+    lv_color_t getThemesFontColor1(void);
+    void lv_theme_switch(const int theme_index);
     void lv_sleep_wakeup(void);
 
+    void lv_roki_widgets(void);
     lv_obj_t *lv_page_back_bar_init(lv_obj_t *parent, const char *name, const char *title, lv_event_cb_t event_cb);
+    lv_obj_t *lv_page_bottom_bar_init(lv_obj_t *parent, const char *left_btn_text, const char *right_btn_text, lv_event_cb_t event_cb);
     lv_obj_t *lv_custom_back_button_create(lv_obj_t *parent, const void *img_src, const char *text);
     lv_obj_t *lv_page_top_bar_init(lv_obj_t *parent, const int index);
 
@@ -115,7 +146,7 @@ extern "C"
     void lv_page_steamoven_init(lv_obj_t *page);
     void lv_page_smartrecipes_init(lv_obj_t *page);
     void lv_page_steaming_init(lv_obj_t *page);
-    void lv_page_steam_left_init(lv_obj_t *page);
+    void lv_page_steam_mode_init(lv_obj_t *page);
     void lv_page_steam_right_init(lv_obj_t *page);
     void lv_page_steam_assist_init(lv_obj_t *page);
     void lv_page_multistage_init(lv_obj_t *page);

@@ -6,20 +6,29 @@
 /*********************
  *      DEFINES
  *********************/
+#define FONT_PATH_FZLTHC_GBK "/assets/fonts/FZLTHC_GBK.TTF"
+#define FONT_PATH_FZLTHJW "/assets/fonts/FZLTHJW.TTF"
+
 int g_wifi_state = 0;
 lv_style_t roller_style_unselected, roller_style_selected;
 lv_style_t slider_style_main, slider_style_indicator, slider_style_knob;
 lv_style_t switch_style_indicator, switch_style_indicator_check, switch_style_knob;
-static lv_obj_t *home, *clock_text;
-static timer_t clock_timer;
-static lv_timer_t *sleep_timer;
+
 char LStOvState = 0, RStOvState = 0;
 char LStoveStatus = 0, RStoveStatus = 0;
-static lv_obj_t *gif;
-static char *themes_path[] = {"S:/oem/robam/images/theme1", "S:/oem/robam/images/theme2"};
+TYPE_FONT_T g_robam_font;
+COLOR_FONT_T g_robam_font_color = {
+    color1 : {0xE1C9BE, 0xFFFFFF}
+};
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_obj_t *clock_text, *win_bg;
+static timer_t clock_timer;
+static lv_timer_t *sleep_timer;
+static lv_obj_t *gif;
+static char *themes_path[] = {"S:/oem/robam/images/theme1/", "S:/oem/robam/images/theme2/"};
+
 void (*page_property_change_cb)(const char *key, void *value);
 void register_page_property_change_cb(void (*cb)(const char *key, void *value))
 {
@@ -42,9 +51,6 @@ static void open_page_anim(lv_obj_t *obj)
         LV_LOG_USER("page name:%s,page_property_change_cb is null", page->name);
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_HIDDEN);
-
-    // lv_obj_t *layer=lv_scr_act();
-    // LV_LOG_USER("lv_scr_act child_cnt:%d user_data:%d",lv_obj_get_child_cnt(layer),layer->user_data);
 }
 
 /*close page anim*/
@@ -59,6 +65,93 @@ static void close_page_anim(lv_obj_t *obj)
 }
 #endif
 //-------------------------------------------------
+static void robam_font_init(void)
+{
+    g_robam_font.FZLTHC_80.name = FONT_PATH_FZLTHC_GBK;
+    g_robam_font.FZLTHC_80.weight = 80;
+    lv_ft_font_init(&g_robam_font.FZLTHC_80);
+
+    g_robam_font.FZLTHC_66.name = FONT_PATH_FZLTHC_GBK;
+    g_robam_font.FZLTHC_66.weight = 66;
+    lv_ft_font_init(&g_robam_font.FZLTHC_66);
+
+    g_robam_font.FZLTHC_60.name = FONT_PATH_FZLTHC_GBK;
+    g_robam_font.FZLTHC_60.weight = 60;
+    lv_ft_font_init(&g_robam_font.FZLTHC_60);
+
+    g_robam_font.FZLTHC_54.name = FONT_PATH_FZLTHC_GBK;
+    g_robam_font.FZLTHC_54.weight = 54;
+    lv_ft_font_init(&g_robam_font.FZLTHC_54);
+
+    g_robam_font.FZLTHC_48.name = FONT_PATH_FZLTHC_GBK;
+    g_robam_font.FZLTHC_48.weight = 48;
+    lv_ft_font_init(&g_robam_font.FZLTHC_48);
+
+    g_robam_font.FZLTHC_44.name = FONT_PATH_FZLTHC_GBK;
+    g_robam_font.FZLTHC_44.weight = 44;
+    lv_ft_font_init(&g_robam_font.FZLTHC_44);
+
+    g_robam_font.FZLTHC_40.name = FONT_PATH_FZLTHC_GBK;
+    g_robam_font.FZLTHC_40.weight = 40;
+    lv_ft_font_init(&g_robam_font.FZLTHC_40);
+
+    g_robam_font.FZLTHC_32.name = FONT_PATH_FZLTHC_GBK;
+    g_robam_font.FZLTHC_32.weight = 32;
+    lv_ft_font_init(&g_robam_font.FZLTHC_32);
+
+    g_robam_font.FZLTHC_30.name = FONT_PATH_FZLTHC_GBK;
+    g_robam_font.FZLTHC_30.weight = 30;
+    lv_ft_font_init(&g_robam_font.FZLTHC_30);
+
+    g_robam_font.FZLTHJW_48.name = FONT_PATH_FZLTHJW;
+    g_robam_font.FZLTHJW_48.weight = 48;
+    lv_ft_font_init(&g_robam_font.FZLTHJW_48);
+
+    g_robam_font.FZLTHJW_44.name = FONT_PATH_FZLTHJW;
+    g_robam_font.FZLTHJW_44.weight = 44;
+    lv_ft_font_init(&g_robam_font.FZLTHJW_44);
+
+    g_robam_font.FZLTHJW_40.name = FONT_PATH_FZLTHJW;
+    g_robam_font.FZLTHJW_40.weight = 40;
+    lv_ft_font_init(&g_robam_font.FZLTHJW_40);
+
+    g_robam_font.FZLTHJW_36.name = FONT_PATH_FZLTHJW;
+    g_robam_font.FZLTHJW_36.weight = 36;
+    lv_ft_font_init(&g_robam_font.FZLTHJW_36);
+
+    g_robam_font.FZLTHJW_32.name = FONT_PATH_FZLTHJW;
+    g_robam_font.FZLTHJW_32.weight = 32;
+    lv_ft_font_init(&g_robam_font.FZLTHJW_32);
+
+    g_robam_font.FZLTHJW_30.name = FONT_PATH_FZLTHJW;
+    g_robam_font.FZLTHJW_30.weight = 30;
+    lv_ft_font_init(&g_robam_font.FZLTHJW_30);
+
+    g_robam_font.FZLTHJW_16.name = FONT_PATH_FZLTHJW;
+    g_robam_font.FZLTHJW_16.weight = 16;
+    lv_ft_font_init(&g_robam_font.FZLTHJW_16);
+}
+
+const char *getImagePath(const char *directory, const char *file)
+{
+    static char path[80];
+    sprintf(path, "%s%s", directory, file);
+    return path;
+}
+const char *getThemesPath(const char *file)
+{
+    return getImagePath(themes_path[g_save_settings.themesIndex], file);
+}
+lv_color_t getThemesFontColor1(void)
+{
+    return lv_color_hex(g_robam_font_color.color1[g_save_settings.themesIndex]);
+}
+void lv_theme_switch(const int theme_index)
+{
+    g_save_settings.themesIndex = theme_index;
+    lv_img_set_src(win_bg, getThemesPath("bg_work_bg.png"));
+    lv_page_reset_page();
+}
 static void getCurrentTime()
 {
     time_t t;
@@ -67,9 +160,9 @@ static void getCurrentTime()
     LV_LOG_USER("year:%d mon:%d day:%d", local_tm->tm_year, local_tm->tm_mon, local_tm->tm_mday);
     LV_LOG_USER("hour:%d min:%d sec:%d", local_tm->tm_hour, local_tm->tm_min, local_tm->tm_sec);
 
-    char buf[8];
-    sprintf(buf, "%02d:%02d", local_tm->tm_hour, local_tm->tm_min);
-    lv_label_set_text(clock_text, buf);
+    // char buf[6];
+    // sprintf(buf, "%02d:%02d", local_tm->tm_hour, local_tm->tm_min);
+    // lv_label_set_text(clock_text, buf);
 }
 
 static void POSIXTimer_cb(union sigval val)
@@ -383,92 +476,54 @@ static void init_style()
     lv_style_set_radius(&switch_style_knob, LV_RADIUS_CIRCLE);
     lv_style_set_pad_all(&switch_style_knob, -3);
 }
-static void home_bar_event_cb(lv_event_t *e)
-{
-    // lv_obj_t *target = lv_event_get_target(e);
-    long user_data = (long)lv_event_get_user_data(e);
-    LV_LOG_USER("%s,code:%d user_data:%ld\n", __func__, e->code, user_data);
-    switch (user_data)
-    {
-    case 0:
-        lv_100ask_page_manager_set_open_page(NULL, "page_set");
-        lv_page_set_tabview_set(1);
-        break;
-    case 1:
-        lv_100ask_page_manager_set_open_page(NULL, "page_set");
-        break;
-    case 2:
-    {
-    }
-    break;
-    case 3:
-    {
-        if (lv_page_get_page_depth() > 1)
-        {
-            lv_page_back_top_page();
-        }
-        else
-        {
-            lv_auto_screen_dialog4(0);
-        }
-    }
-    break;
-    }
-}
+
 static void lv_sleep_timer_cb(lv_timer_t *timer)
 {
     uint32_t tick = lv_tick_get();
     LV_LOG_USER("%s,sleep...tick:%u", __func__, tick);
 
     lv_timer_pause(sleep_timer);
-    lv_auto_screen_dialog4(0);
+    // lv_auto_screen_dialog4(0);
 }
 void lv_sleep_wakeup(void)
 {
     // LV_LOG_USER("%s,wakeup...", __func__);
     lv_timer_reset(sleep_timer);
     lv_timer_resume(sleep_timer);
-    lv_auto_screen_dialog4_close();
+    // lv_auto_screen_dialog4_close();
 }
-int http_weather_get_cb(int code, const char *body)
-{
-    LV_LOG_USER("code:%d body:%s", code, body);
-    return 0;
-}
+
 lv_obj_t *manual_scr = NULL, *main_scr = NULL;
 void lv_roki_widgets(void)
 {
     main_scr = lv_scr_act();
+    // manual_scr = lv_scr_act();
     LV_LOG_USER("%s,manual_scr:%p main_scr:%p", __func__, manual_scr, main_scr);
     // lv_100ask_pinyin_ime_simple_test();
     // lv_100ask_page_manager_simple_test();
-    // lv_100ask_demo_layer();
     // lv_obj_t *bg = lv_img_create(lv_scr_act());
     // lv_img_set_src(bg, "S:/assets/images/bg_home_bg.png");
-    cycle_scroll_test(main_scr);
-    return;
+    // cycle_scroll_test(main_scr);
+    // return;
     register_property_change_cb(property_change_cb);
+    robam_font_init();
     init_style();
 
     clock_timer = POSIXTimerCreate(0, POSIXTimer_cb);
     POSIXTimerSet(clock_timer, 60, 10);
     sleep_timer = lv_timer_create(lv_sleep_timer_cb, 60000, NULL);
 
-    lv_obj_t *win_bg = lv_img_create(lv_scr_act());
-    lv_img_set_src(win_bg, themesImagesPath "window-background.png");
+    win_bg = lv_img_create(main_scr);
+    lv_img_set_src(win_bg, getThemesPath("bg_work_bg.png"));
     //****************************************************
-    home = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(home, LV_PCT(100), LV_PCT(100));
-
-    //****************************************************
-    lv_obj_t *page_manager = lv_100ask_page_manager_create(home);
+    lv_obj_t *page_manager = lv_100ask_page_manager_create(main_scr);
 
     lv_obj_t *main_page = lv_100ask_page_manager_page_create(page_manager, "main_page");
     lv_obj_t *page_hood = lv_100ask_page_manager_page_create(page_manager, "page_hood");
     lv_obj_t *page_steamoven = lv_100ask_page_manager_page_create(page_manager, "page_steamoven");
     lv_obj_t *page_smartrecipes = lv_100ask_page_manager_page_create(page_manager, "page_smartrecipes");
     lv_obj_t *page_steaming = lv_100ask_page_manager_page_create(page_manager, "page_steaming");
-    lv_obj_t *page_steam_left = lv_100ask_page_manager_page_create(page_manager, "page_steam_left");
+    lv_obj_t *page_steam_mode = lv_100ask_page_manager_page_create(page_manager, "page_steam_mode");
     lv_obj_t *page_set = lv_100ask_page_manager_page_create(page_manager, "page_set");
     lv_obj_t *page_cook_details = lv_100ask_page_manager_page_create(page_manager, "page_cook_details");
     lv_obj_t *page_multistage = lv_100ask_page_manager_page_create(page_manager, "page_multistage");
@@ -490,7 +545,7 @@ void lv_roki_widgets(void)
     lv_100ask_page_manager_set_page_init(page_steamoven, lv_page_steamoven_init);
     lv_100ask_page_manager_set_page_init(page_smartrecipes, lv_page_smartrecipes_init);
     lv_100ask_page_manager_set_page_init(page_steaming, lv_page_steaming_init);
-    lv_100ask_page_manager_set_page_init(page_steam_left, lv_page_steam_left_init);
+    lv_100ask_page_manager_set_page_init(page_steam_mode, lv_page_steam_mode_init);
     lv_100ask_page_manager_set_page_init(page_set, lv_page_set_init);
     lv_100ask_page_manager_set_page_init(page_cook_details, lv_page_cook_details_init);
     lv_100ask_page_manager_set_page_init(page_multistage, lv_page_multistage_init);
@@ -515,8 +570,8 @@ void lv_roki_widgets(void)
     lv_100ask_page_manager_set_close_page_anim(page_steamoven, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_smartrecipes, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_smartrecipes, close_page_anim);
-    lv_100ask_page_manager_set_open_page_anim(page_steam_left, open_page_anim);
-    lv_100ask_page_manager_set_close_page_anim(page_steam_left, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_steam_mode, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_steam_mode, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_steaming, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_steaming, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_set, open_page_anim);

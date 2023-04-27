@@ -511,6 +511,8 @@ static void save_settings_init(void)
     H_Kv_Get("screenSaverIndex", &g_save_settings.screenSaverIndex, &len);
     H_Kv_Get("brightness", &g_save_settings.brightness, &len);
     H_Kv_Get("wifiEnable", &g_save_settings.wifiEnable, &len);
+    H_Kv_Get("themesIndex", &g_save_settings.themesIndex, &len);
+
     if (g_save_settings.brightness == 0)
     {
         g_save_settings.brightness = 6;

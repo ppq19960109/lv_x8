@@ -125,9 +125,10 @@ typedef struct
     unsigned short temp;
     unsigned short mintemp;
     unsigned short maxtemp;
+    char **temp_model;
     unsigned short time;
     unsigned short maxtime;
-    char name[32];
+    char name[24];
 } steamoven_mode_t;
 
 typedef struct
@@ -152,7 +153,7 @@ typedef struct
     char screenSaverIndex;
     unsigned char brightness;
     char wifiEnable;
-    char themesIndex;
+    unsigned char themesIndex;
 } save_settings_t;
 
 extern recipe_t g_recipes[];
@@ -163,6 +164,8 @@ extern save_settings_t g_save_settings;
 void mlog_hex(const void *buf, int len, const char *file, const int line, const char *func);
 #define mlogHex(buf, buf_len) mlog_hex(buf, buf_len, __FILENAME__, __LINE__, __FUNCTION__)
 
+void register_property_change_cb(void (*cb)(const char *key, void *value));
+
 int lv_dev_init(void);
 void lv_dev_deinit(void);
 dev_state_t *get_dev_state(void);
@@ -172,8 +175,6 @@ int get_value_int(dev_attr_t *attr);
 char *get_attr_value_string(const char *name);
 char *get_value_string(dev_attr_t *attr);
 const char *workModeName(const char mode);
-
-void register_property_change_cb(void (*cb)(const char *key, void *value));
 
 void set_num_toServer(const char *key, int value);
 void get_toServer(const char *key);

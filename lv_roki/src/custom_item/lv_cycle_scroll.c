@@ -1,7 +1,5 @@
 #include "lv_cycle_scroll.h"
 
-static cycle_scroll_child_cb cycle_scroll_child_func;
-static int cycle_flag = 0, mask_flag = 0, selected_index = 0;
 /**********************************************************************
 **函数名称: cycle_scroll_change
 **函数说明: 循环滚轮修改中心索引
@@ -9,12 +7,13 @@ static int cycle_flag = 0, mask_flag = 0, selected_index = 0;
 **输出参数: none
 **返 回 值: none
 ************************************************************************/
-void cycle_scroll_change(lv_obj_t *cycle_scroll, const int cur_index)
+void cycle_scroll_change(lv_obj_t *cycle_scroll, const unsigned int cur_index)
 {
-    if (cycle_flag == 0)
+    lv_cycle_scroll_t *lv_cycle_scroll = (lv_cycle_scroll_t *)cycle_scroll->user_data;
+    if (lv_cycle_scroll->cycle_flag == 0)
     {
         lv_obj_scroll_to_view(lv_obj_get_child(cycle_scroll, cur_index), LV_ANIM_OFF);
-        selected_index = cur_index;
+        lv_cycle_scroll->selected_index = cur_index;
         return;
     }
     uint32_t child_cnt = lv_obj_get_child_cnt(cycle_scroll); // 获取子界面的数量
@@ -97,8 +96,8 @@ static void mask_event_cb(lv_event_t *e)
 static void scroll_y_event(lv_event_t *e)
 {
     lv_obj_t *cont = lv_event_get_target(e); // 获取事件的初始对象
-
-    if (mask_flag)
+    lv_cycle_scroll_t *lv_cycle_scroll = (lv_cycle_scroll_t *)cont->user_data;
+    if (lv_cycle_scroll != NULL && lv_cycle_scroll->mask_flag)
         mask_event_cb(e);
     if (e->code != LV_EVENT_SCROLL_END && e->code != LV_EVENT_SCROLL)
         return;
@@ -134,7 +133,7 @@ static void scroll_y_event(lv_event_t *e)
         //             lv_area_get_height(&cont_a), child_a.y1, lv_area_get_height(&child_a));
         // LV_LOG_USER("%s,2 parent height:%d child y1:%d %d %d height:%d\n", __func__, lv_obj_get_height(cont),
         //             lv_obj_get_y(child), cont->coords.y1, child->coords.y1, lv_obj_get_height(child));
-        if (e->code == LV_EVENT_SCROLL_END && cycle_flag > 0)
+        if (e->code == LV_EVENT_SCROLL_END && lv_cycle_scroll->cycle_flag > 0)
         {
             /* 子界面的坐标与父界面的坐标相等时，说明当前界面在父界面中显示 */
             if (child_y_center == cont_y_center)
@@ -146,13 +145,13 @@ static void scroll_y_event(lv_event_t *e)
                 /* 判断界面移动的数数据，并将当前界面的索引改为中间位置 */
                 cycle_scroll_change(cont, current_btn_index);
                 /* 保证界面居中显示 */
-                if (cycle_scroll_child_func != NULL)
-                    cycle_scroll_child_func(child, 1);
+                if (lv_cycle_scroll->cb != NULL)
+                    lv_cycle_scroll->cb(child, 1, 1);
             }
             else
             {
-                if (cycle_scroll_child_func != NULL)
-                    cycle_scroll_child_func(child, 0);
+                if (lv_cycle_scroll->cb != NULL)
+                    lv_cycle_scroll->cb(child, 0, 0);
             }
         }
         else
@@ -160,19 +159,24 @@ static void scroll_y_event(lv_event_t *e)
             if (child_y_center <= cont_y_center + lv_area_get_height(&child_a) / 2 &&
                 child_y_center >= cont_y_center - lv_area_get_height(&child_a) / 2)
             {
-                if (cycle_scroll_child_func != NULL)
-                    cycle_scroll_child_func(child, 1);
                 if (e->code == LV_EVENT_SCROLL_END)
                 {
-                    selected_index = i;
-                    LV_LOG_USER("%s,selected_index:%d\n", __func__, selected_index);
+                    lv_cycle_scroll->selected_index = i;
+                    LV_LOG_USER("%s,selected_index:%d\n", __func__, lv_cycle_scroll->selected_index);
+                    if (lv_cycle_scroll->cb != NULL)
+                        lv_cycle_scroll->cb(child, 1, 1);
+                }
+                else
+                {
+                    if (lv_cycle_scroll->cb != NULL)
+                        lv_cycle_scroll->cb(child, 1, 0);
                 }
             }
             else
             {
-                if (cycle_scroll_child_func != NULL)
+                if (lv_cycle_scroll->cb != NULL)
                 {
-                    cycle_scroll_child_func(child, 0);
+                    lv_cycle_scroll->cb(child, 0, 0);
                 }
             }
         }
@@ -189,7 +193,8 @@ static void scroll_y_event(lv_event_t *e)
 static void scroll_x_event(lv_event_t *e)
 {
     lv_obj_t *cont = lv_event_get_target(e); // 获取事件的初始对象
-    if (mask_flag)
+    lv_cycle_scroll_t *lv_cycle_scroll = (lv_cycle_scroll_t *)cont->user_data;
+    if (lv_cycle_scroll != NULL && lv_cycle_scroll->mask_flag)
         mask_event_cb(e);
     if (e->code != LV_EVENT_SCROLL_END && e->code != LV_EVENT_SCROLL)
         return;
@@ -224,7 +229,7 @@ static void scroll_x_event(lv_event_t *e)
         //             lv_area_get_height(&cont_a), child_a.y1, lv_area_get_height(&child_a));
         // LV_LOG_USER("%s,2 parent height:%d child y1:%d %d %d height:%d\n", __func__, lv_obj_get_height(cont),
         //             lv_obj_get_y(child), cont->coords.y1, child->coords.y1, lv_obj_get_height(child));
-        if (e->code == LV_EVENT_SCROLL_END && cycle_flag > 0)
+        if (e->code == LV_EVENT_SCROLL_END && lv_cycle_scroll->cycle_flag > 0)
         {
             /* 子界面的坐标与父界面的坐标相等时，说明当前界面在父界面中显示 */
             if (child_x_center == cont_x_center)
@@ -237,13 +242,13 @@ static void scroll_x_event(lv_event_t *e)
                 /* 判断界面移动的数数据，并将当前界面的索引改为中间位置 */
                 cycle_scroll_change(cont, current_btn_index);
                 /* 保证界面居中显示 */
-                if (cycle_scroll_child_func != NULL)
-                    cycle_scroll_child_func(child, 1);
+                if (lv_cycle_scroll->cb != NULL)
+                    lv_cycle_scroll->cb(child, 1, 1);
             }
             else
             {
-                if (cycle_scroll_child_func != NULL)
-                    cycle_scroll_child_func(child, 0);
+                if (lv_cycle_scroll->cb != NULL)
+                    lv_cycle_scroll->cb(child, 0, 0);
             }
         }
         else
@@ -251,19 +256,24 @@ static void scroll_x_event(lv_event_t *e)
             if (child_x_center <= cont_x_center + lv_area_get_width(&child_a) / 2 &&
                 child_x_center >= cont_x_center - lv_area_get_width(&child_a) / 2)
             {
-                if (cycle_scroll_child_func != NULL)
-                    cycle_scroll_child_func(child, 1);
                 if (e->code == LV_EVENT_SCROLL_END)
                 {
-                    selected_index = i;
-                    LV_LOG_USER("%s,selected_index:%d\n", __func__, selected_index);
+                    lv_cycle_scroll->selected_index = i;
+                    LV_LOG_USER("%s,selected_index:%d\n", __func__, lv_cycle_scroll->selected_index);
+                    if (lv_cycle_scroll->cb != NULL)
+                        lv_cycle_scroll->cb(child, 1, 1);
+                }
+                else
+                {
+                    if (lv_cycle_scroll->cb != NULL)
+                        lv_cycle_scroll->cb(child, 1, 0);
                 }
             }
             else
             {
-                if (cycle_scroll_child_func != NULL)
+                if (lv_cycle_scroll->cb != NULL)
                 {
-                    cycle_scroll_child_func(child, 0);
+                    lv_cycle_scroll->cb(child, 0, 0);
                 }
             }
         }
@@ -277,15 +287,12 @@ static void scroll_x_event(lv_event_t *e)
 **输出参数: none
 **返 回 值: 循环滚轮对象
 ************************************************************************/
-lv_obj_t *lv_cycle_scroll_create(lv_obj_t *parent, int width, int height, lv_flex_flow_t flow,
-                                 cycle_scroll_child_cb cb, int iscycle, int mask)
+lv_obj_t *lv_cycle_scroll_create(lv_obj_t *parent, int width, int height, lv_flex_flow_t flow, lv_cycle_scroll_t *lv_cycle_scroll)
 {
-    cycle_scroll_child_func = cb;
-    cycle_flag = iscycle;
-    mask_flag = mask;
     lv_obj_t *cont = lv_obj_create(parent); // 在屏幕上创建一个container
-    lv_obj_set_size(cont, width, height);   // 设置cont的尺寸
-    lv_obj_set_flex_flow(cont, flow);       // 设置cont的子级的layout: 弹性布局
+    cont->user_data = lv_cycle_scroll;
+    lv_obj_set_size(cont, width, height); // 设置cont的尺寸
+    lv_obj_set_flex_flow(cont, flow);     // 设置cont的子级的layout: 弹性布局
     // lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     // 1.添加事件
     if (LV_FLEX_FLOW_COLUMN == (flow & 0x01))
@@ -303,13 +310,13 @@ lv_obj_t *lv_cycle_scroll_create(lv_obj_t *parent, int width, int height, lv_fle
     // 2.设置样式
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF); // 隐藏scrollbar
 
-    lv_obj_set_style_bg_opa(cont, LV_OPA_100, 0);
-    lv_obj_set_style_bg_color(cont, lv_color_hex(0xffffff), 0);
+    // lv_obj_set_style_bg_opa(cont, LV_OPA_100, 0);
+    // lv_obj_set_style_bg_color(cont, lv_color_hex(0xffffff), 0);
     lv_obj_set_style_pad_all(cont, 5, 0);
     lv_obj_set_style_pad_row(cont, 10, 0);
     lv_obj_set_style_pad_column(cont, 10, 0);
     // lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_ELASTIC);
-    lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    // lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_MOMENTUM);
     return cont;
 }
 /**********************************************************************
@@ -321,8 +328,9 @@ lv_obj_t *lv_cycle_scroll_create(lv_obj_t *parent, int width, int height, lv_fle
 ************************************************************************/
 int lv_cycle_scroll_get_selected_index(lv_obj_t *cycle_scroll)
 {
-    if (cycle_flag > 0)
-        return selected_index;
+    lv_cycle_scroll_t *lv_cycle_scroll = (lv_cycle_scroll_t *)cycle_scroll->user_data;
+    if (lv_cycle_scroll->cycle_flag > 0)
+        return lv_cycle_scroll->selected_index;
     lv_coord_t child_cnt = lv_obj_get_child_cnt(cycle_scroll); // 获取子界面的数量
     return (child_cnt - 1) / 2;                                // 中间界面的位置
 }
@@ -338,7 +346,7 @@ lv_obj_t *lv_cycle_scroll_get_selected(lv_obj_t *cycle_scroll)
     return lv_obj_get_child(cycle_scroll, lv_cycle_scroll_get_selected_index(cycle_scroll));
 }
 #if 1
-static void child_select_test(lv_obj_t *child, int select)
+static void child_select_test(lv_obj_t *child, char select, char select_end)
 {
     if (select)
     {
@@ -355,7 +363,11 @@ static void child_select_test(lv_obj_t *child, int select)
 }
 void cycle_scroll_test(lv_obj_t *parent)
 {
-    lv_obj_t *cont = lv_cycle_scroll_create(parent, 280, 240, LV_FLEX_FLOW_COLUMN, child_select_test, 0, 0);
+    static lv_cycle_scroll_t lv_cycle_scroll = {0};
+    lv_cycle_scroll.cb = child_select_test;
+    lv_cycle_scroll.cycle_flag = 0;
+    lv_cycle_scroll.mask_flag = 1;
+    lv_obj_t *cont = lv_cycle_scroll_create(parent, 280, 240, LV_FLEX_FLOW_COLUMN, &lv_cycle_scroll);
     lv_obj_align(cont, LV_ALIGN_CENTER, 0, 0);
     /// 子对象
     uint32_t i;
