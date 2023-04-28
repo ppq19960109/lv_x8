@@ -822,6 +822,8 @@ static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
 
     if(has_next < 0) {
         lv_ffmpeg_player_set_cmd(obj, player->auto_restart ? LV_FFMPEG_PLAYER_CMD_START : LV_FFMPEG_PLAYER_CMD_STOP);
+        if(player->auto_restart==false)
+            lv_event_send(obj,_LV_EVENT_LAST,NULL);
         return;
     }
 

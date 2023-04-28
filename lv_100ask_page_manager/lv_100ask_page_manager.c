@@ -191,7 +191,7 @@ void lv_100ask_page_manager_set_close_page(lv_obj_t *obj, char *name)
 }
 static void lv_100ask_page_manager_clear_page(lv_obj_t *obj)
 {
-    // lv_obj_clean(obj);
+    lv_obj_clean(obj);
 }
 void lv_100ask_page_manager_set_load_page_event(lv_obj_t *obj, lv_obj_t *page, char *name)
 {

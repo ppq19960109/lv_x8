@@ -3,15 +3,34 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdio.h>
 #include "lv_roki/lv_roki.h"
 
 /*********************
  *      DEFINES
  *********************/
-static lv_obj_t *left_steaming, *right_steaming;
+typedef struct
+{
+    lv_obj_t *arc;
+    lv_obj_t *arc_label_temp;
+    lv_obj_t *arc_label_top_temp;
+    lv_obj_t *arc_label_bottom_temp;
+    lv_obj_t *arc_label_time;
+    lv_obj_t *arc_label_work_state;
+
+    lv_obj_t *label_mode;
+    lv_obj_t *label_temp;
+    lv_obj_t *label_top_temp;
+    lv_obj_t *label_bottom_temp;
+    lv_obj_t *label_time;
+    lv_obj_t *label_steam;
+
+    lv_obj_t *btn_preheat;
+    lv_obj_t *btn_vapour;
+    lv_obj_t *btn_start_stop;
+} lv_cooking_t;
+static lv_cooking_t lv_cooking;
+static lv_obj_t *left_steaming, *left_child, *right_child;
 static lv_obj_t *btn_array[2];
-static lv_obj_t *left_child[11], *right_child[11];
 static char work_state[2];
 /**********************
  *  STATIC VARIABLES
@@ -375,20 +394,21 @@ static void property_change_cb(const char *key, void *value)
 static void page_update_cb(void *arg)
 {
     LV_LOG_USER("%s\n", __func__);
-    page_update_StOvState(0, NULL);
-    page_update_StOvState(1, NULL);
-    page_update_StOvRealTemp(0, NULL);
-    page_update_StOvRealTemp(1, NULL);
-    page_update_StOvSetTimerLeft(0, NULL);
-    page_update_StOvSetTimerLeft(1, NULL);
-    page_update_StOvOrderTimerLeft(0, NULL);
-    page_update_StOvOrderTimerLeft(1, NULL);
-    page_update_StOvMode(0, NULL);
-    page_update_StOvMode(1, NULL);
-    page_update_CookName(0, NULL);
-    page_update_CookName(1, NULL);
-    page_update_StOvSetTemp_StOvSetTimer(0, NULL);
-    page_update_StOvSetTemp_StOvSetTimer(1, NULL);
+    lv_page_top_hide(1);
+    // page_update_StOvState(0, NULL);
+    // page_update_StOvState(1, NULL);
+    // page_update_StOvRealTemp(0, NULL);
+    // page_update_StOvRealTemp(1, NULL);
+    // page_update_StOvSetTimerLeft(0, NULL);
+    // page_update_StOvSetTimerLeft(1, NULL);
+    // page_update_StOvOrderTimerLeft(0, NULL);
+    // page_update_StOvOrderTimerLeft(1, NULL);
+    // page_update_StOvMode(0, NULL);
+    // page_update_StOvMode(1, NULL);
+    // page_update_CookName(0, NULL);
+    // page_update_CookName(1, NULL);
+    // page_update_StOvSetTemp_StOvSetTimer(0, NULL);
+    // page_update_StOvSetTemp_StOvSetTimer(1, NULL);
 }
 
 static void finish_back_event_cb(lv_event_t *e)
@@ -405,88 +425,111 @@ static void finish_back_event_cb(lv_event_t *e)
         set_num_toServer("RStOvOperation", WORK_OPERATION_CONFIRM);
     }
 }
-static lv_obj_t *lv_steam_item_create(lv_obj_t *parent, const long index)
+static lv_obj_t *lv_steam_item_create(lv_obj_t *parent, const int index, lv_cooking_t *cooking)
 {
-    // lv_obj_t *obj = lv_obj_create(parent);
     lv_obj_t *obj = lv_img_create(parent);
-    lv_img_set_src(obj, themesImagesPath "icon_steam_runing_background.png");
-    lv_obj_set_size(obj, 290, 290);
+    lv_img_set_src(obj, getThemesPath("bg_work_arc_circle.png"));
+    // lv_obj_set_size(obj, 290, 290);
+    lv_obj_t *img = lv_img_create(obj);
+    lv_img_set_src(img, getThemesPath("bg_work_arc_bg.png"));
+    // lv_obj_align_to(img, obj, LV_ALIGN_CENTER, 0, 0);
     //------------------------------
-    lv_obj_t *add_img = lv_img_create(obj); // 0
-    lv_img_set_src(add_img, themesImagesPath "icon_cook_add.png");
-    lv_obj_align(add_img, LV_ALIGN_TOP_MID, 0, 86);
+    lv_obj_t *temp_obj = lv_obj_create(obj);
+    lv_obj_set_size(temp_obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_align(temp_obj, LV_ALIGN_TOP_MID, 0, 140);
+    lv_obj_t *label_temp = lv_label_create(temp_obj);
+    lv_obj_set_style_text_font(label_temp, g_robam_font.FZLTHC_66.font, 0);
+    lv_obj_set_style_text_color(label_temp, getThemesFontColor1(), 0);
+    lv_label_set_text(label_temp, "180");
+    lv_obj_t *label_unit = lv_label_create(temp_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "℃");
+    lv_obj_align_to(label_unit, label_temp, LV_ALIGN_OUT_RIGHT_MID, 0, -10);
+    cooking->arc_label_temp = label_temp;
 
-    lv_obj_t *label = lv_label_create(obj); // 1
-    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_30, 0);
-    lv_obj_set_style_text_color(label, lv_color_hex(themesTextColor2), 0);
-    if (index == 0)
-        lv_label_set_text(label, "左腔");
-    else
-        lv_label_set_text(label, "右腔");
-    lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 183);
-    //------------------------------
-    lv_obj_t *label_state = lv_label_create(obj); // 2
-    lv_obj_set_style_text_font(label_state, &lv_font_SiYuanHeiTi_Normal_30, 0);
-    lv_obj_set_style_text_color(label_state, lv_color_hex(themesTextColor), 0);
-    lv_obj_align(label_state, LV_ALIGN_TOP_MID, 0, 48);
+    temp_obj = lv_obj_create(obj);
+    lv_obj_set_size(temp_obj, 300, LV_SIZE_CONTENT);
+    lv_obj_align(temp_obj, LV_ALIGN_TOP_MID, 0, 90);
+    label_temp = lv_label_create(temp_obj);
+    lv_obj_set_style_text_font(label_temp, g_robam_font.FZLTHC_66.font, 0);
+    lv_obj_set_style_text_color(label_temp, getThemesFontColor1(), 0);
+    lv_label_set_text(label_temp, "150");
+    lv_obj_align(label_temp, LV_ALIGN_CENTER, 0, 0);
+    label_unit = lv_label_create(temp_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "℃");
+    lv_obj_align_to(label_unit, label_temp, LV_ALIGN_OUT_RIGHT_MID, 0, -10);
+    label_unit = lv_label_create(temp_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "上温");
+    lv_obj_align_to(label_unit, label_temp, LV_ALIGN_OUT_LEFT_MID, 0, 10);
+    cooking->arc_label_top_temp = label_temp;
 
-    lv_obj_t *label_temp_time = lv_label_create(obj); // 3
-    lv_obj_set_style_text_font(label_temp_time, &lv_font_SiYuanHeiTi_Normal_50, 0);
-    lv_obj_set_style_text_color(label_temp_time, lv_color_hex(themesTextColor), 0);
-    lv_obj_align(label_temp_time, LV_ALIGN_TOP_MID, 0, 98);
+    temp_obj = lv_obj_create(obj);
+    lv_obj_set_size(temp_obj, 300, LV_SIZE_CONTENT);
+    lv_obj_align(temp_obj, LV_ALIGN_TOP_MID, 0, 170);
+    label_temp = lv_label_create(temp_obj);
+    lv_obj_set_style_text_font(label_temp, g_robam_font.FZLTHC_66.font, 0);
+    lv_obj_set_style_text_color(label_temp, getThemesFontColor1(), 0);
+    lv_label_set_text(label_temp, "160");
+    lv_obj_align(label_temp, LV_ALIGN_CENTER, 0, 0);
+    label_unit = lv_label_create(temp_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "℃");
+    lv_obj_align_to(label_unit, label_temp, LV_ALIGN_OUT_RIGHT_MID, 0, -10);
+    label_unit = lv_label_create(temp_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "下温");
+    lv_obj_align_to(label_unit, label_temp, LV_ALIGN_OUT_LEFT_MID, 0, 10);
+    cooking->arc_label_bottom_temp = label_temp;
 
-    lv_obj_t *label_mode = lv_label_create(obj); // 4
-    lv_obj_set_style_text_font(label_mode, &lv_font_SiYuanHeiTi_Normal_30, 0);
-    lv_obj_set_style_text_color(label_mode, lv_color_hex(themesTextColor2), 0);
-    lv_obj_align(label_mode, LV_ALIGN_TOP_MID, 0, 161);
+    lv_obj_t *time_obj = lv_obj_create(obj);
+    lv_obj_set_size(time_obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_align(time_obj, LV_ALIGN_TOP_MID, 0, 140);
+    lv_obj_t *label_time = lv_label_create(time_obj);
+    lv_obj_set_style_text_font(label_time, g_robam_font.FZLTHC_66.font, 0);
+    lv_obj_set_style_text_color(label_time, getThemesFontColor1(), 0);
+    lv_label_set_text(label_time, "30");
+    label_unit = lv_label_create(time_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "min");
+    lv_obj_align_to(label_unit, label_time, LV_ALIGN_OUT_RIGHT_MID, 0, 10);
+    cooking->arc_label_time = label_time;
 
-    lv_obj_t *label_set_temp_time = lv_label_create(obj); // 5
-    lv_obj_set_style_text_font(label_set_temp_time, &lv_font_SiYuanHeiTi_Normal_30, 0);
-    lv_obj_set_style_text_color(label_set_temp_time, lv_color_hex(themesTextColor2), 0);
-    lv_obj_align(label_set_temp_time, LV_ALIGN_TOP_MID, 0, 200);
+    lv_obj_t *label_state = lv_label_create(obj);
+    lv_obj_set_style_text_font(label_state, g_robam_font.FZLTHJW_36.font, 0);
+    lv_obj_set_style_text_color(label_state, getThemesFontColor1(), 0);
+    lv_obj_align(label_state, LV_ALIGN_TOP_MID, 0, 242);
+    lv_label_set_text(label_state, "预热中");
+    cooking->arc_label_work_state = label_state;
 
-    lv_obj_t *arc = lv_arc_create(obj); // 6
-    lv_obj_set_size(arc, LV_PCT(100), LV_PCT(100));
+    lv_obj_t *arc = lv_arc_create(obj);
+    lv_obj_set_size(arc, 315, 315);
     lv_arc_set_rotation(arc, 270);
     lv_arc_set_bg_angles(arc, 0, 360);
-    lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
+    // lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
     lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_center(arc);
     lv_obj_set_style_arc_color(arc, lv_color_hex(themesTextColor), LV_PART_INDICATOR);
     lv_obj_set_style_arc_width(arc, 20, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(arc, true, LV_PART_INDICATOR);
-    lv_arc_set_value(arc, 50);
-
-    lv_obj_t *run_img = lv_img_create(obj); // 7
-    lv_img_set_src(run_img, themesImagesPath "icon_steam_runing.png");
-    lv_obj_align(run_img, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_update_layout(run_img);
-    lv_img_set_pivot(run_img, lv_obj_get_width(run_img) / 2, lv_obj_get_height(run_img) / 2);
+    lv_obj_set_style_bg_img_src(arc, publicImagesPath "knob.png", LV_PART_KNOB);
+    lv_obj_set_style_pad_all(arc, 10, LV_PART_KNOB);
+    lv_arc_set_value(arc, 30);
+    cooking->arc = arc;
     //------------------------------
-    lv_obj_t *label_finish_mode = lv_label_create(obj); // 8
-    lv_obj_set_style_text_font(label_finish_mode, &lv_font_SiYuanHeiTi_Normal_30, 0);
-    lv_obj_set_style_text_color(label_finish_mode, lv_color_hex(themesTextColor2), 0);
-    lv_obj_align(label_finish_mode, LV_ALIGN_TOP_MID, 0, 75);
+    // lv_obj_t *run_img = lv_img_create(obj); //
+    // lv_img_set_src(run_img, themesImagesPath "icon_steam_runing.png");
+    // lv_obj_align(run_img, LV_ALIGN_CENTER, 0, 0);
+    // lv_obj_update_layout(run_img);
+    // lv_img_set_pivot(run_img, lv_obj_get_width(run_img) / 2, lv_obj_get_height(run_img) / 2);
 
-    lv_obj_t *label_finish = lv_label_create(obj); // 9
-    lv_obj_set_style_text_font(label_finish, &lv_font_SiYuanHeiTi_Normal_50, 0);
-    lv_obj_set_style_text_color(label_finish, lv_color_hex(themesTextColor), 0);
-    lv_obj_align(label_finish, LV_ALIGN_TOP_MID, 0, 123);
-    lv_label_set_text(label_finish, "烹饪已完成");
-
-    lv_obj_t *label_finish_btn = lv_btn_create(obj); // 10
-    lv_obj_set_size(label_finish_btn, 140, 50);
-    lv_obj_set_style_bg_color(label_finish_btn, lv_color_hex(themesTextColor2), 0);
-    lv_obj_set_style_bg_opa(label_finish_btn, LV_OPA_100, 0);
-    lv_obj_set_style_radius(label_finish_btn, 25, 0);
-    lv_obj_align(label_finish_btn, LV_ALIGN_TOP_MID, 0, 186);
-    lv_obj_add_event_cb(label_finish_btn, finish_back_event_cb, LV_EVENT_CLICKED, (void *)index);
-
-    lv_obj_t *label_finish_btn_text = lv_label_create(label_finish_btn);
-    lv_obj_set_style_text_font(label_finish_btn_text, &lv_font_SiYuanHeiTi_Normal_30, 0);
-    lv_obj_set_style_text_color(label_finish_btn_text, lv_color_hex(0x000000), 0);
-    lv_label_set_text(label_finish_btn_text, "返回");
-    lv_obj_center(label_finish_btn_text);
     return obj;
 }
 static void left_dialog1_event_cb(lv_event_t *e)
@@ -517,7 +560,7 @@ static void right_dialog1_event_cb(lv_event_t *e)
     }
     clean_manual_layer();
 }
-static void left_btn_event_cb(lv_event_t *e)
+static void btn_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
     // lv_obj_t *target = lv_event_get_target(e);
@@ -525,36 +568,13 @@ static void left_btn_event_cb(lv_event_t *e)
     switch (user_data)
     {
     case 0:
-        if (work_state[0] == WORK_STATE_STOP)
-        {
-            lv_100ask_page_manager_set_open_page(NULL, "page_steam_left");
-        }
-        else if (work_state[0] == WORK_STATE_PAUSE || work_state[0] == WORK_STATE_PAUSE_RESERVE || work_state[0] == WORK_STATE_PREHEAT_RESERVE)
-        {
-            set_num_toServer("LStOvOperation", WORK_OPERATION_START);
-        }
-        else
-        {
-            set_num_toServer("LStOvOperation", WORK_OPERATION_PAUSE);
-        }
+
         break;
     case 1:
-        if (work_state[0] == WORK_STATE_STOP)
-        {
-        }
-        else
-        {
-            lv_manual_dialog1("是否取消左腔烹饪?", "否", "是", left_dialog1_event_cb);
-        }
+
         break;
     case 2:
-        if (work_state[0] == WORK_STATE_STOP)
-        {
-        }
-        else
-        {
-            set_num_toServer("LStOvOperation", WORK_OPERATION_RUN_NOW);
-        }
+
         break;
     }
 }
@@ -601,10 +621,7 @@ static void right_btn_event_cb(lv_event_t *e)
 }
 static void back_bar_event_cb(lv_event_t *e)
 {
-    if (lv_page_exist_page("page_steamoven"))
-        lv_page_back_page("page_steamoven");
-    else
-        lv_page_back_top_page();
+    lv_page_back_top_page();
 }
 void lv_page_steaming_init(lv_obj_t *page)
 {
@@ -613,24 +630,123 @@ void lv_page_steaming_init(lv_obj_t *page)
     manager_page->page_property_change_cb = property_change_cb;
     manager_page->page_update_cb = page_update_cb;
 
-    lv_obj_t *back_bar = lv_page_back_bar_init(page, "蒸烤箱", NULL, back_bar_event_cb);
+    lv_page_back_bar_init(page, "返回", NULL, NULL);
 
-    lv_obj_t *cont_row = lv_obj_create(page);
-    lv_obj_set_size(cont_row, 290 * 2 + 112, 290);
-    lv_obj_align_to(cont_row, back_bar, LV_ALIGN_OUT_BOTTOM_MID, 0, 25);
-    lv_obj_set_flex_flow(cont_row, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_t *obj = lv_steam_item_create(page, 0, &lv_cooking);
+    lv_obj_align(obj, LV_ALIGN_TOP_LEFT, 60, 80);
 
-    left_steaming = lv_steam_item_create(cont_row, 0);
-    for (int i = 0; i < 11; ++i)
-        left_child[i] = lv_obj_get_child(left_steaming, i);
+    lv_obj_t *cont = lv_obj_create(page);
+    lv_obj_set_size(cont, 240, 270);
+    lv_obj_align(cont, LV_ALIGN_LEFT_MID, 450, 15);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
-    right_steaming = lv_steam_item_create(cont_row, 1);
-    for (int i = 0; i < 11; ++i)
-        right_child[i] = lv_obj_get_child(right_steaming, i);
+    lv_obj_t *label = lv_label_create(cont);
+    lv_obj_set_style_text_font(label, g_robam_font.FZLTHC_60.font, 0);
+    lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
+    lv_label_set_text(label, "焙烤");
+    lv_cooking.label_mode = label;
 
-    btn_array[0] = lv_btn_array_create(page, 3, left_btn_event_cb);
-    lv_obj_align(btn_array[0], LV_ALIGN_LEFT_MID, 52, 25);
-    btn_array[1] = lv_btn_array_create(page, 3, right_btn_event_cb);
-    lv_obj_align(btn_array[1], LV_ALIGN_RIGHT_MID, -52, 25);
+    lv_obj_t *steam_obj = lv_obj_create(cont);
+    lv_obj_set_size(steam_obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    label = lv_label_create(steam_obj);
+    lv_obj_set_style_text_font(label, g_robam_font.FZLTHC_66.font, 0);
+    lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
+    lv_label_set_text(label, "中");
+    lv_obj_t *label_unit = lv_label_create(steam_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "蒸汽");
+    lv_obj_align_to(label_unit, label, LV_ALIGN_OUT_RIGHT_MID, 5, 15);
+    lv_cooking.label_steam = label;
+    lv_obj_add_flag(lv_obj_get_parent(lv_cooking.label_steam), LV_OBJ_FLAG_HIDDEN);
+
+    lv_obj_t *time_obj = lv_obj_create(cont);
+    lv_obj_set_size(time_obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_t *label_time = lv_label_create(time_obj);
+    lv_obj_set_style_text_font(label_time, g_robam_font.FZLTHC_66.font, 0);
+    lv_obj_set_style_text_color(label_time, getThemesFontColor1(), 0);
+    lv_label_set_text(label_time, "30");
+    label_unit = lv_label_create(time_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "min");
+    lv_obj_align_to(label_unit, label_time, LV_ALIGN_OUT_RIGHT_MID, 0, 10);
+    lv_cooking.label_time = label_time;
+    lv_obj_add_flag(lv_obj_get_parent(lv_cooking.label_time), LV_OBJ_FLAG_HIDDEN);
+
+    lv_obj_t *temp_obj = lv_obj_create(cont);
+    lv_obj_set_size(temp_obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_t *label_temp = lv_label_create(temp_obj);
+    lv_obj_set_style_text_font(label_temp, g_robam_font.FZLTHC_66.font, 0);
+    lv_obj_set_style_text_color(label_temp, getThemesFontColor1(), 0);
+    lv_label_set_text(label_temp, "180");
+    label_unit = lv_label_create(temp_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "℃");
+    lv_obj_align_to(label_unit, label_temp, LV_ALIGN_OUT_RIGHT_MID, 0, -10);
+    lv_cooking.label_temp = label_temp;
+    lv_obj_add_flag(lv_obj_get_parent(lv_cooking.label_temp), LV_OBJ_FLAG_HIDDEN);
+
+    temp_obj = lv_obj_create(cont);
+    lv_obj_set_size(temp_obj, LV_PCT(100), LV_SIZE_CONTENT);
+    label_temp = lv_label_create(temp_obj);
+    lv_obj_set_style_text_font(label_temp, g_robam_font.FZLTHC_66.font, 0);
+    lv_obj_set_style_text_color(label_temp, getThemesFontColor1(), 0);
+    lv_label_set_text(label_temp, "150");
+    lv_obj_align(label_temp, LV_ALIGN_CENTER, 0, 0);
+    label_unit = lv_label_create(temp_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "℃");
+    lv_obj_align_to(label_unit, label_temp, LV_ALIGN_OUT_RIGHT_MID, 0, -10);
+    label_unit = lv_label_create(temp_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "上温");
+    lv_obj_align_to(label_unit, label_temp, LV_ALIGN_OUT_LEFT_MID, 0, 10);
+    lv_cooking.label_top_temp = label_temp;
+
+    temp_obj = lv_obj_create(cont);
+    lv_obj_set_size(temp_obj, LV_PCT(100), LV_SIZE_CONTENT);
+    lv_obj_align(temp_obj, LV_ALIGN_TOP_MID, 0, 170);
+    label_temp = lv_label_create(temp_obj);
+    lv_obj_set_style_text_font(label_temp, g_robam_font.FZLTHC_66.font, 0);
+    lv_obj_set_style_text_color(label_temp, getThemesFontColor1(), 0);
+    lv_label_set_text(label_temp, "160");
+    lv_obj_align(label_temp, LV_ALIGN_CENTER, 0, 0);
+    label_unit = lv_label_create(temp_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "℃");
+    lv_obj_align_to(label_unit, label_temp, LV_ALIGN_OUT_RIGHT_MID, 0, -10);
+    label_unit = lv_label_create(temp_obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "下温");
+    lv_obj_align_to(label_unit, label_temp, LV_ALIGN_OUT_LEFT_MID, 0, 10);
+    lv_cooking.label_bottom_temp = label_temp;
+
+    cont = lv_obj_create(page);
+    lv_obj_set_size(cont, 80, 270);
+    lv_obj_align(cont, LV_ALIGN_LEFT_MID, 730, 15);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN_REVERSE);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
+
+    lv_obj_t *img = lv_img_create(cont);
+    lv_img_set_src(img, getThemesPath("bg_stop.png"));
+    lv_obj_add_event_cb(img, btn_event_cb, LV_EVENT_CLICKED, (void *)0);
+    lv_cooking.btn_start_stop = img;
+    img = lv_img_create(cont);
+    lv_img_set_src(img, getThemesPath("bg_preheat.png"));
+    lv_obj_add_event_cb(img, btn_event_cb, LV_EVENT_CLICKED, (void *)1);
+    lv_cooking.btn_preheat = img;
+    img = lv_img_create(cont);
+    lv_img_set_src(img, getThemesPath("bg_vapour.png"));
+    lv_obj_add_event_cb(img, btn_event_cb, LV_EVENT_CLICKED, (void *)2);
+    lv_cooking.btn_vapour = img;
+
+    lv_obj_add_flag(lv_cooking.btn_preheat, LV_OBJ_FLAG_HIDDEN);
+    // lv_obj_add_flag(lv_cooking.btn_vapour, LV_OBJ_FLAG_HIDDEN);
 }

@@ -3,7 +3,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdio.h>
 #include "lv_roki/lv_roki.h"
 
 /*********************

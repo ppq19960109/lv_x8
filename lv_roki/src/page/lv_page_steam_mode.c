@@ -230,7 +230,8 @@ static void bottom_bar_event_cb(lv_event_t *e)
     }
     else
     {
-        lv_theme_switch(1);
+        // lv_theme_switch(1);
+        lv_100ask_page_manager_set_open_page(NULL, "page_steaming");
     }
 }
 void lv_page_steam_mode_init(lv_obj_t *page)
@@ -280,7 +281,7 @@ void lv_page_steam_mode_init(lv_obj_t *page)
     }
     lv_obj_t *bg_line = lv_img_create(cont_row);
     lv_img_set_src(bg_line, getThemesPath("bg_line.png"));
-    lv_obj_set_width(bg_line, 2);
+    lv_obj_set_size(bg_line, 2, LV_PCT(100));
     //----------------------------------------------------------------------------
     roller_scroll[1] = lv_cycle_scroll_create(cont_row, 180, LV_PCT(100), LV_FLEX_FLOW_COLUMN, &lv_cycle_scroll);
     lv_obj_clear_flag(roller_scroll[0], LV_OBJ_FLAG_SCROLL_ELASTIC);
@@ -293,13 +294,9 @@ void lv_page_steam_mode_init(lv_obj_t *page)
     //----------------------------------------------------------------------------
     bg_line = lv_img_create(cont_row);
     lv_img_set_src(bg_line, getThemesPath("bg_line.png"));
-    lv_obj_set_width(bg_line, 2);
+    lv_obj_set_size(bg_line, 2, LV_PCT(100));
     roller_scroll[2] = lv_cycle_scroll_create(cont_row, 180, LV_PCT(100), LV_FLEX_FLOW_COLUMN, &lv_cycle_scroll);
     // lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_MOMENTUM);
 
     cycle_scroll_change(roller_scroll[0], 0);
-    //------------------------------
-    // const char *text[] = {"启动", "预约"};
-    // lv_obj_t *btn_array = lv_custom_btn_array_create(page, text, 2, btn_array_event_cb);
-    // lv_obj_align_to(btn_array, back_bar, LV_ALIGN_OUT_BOTTOM_RIGHT, -60, 90);
 }

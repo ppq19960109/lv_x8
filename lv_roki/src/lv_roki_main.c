@@ -14,7 +14,7 @@ lv_style_t roller_style_unselected, roller_style_selected;
 lv_style_t slider_style_main, slider_style_indicator, slider_style_knob;
 lv_style_t switch_style_indicator, switch_style_indicator_check, switch_style_knob;
 
-char LStOvState = 0, RStOvState = 0;
+char LStOvState = 0;
 char LStoveStatus = 0, RStoveStatus = 0;
 TYPE_FONT_T g_robam_font;
 COLOR_FONT_T g_robam_font_color = {
@@ -23,10 +23,9 @@ COLOR_FONT_T g_robam_font_color = {
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_obj_t *clock_text, *win_bg;
-static timer_t clock_timer;
-static lv_timer_t *sleep_timer;
-static lv_obj_t *gif;
+static lv_obj_t *win_bg;
+static lv_timer_t *sleep_timer, *clock_timer;
+
 static char *themes_path[] = {"S:/oem/robam/images/theme1/", "S:/oem/robam/images/theme2/"};
 
 void (*page_property_change_cb)(const char *key, void *value);
@@ -151,18 +150,7 @@ void lv_theme_switch(const int theme_index)
     g_save_settings.themesIndex = theme_index;
     lv_img_set_src(win_bg, getThemesPath("bg_work_bg.png"));
     lv_page_reset_page();
-}
-static void getCurrentTime()
-{
-    time_t t;
-    time(&t);
-    struct tm *local_tm = localtime(&t);
-    LV_LOG_USER("year:%d mon:%d day:%d", local_tm->tm_year, local_tm->tm_mon, local_tm->tm_mday);
-    LV_LOG_USER("hour:%d min:%d sec:%d", local_tm->tm_hour, local_tm->tm_min, local_tm->tm_sec);
-
-    // char buf[6];
-    // sprintf(buf, "%02d:%02d", local_tm->tm_hour, local_tm->tm_min);
-    // lv_label_set_text(clock_text, buf);
+    lv_page_top_bar_reinit();
 }
 
 static void POSIXTimer_cb(union sigval val)
@@ -172,12 +160,7 @@ static void POSIXTimer_cb(union sigval val)
     {
         // raise(SIGRTMIN);
         pthread_mutex_lock(&g_mutex);
-        if (gif != NULL)
-        {
-            lv_obj_del(gif);
-            gif = NULL;
-        }
-        getCurrentTime();
+        // getCurrentTime();
         pthread_mutex_unlock(&g_mutex);
     }
 }
@@ -216,29 +199,9 @@ static void property_change_cb(const char *key, void *value)
     if (strcmp("LStOvState", key) == 0)
     {
         LStOvState = get_value_int(value);
-        RStOvState = get_attr_value_int("RStOvState");
         if (LStOvState == WORK_STATE_STOP)
         {
-            if (RStOvState == WORK_STATE_STOP)
-            {
-                steamInterfaceChange(0);
-            }
-        }
-        else
-        {
-            steamInterfaceChange(1);
-        }
-    }
-    else if (strcmp("RStOvState", key) == 0)
-    {
-        LStOvState = get_attr_value_int("LStOvState");
-        RStOvState = get_value_int(value);
-        if (RStOvState == WORK_STATE_STOP)
-        {
-            if (LStOvState == WORK_STATE_STOP)
-            {
-                steamInterfaceChange(0);
-            }
+            steamInterfaceChange(0);
         }
         else
         {
@@ -340,7 +303,7 @@ static void property_change_cb(const char *key, void *value)
     {
         long t = get_value_int(value);
         setClockTimestamp(t);
-        getCurrentTime();
+        // getCurrentTime();
     }
     else if (strcmp("HoodOffLeftTime", key) == 0)
     {
@@ -476,7 +439,12 @@ static void init_style()
     lv_style_set_radius(&switch_style_knob, LV_RADIUS_CIRCLE);
     lv_style_set_pad_all(&switch_style_knob, -3);
 }
-
+static void lv_clock_timer_cb(lv_timer_t *timer)
+{
+    uint32_t tick = lv_tick_get();
+    LV_LOG_USER("%s,tick:%u", __func__, tick);
+    lv_page_top_update_time(0);
+}
 static void lv_sleep_timer_cb(lv_timer_t *timer)
 {
     uint32_t tick = lv_tick_get();
@@ -491,6 +459,31 @@ void lv_sleep_wakeup(void)
     lv_timer_reset(sleep_timer);
     lv_timer_resume(sleep_timer);
     // lv_auto_screen_dialog4_close();
+}
+
+/**********************************************************************
+**函数名称: animation_play_over
+**函数说明: 开机动画播放结束事件回调
+**输入参数: e: lv_event_t
+**输出参数: none
+**返 回 值: none
+************************************************************************/
+static void animation_play_over(lv_event_t *e)
+{
+    lv_obj_t *obj = lv_event_get_target(e);
+    lv_obj_del(obj);
+    LV_LOG_USER("%s,code:%d child_cnt:%d\n", __func__, e->code, lv_obj_get_child_cnt(lv_layer_top()));
+}
+static void boot_video(void)
+{
+    if (lv_ffmpeg_get_frame_num("/assets/images/boot_9068a.mp4") <= 0)
+        return;
+    lv_obj_t *player = lv_ffmpeg_player_create(lv_layer_top());
+    lv_ffmpeg_player_set_src(player, "/assets/images/boot_9068a.mp4");
+    lv_ffmpeg_player_set_auto_restart(player, false);
+    lv_ffmpeg_player_set_cmd(player, LV_FFMPEG_PLAYER_CMD_START);
+
+    lv_obj_add_event_cb(player, animation_play_over, _LV_EVENT_LAST, NULL);
 }
 
 lv_obj_t *manual_scr = NULL, *main_scr = NULL;
@@ -509,14 +502,16 @@ void lv_roki_widgets(void)
     robam_font_init();
     init_style();
 
-    clock_timer = POSIXTimerCreate(0, POSIXTimer_cb);
-    POSIXTimerSet(clock_timer, 60, 10);
+    clock_timer = lv_timer_create(lv_clock_timer_cb, 59000, NULL);
     sleep_timer = lv_timer_create(lv_sleep_timer_cb, 60000, NULL);
 
+    // boot_video();
     win_bg = lv_img_create(main_scr);
     lv_img_set_src(win_bg, getThemesPath("bg_work_bg.png"));
     //****************************************************
     lv_obj_t *page_manager = lv_100ask_page_manager_create(main_scr);
+
+    lv_page_top_bar_init(main_scr);
 
     lv_obj_t *main_page = lv_100ask_page_manager_page_create(page_manager, "main_page");
     lv_obj_t *page_hood = lv_100ask_page_manager_page_create(page_manager, "page_hood");
@@ -607,4 +602,5 @@ void lv_roki_widgets(void)
 #endif
     lv_100ask_page_manager_set_main_page(page_manager, main_page);
     lv_100ask_page_manager_set_open_page(NULL, "main_page");
+
 }

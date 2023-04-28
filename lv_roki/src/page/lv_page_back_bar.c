@@ -44,7 +44,7 @@ lv_obj_t *lv_page_back_bar_init(lv_obj_t *parent, const char *name, const char *
 {
     LV_LOG_USER("%s...", __func__);
     lv_obj_t *back_bar = lv_obj_create(parent);
-    lv_obj_set_size(back_bar, LV_PCT(100), 80);
+    lv_obj_set_size(back_bar, LV_PCT(40), 80);
 
     lv_obj_t *back_button = lv_custom_back_button_create(back_bar, getThemesPath("bg_back.png"), name);
 

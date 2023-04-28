@@ -12,6 +12,15 @@ static lv_obj_t *home_mode_img;
 /**********************
  *  STATIC VARIABLES
  **********************/
+static void property_change_cb(const char *key, void *value)
+{
+    LV_LOG_USER("key:%s\n", key);
+}
+static void page_update_cb(void *arg)
+{
+    LV_LOG_USER("%s\n", __func__);
+    lv_page_top_hide(-1);
+}
 static void scroll_child_select_cb(lv_obj_t *child, char select, char select_end)
 {
     lv_obj_t *child2 = lv_obj_get_child(child, 0);
@@ -49,6 +58,10 @@ static void mode_event_cb(lv_event_t *e)
 }
 void lv_page_main_init(lv_obj_t *page)
 {
+    lv_100ask_page_manager_page_t *manager_page = (lv_100ask_page_manager_page_t *)page;
+    manager_page->page_property_change_cb = property_change_cb;
+    manager_page->page_update_cb = page_update_cb;
+
     lv_obj_t *bg = lv_img_create(page);
     lv_img_set_src(bg, getThemesPath("bg_home_bg.png"));
 
