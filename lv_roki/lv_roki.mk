@@ -1,6 +1,7 @@
 LV_ROKI_DIR_NAME := lv_roki
 
 CFLAGS += -I$(LVGL_DIR)/$(LV_ROKI_DIR_NAME)/src
+CFLAGS += -I$(LVGL_DIR)/$(LV_ROKI_DIR_NAME)/src/tcp
 
 CSRCS += $(wildcard $(LVGL_DIR)/$(LV_ROKI_DIR_NAME)/src/*.c)
 CSRCS += $(wildcard $(LVGL_DIR)/$(LV_ROKI_DIR_NAME)/src/tcp/*.c)

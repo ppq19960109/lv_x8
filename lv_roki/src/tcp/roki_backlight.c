@@ -3,7 +3,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_backlight.h"
+#include "roki_backlight.h"
 #include "lv_roki/lv_roki.h"
 #define SYSFS_BL_DIR "/sys/devices/platform/backlight/backlight/backlight"
 /*********************

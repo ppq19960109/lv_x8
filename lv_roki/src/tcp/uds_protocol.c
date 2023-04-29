@@ -11,14 +11,12 @@
 #include "hthread.h"
 
 static pthread_mutex_t mutex;
-static char g_send_buf[3072];
-static int g_seqid = 0;
 static hio_t *mio = NULL;
 
-int (*uds_json_recv_cb)(cJSON *);
-void register_uds_json_recv_cb(int (*cb)(cJSON *))
+int (*uds_data_recv_cb)(void *, int);
+void register_uds_recv_cb(int (*cb)(void *, int))
 {
-    uds_json_recv_cb = cb;
+    uds_data_recv_cb = cb;
 }
 
 int cJSON_Object_isNull(cJSON *object) // cJSON判断Object是否为空
@@ -44,164 +42,38 @@ static unsigned char CheckSum(unsigned char *buf, int len) // 和校验算法
     return ret;
 }
 
-static int send_to_uds(cJSON *root)
+static int send_to_uds(unsigned char *data, int len)
 {
     if (mio == NULL)
     {
         LOGW("%s,mio NULL", __func__);
-        cJSON_Delete(root);
         return -1;
     }
-    char *json = cJSON_PrintUnformatted(root);
-    if (json == NULL)
-    {
-        LOGE("%s,cJSON_PrintUnformatted error", __func__);
-        cJSON_Delete(root);
-        return -1;
-    }
-    int len = strlen(json);
-
-    printf("send to comm---------------------- cJSON_PrintUnformatted json:%d,%s\n", len, json);
+    mlogHex(data, len);
     pthread_mutex_lock(&mutex);
-    char *send_buf;
-    if (len + 10 > sizeof(g_send_buf))
-    {
-        send_buf = (char *)malloc(len + 10);
-    }
-    else
-    {
-        send_buf = g_send_buf;
-    }
-    send_buf[0] = FRAME_HEADER;
-    send_buf[1] = FRAME_HEADER;
-    send_buf[2] = 0;
-    send_buf[3] = g_seqid / 256;
-    send_buf[4] = g_seqid % 256;
-    send_buf[5] = len >> 8;
-    send_buf[6] = len;
-    memcpy(&send_buf[7], json, len);
-    send_buf[7 + len] = CheckSum((unsigned char *)&send_buf[2], len + 5);
-    send_buf[8 + len] = FRAME_TAIL;
-    send_buf[9 + len] = FRAME_TAIL;
 
-    hio_write(mio, send_buf, len + 10);
-    if (len + 10 > sizeof(g_send_buf))
-    {
-        free(send_buf);
-    }
+    int ret = hio_write(mio, data, len);
     pthread_mutex_unlock(&mutex);
-    cJSON_free(json);
-    cJSON_Delete(root);
-    return 0;
+    return ret;
 }
 
-int send_set_uds(cJSON *send)
+int send_set_uds(unsigned char *payload, int payload_len)
 {
-    if (cJSON_Object_isNull(send))
-    {
-        cJSON_Delete(send);
-        LOGE("%s,send NULL", __func__);
-        return -1;
-    }
-
-    cJSON *root = cJSON_CreateObject();
-    cJSON_AddStringToObject(root, TYPE, TYPE_SET);
-    cJSON_AddItemToObject(root, DATA, send);
-
-    send_to_uds(root);
-    return 0;
+    return roki_uart_send_msg2(32, 192, payload, payload_len, 0, send_to_uds);
 }
-int send_get_uds(cJSON *send)
+int send_get_uds(unsigned char *payload, int payload_len)
 {
-    cJSON *root = cJSON_CreateObject();
-    cJSON_AddStringToObject(root, TYPE, TYPE_GET);
-    cJSON_AddItemToObject(root, DATA, send);
-
-    send_to_uds(root);
-    return 0;
+    return roki_uart_send_msg2(32, 190, payload, payload_len, 0, send_to_uds);
 }
 int send_getall_uds(void)
 {
-    cJSON *root = cJSON_CreateObject();
-    cJSON_AddStringToObject(root, TYPE, TYPE_GETALL);
-    cJSON_AddNullToObject(root, DATA);
-
-    send_to_uds(root);
-    return 0;
+    unsigned char payload = 0;
+    return roki_uart_send_msg2(32, 190, &payload, 1, 0, send_to_uds);
 }
 
-static int uds_json_parse(char *value, unsigned int value_len) // uds接受的json数据解析
+static void uds_protocol_recv(unsigned char *data, int len)
 {
-    cJSON *root = cJSON_Parse(value);
-    if (root == NULL)
-    {
-        LOGE("JSON Parse Error");
-        return -1;
-    }
-
-    // char * json = cJSON_PrintUnformatted(root);
-    // LOGI("recv from comm-------------------------- json:%s", json);
-    // cJSON_free(json);
-    LOGI("recv from UI--------------------------:%.*s", value_len, value);
-
-    cJSON *Type = cJSON_GetObjectItem(root, TYPE);
-    if (Type == NULL)
-    {
-        LOGE("Type is NULL\n");
-        goto fail;
-    }
-    cJSON *Data = cJSON_GetObjectItem(root, DATA);
-    if (Data == NULL)
-    {
-        LOGE("Data is NULL\n");
-        goto fail;
-    }
-    if (uds_json_recv_cb != NULL)
-        uds_json_recv_cb(Data);
-    else
-        LOGE("uds_json_recv_cb is NULL\n");
-fail:
-    cJSON_Delete(root);
-    return -1;
-}
-
-int uds_protocol_recv(char *data, unsigned int len) // uds接受回调函数，初始化时注册
-{
-    int ret = 0;
-    int msg_len, encry, seqid;
-    unsigned char verify;
-
-    for (int i = 0; i < len; ++i)
-    {
-        if (data[i] == FRAME_HEADER && data[i + 1] == FRAME_HEADER)
-        {
-            encry = data[i + 2];
-            seqid = (data[i + 3] << 8) + data[i + 4];
-            msg_len = (data[i + 5] << 8) + data[i + 6];
-            if (data[i + 6 + msg_len + 2] != FRAME_TAIL || data[i + 6 + msg_len + 3] != FRAME_TAIL)
-            {
-                continue;
-            }
-            // mlogHex(&data[i], 6 + msg_len + 4);
-            LOGI("uds_recv encry:%d seqid:%d msg_len:%d", encry, seqid, msg_len);
-            verify = data[i + 6 + msg_len + 1];
-            unsigned char verify_check = CheckSum((unsigned char *)&data[i + 2], msg_len + 5);
-            if (verify_check != verify)
-            {
-                LOGE("CheckSum error:%d,%d", verify_check, verify);
-                // continue;
-            }
-            if (msg_len > 0)
-            {
-                ret = uds_json_parse(&data[i + 6 + 1], msg_len);
-                if (ret == 0)
-                {
-                    i += 6 + msg_len + 3;
-                }
-            }
-        }
-    }
-    return 0;
+    roki_uart_recv_msg(data, &len, uds_data_recv_cb);
 }
 static void on_recv(hio_t *io, void *buf, int readbytes)
 {
@@ -213,7 +85,7 @@ static void on_recv(hio_t *io, void *buf, int readbytes)
            SOCKADDR_STR(hio_peeraddr(io), peeraddrstr));
     printf("< %.*s\n", readbytes, (char *)buf);
 
-    uds_protocol_recv((char *)buf, readbytes);
+    uds_protocol_recv((unsigned char *)buf, readbytes);
 }
 static int tcp_client_reconnect_create(hloop_t *loop);
 static void reconnect_timer_cb(htimer_t *timer)
@@ -245,7 +117,7 @@ static void on_connect(hio_t *io)
 
 static int tcp_client_reconnect_create(hloop_t *loop)
 {
-    static char recvbuf[5120];
+    static char recvbuf[4096];
     mio = hloop_create_tcp_client(loop, "/tmp/unix_server.domain", -1, on_connect, on_close);
     if (mio == NULL)
     {
@@ -284,7 +156,7 @@ void mlog_init(void)
 {
     hlog_set_handler(mlogger);
     hlog_set_file("LVGL.log");
-    hlog_set_max_filesize(1024*100);
+    hlog_set_max_filesize(1024 * 100);
     hlog_set_format(DEFAULT_LOG_FORMAT);
     hlog_set_level(LOG_LEVEL_DEBUG);
     hlog_set_remain_days(1);

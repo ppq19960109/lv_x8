@@ -1,5 +1,5 @@
-#ifndef _LV_DEV_STATE_H_
-#define _LV_DEV_STATE_H_
+#ifndef _ROKI_DEV_STATE_H_
+#define _ROKI_DEV_STATE_H_
 
 #include "cJSON.h"
 #include "KV_linux.h"
@@ -84,9 +84,11 @@ enum OTA_STATE_ENUM
 };
 typedef struct
 {
-    char key[28];
+    char key[18];
     enum LINK_VALUE_TYPE value_type;
-    // unsigned char value_len;
+    unsigned char dev_type;
+    unsigned char cmd;
+    unsigned char value_len;
     // char *value;
     union
     {
@@ -160,9 +162,6 @@ extern recipe_t g_recipes[];
 extern const char *workStateChineseEnum[];
 extern char wifi_connecting;
 extern save_settings_t g_save_settings;
-
-void mlog_hex(const void *buf, int len, const char *file, const int line, const char *func);
-#define mlogHex(buf, buf_len) mlog_hex(buf, buf_len, __FILENAME__, __LINE__, __FUNCTION__)
 
 void register_property_change_cb(void (*cb)(const char *key, void *value));
 

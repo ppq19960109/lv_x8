@@ -1,5 +1,5 @@
-#ifndef LV_BACKLIGHT_H
-#define LV_BACKLIGHT_H
+#ifndef _ROKI_BACKLIGHT_H
+#define _ROKI_BACKLIGHT_H
 
 #ifdef __cplusplus
 extern "C" {

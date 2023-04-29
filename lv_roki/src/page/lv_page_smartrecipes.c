@@ -498,7 +498,7 @@ void lv_page_smartrecipes_init(lv_obj_t *page)
     LV_LOG_USER("%s...", __func__);
     // lv_obj_clear_flag(page, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_t *back_bar = lv_page_back_bar_init(page, "智慧菜谱", NULL, NULL);
-    lv_page_top_bar_init(page, 2);
+    lv_page_top_bar_init(page);
 
     smart_recipes[0] = lv_obj_create(page);
     lv_obj_set_size(smart_recipes[0], LV_PCT(100), 345);

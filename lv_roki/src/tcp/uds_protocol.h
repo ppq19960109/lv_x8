@@ -18,11 +18,11 @@
 void mlog_init(void);
 int uds_protocol_init(void);
 void uds_protocol_deinit(void);
-int uds_protocol_recv(char *data, unsigned int len);
 
 int cJSON_Object_isNull(cJSON *object);
 int send_getall_uds(void);
-int send_set_uds(cJSON *send);
-int send_get_uds(cJSON *send);
-void register_uds_json_recv_cb(int (*cb)(cJSON *));
+int send_get_uds(unsigned char *payload, int payload_len);
+int send_set_uds(unsigned char *payload, int payload_len);
+
+void register_uds_recv_cb(int (*cb)(void *, int));
 #endif
