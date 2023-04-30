@@ -377,14 +377,14 @@ void cycle_scroll_test(lv_obj_t *parent)
         lv_obj_t *btn = lv_obj_create(cont); // 在container上创建button
         lv_obj_set_width(btn, lv_pct(100));  // 设置button的width = lv_pct(100); //pct : percentage 相对于父亲的宽度100%
         lv_obj_set_height(btn, 60);
-        lv_obj_set_style_bg_color(btn, lv_color_hex(themesTextColor2), 0);
+        lv_obj_set_style_bg_color(btn, lv_color_hex(0xA2A2A2), 0);
         // lv_obj_set_style_bg_color(btn, lv_color_hex(themesTextColor), LV_STATE_CHECKED);
         // lv_obj_set_style_bg_opa(btn, LV_OPA_100, 0);
         /// 孙对象
         lv_obj_t *label = lv_label_create(btn); // 在button上创建一个label（标签）
-        lv_obj_set_style_text_color(label, lv_color_hex(themesTextColor), 0);
-        lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_30, 0);
-        lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_40, LV_STATE_CHECKED);
+        lv_obj_set_style_text_color(label, lv_color_hex(0xE68855), 0);
+        lv_obj_set_style_text_font(label, &lv_font_montserrat_24, 0);
+        lv_obj_set_style_text_font(label, &lv_font_montserrat_30, LV_STATE_CHECKED);
         lv_label_set_text_fmt(label, "Button %d", i); // 动态设置label的文本内容  fmt: format（格式）
         lv_obj_center(label);
     }

@@ -1,7 +1,3 @@
-/**
- * @file lv_roki.h
- *
- */
 #ifndef LV_ROKI_H
 #define LV_ROKI_H
 
@@ -21,46 +17,38 @@ extern "C"
 #include <sys/reboot.h>
 #include <pthread.h>
 #include <errno.h>
-
 #include <sys/select.h>
 #include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/time.h>
-
 #include <sys/socket.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <sys/un.h>
 
-#include "cJSON.h"
-#include "base64.h"
 #include "curl/curl.h"
 
+#include "cJSON.h"
 #include "cmd_run.h"
 #include "commonFunc.h"
-#include "networkFunc.h"
-// #include "signalQuit.h"
 #include "POSIXTimer.h"
-// #include "UartCfg.h"
+
+#include "main.h"
 //---------------------------------------
 #include "lvgl/lvgl.h"
 
 #include "lv_100ask_pinyin_ime/lv_100ask_pinyin_ime.h"
 #include "lv_100ask_page_manager/lv_100ask_page_manager.h"
 
-#include "tcp/roki_backlight.h"
-#include "tcp/roki_dev_state.h"
-#include "tcp/uds_protocol.h"
-#include "tcp/wifi_list.h"
-#include "tcp/hv_http_client.h"
-#include "tcp/roki_uart_parse_msg.h"
-
 #include "custom_item/lv_custom_item.h"
 #include "custom_item/lv_cycle_scroll.h"
 #include "dialog/lv_auto_dialog.h"
 #include "dialog/lv_manual_dialog.h"
+
+#include "general/backlight.h"
+#include "general/wifi_list.h"
     /*********************
      *      DEFINES
      *********************/
