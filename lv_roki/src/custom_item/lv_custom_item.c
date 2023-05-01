@@ -52,30 +52,7 @@ char *time_roller_options(int max_time)
     LV_LOG_USER("%s,index:%d", __func__, index);
     return roller_options;
 }
-int lv_custom_isSteam(steamoven_t *steamoven)
-{
-    steamoven_attr_t *step;
-    if (steamoven->attr_len == 0)
-    {
-        step = &steamoven->attr[0];
-        if (step->mode == 1 || step->mode == 3 || step->mode == 4 || step->mode == 65 || step->mode == 66 || step->mode == 68)
-        {
-            return 1;
-        }
-    }
-    else
-    {
-        for (int i = 0; i < steamoven->attr_len; ++i)
-        {
-            step = &steamoven->attr[i];
-            if (step->mode == 1 || step->mode == 3 || step->mode == 4 || step->mode == 65 || step->mode == 66 || step->mode == 68)
-            {
-                return 1;
-            }
-        }
-    }
-    return 0;
-}
+
 
 lv_obj_t *lv_custom_image_button_create(lv_obj_t *parent, const void *img_src, lv_coord_t x, lv_coord_t y)
 {

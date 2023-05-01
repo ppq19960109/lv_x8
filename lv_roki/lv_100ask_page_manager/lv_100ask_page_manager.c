@@ -497,9 +497,9 @@ void lv_page_reset_page(void)
         act_hist = _lv_ll_get_head(history_ll);
     };
     LV_LOG_USER("%s,cur_depth:%d page_manager%p", __func__, page_manager->cur_depth, &page_manager->obj);
-    for(int i = 0;i<lv_obj_get_child_cnt(&page_manager->obj);++i)
+    for (int i = 0; i < lv_obj_get_child_cnt(&page_manager->obj); ++i)
     {
-        lv_obj_clean(lv_obj_get_child(&page_manager->obj,i));
+        lv_obj_clean(lv_obj_get_child(&page_manager->obj, i));
     }
     lv_100ask_page_manager_set_open_page(page_manager->main_page, NULL);
     LV_LOG_USER("%s,cur_depth:%d", __func__, page_manager->cur_depth);

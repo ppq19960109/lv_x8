@@ -214,8 +214,8 @@ static lv_obj_t *lv_recipe_create(lv_obj_t *parent, const char *img_src, const c
     lv_obj_t *label = lv_label_create(bottom_img);
     lv_label_set_long_mode(label, LV_LABEL_LONG_DOT);
     lv_obj_set_size(label, LV_PCT(100) - 20, 24);
-    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_20, 0);
-    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_24, LV_STATE_CHECKED);
+    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_24, 0);
+    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_26, LV_STATE_CHECKED);
     lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), 0);
     lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_text(label, text);

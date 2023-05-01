@@ -1,60 +1,34 @@
-#include "lv_roki/lv_roki.h"
+#include "main.h"
 #include "roki_dev_state.h"
 #include "uds_protocol.h"
 #include "hlog.h"
 
 recipe_t g_recipes[60];
-save_settings_t g_save_settings;
 char wifi_connecting = 0;
 static pthread_mutex_t mutex;
 static dev_state_t *g_dev_state = NULL;
-const char *workStateChineseEnum[] = {"停止", "预约中", "预热中", "运行中", "烹饪完成", "暂停中", "预约暂停中", "预热暂停中"};
-static char *workModeEnum[] = {"未设定", "经典蒸", "鲜嫩蒸", "高温蒸", "热风烧烤", "上下加热", "立体热风", "蒸汽嫩烤", "空气速炸", "解冻", "发酵", "保温"};
-const char *workModeName(const char mode)
+const char *workStateChineseEnum[] = {"停止", "预约中", "预热中", "预热暂停中", "运行中", "暂停中", "烹饪完成", "自检中"};
+static char *workModeEnum[] = {"无模式", "鲜嫩蒸", "营养蒸", "高温蒸", "微波蒸", "智控蒸", "快热", "风焙烤", "焙烤", "风扇烤", "强烤烧", "烤烧", "快速预热", "果蔬烘干", "专业烤", "微波烤", "煎烤", "底加热", "空气炸", "微波", "eco", "手动加湿烤", "加湿烤-焙烤", "加湿烤-风焙烤", "加湿烤-强烤烧", "加湿烤-烤烧", "干燥", "杀菌", "除垢", "保温", "解冻", "清洁"};
+const char *workModeName(const int mode)
 {
-    char *name;
-    switch (mode)
-    {
-    case 1:
-        name = workModeEnum[1];
-        break;
-    case 3:
-        name = workModeEnum[2];
-        break;
-    case 4:
-        name = workModeEnum[3];
-        break;
-    case 35:
-        name = workModeEnum[4];
-        break;
-    case 36:
-        name = workModeEnum[5];
-        break;
-    case 38:
-        name = workModeEnum[6];
-        break;
-    case 40:
-        name = workModeEnum[7];
-        break;
-    case 42:
-        name = workModeEnum[8];
-        break;
-    case 65:
-        name = workModeEnum[9];
-        break;
-    case 66:
-        name = workModeEnum[10];
-        break;
-    case 68:
-        name = workModeEnum[11];
-        break;
-    default:
-        name = workModeEnum[0];
-        break;
-    }
-    return name;
+    return workModeEnum[mode];
 }
-
+int pointer_convert_num(unsigned char *data, int len)
+{
+    int val = 0;
+    for (int i = 0; i < len; ++i)
+    {
+        val = (val << 8) + data[i];
+    }
+    return val;
+}
+void num_convert_pointer(unsigned char *src, unsigned char *data, int len)
+{
+    for (int i = 0; i < len; ++i)
+    {
+        src[i] = data[len - 1 - i];
+    }
+}
 void (*property_change_cb)(const char *key, void *value);
 void register_property_change_cb(void (*cb)(const char *key, void *value))
 {
@@ -96,13 +70,11 @@ dev_attr_t *get_attr_cmd(const unsigned char cmd)
 }
 int get_value_int(dev_attr_t *attr)
 {
-    // int val = 0;
-    // for (int i = attr->value_len - 1; i >= 0; --i)
-    // {
-    //     val = (val << 8) + attr->value[i];
-    // }
-    // return val;
+#ifndef ATTR_UNION
+    return pointer_convert_num((unsigned char *)attr->value, attr->value_len);
+#else
     return attr->value.n;
+#endif
 }
 int get_attr_value_int(const char *name)
 {
@@ -116,8 +88,11 @@ int get_attr_value_int(const char *name)
 }
 char *get_value_string(dev_attr_t *attr)
 {
-    // return attr->value;
+#ifndef ATTR_UNION
+    return attr->value;
+#else
     return attr->value.p;
+#endif
 }
 char *get_attr_value_string(const char *name)
 {
@@ -127,52 +102,71 @@ char *get_attr_value_string(const char *name)
         LOGE("%s,attr name:%s not exits", __func__, name);
         return NULL;
     }
-    // return attr->value;
     return get_value_string(attr);
 }
-int pointer_convert_num(unsigned char *data, int len)
+
+void roki_attr_set_key_value(const char *key, int value)
 {
-    int val = 0;
-    for (int i = 0; i < len; ++i)
+    LOGI("%s,key:%s value:%d", __func__, key, value);
+    dev_attr_t *ptr = get_attr_ptr(key);
+    if (ptr == NULL)
     {
-        val = (val << 8) + data[i];
+        LOGE("%s,attr is NULL:%s", __func__, key);
+        return;
     }
-    return val;
+    if (LINK_VALUE_TYPE_NUM == ptr->value_type)
+    {
+#ifndef ATTR_UNION
+        num_convert_pointer((unsigned char *)ptr->value, (unsigned char *)&value, ptr->value_len);
+#else
+        ptr->value.n = value;
+#endif
+        if (property_change_cb != NULL)
+            property_change_cb(ptr->key, ptr);
+    }
 }
-static void lv_dev_set_value(unsigned char *data, unsigned char len, dev_attr_t *ptr)
+static void roki_dev_set_value(unsigned char *data, unsigned char len, dev_attr_t *ptr)
 {
     char change = 0;
 
     if (LINK_VALUE_TYPE_NUM == ptr->value_type)
     {
+#ifndef ATTR_UNION
+        if (memcmp(ptr->value, data, ptr->value_len))
+        {
+            memcpy(ptr->value, data, ptr->value_len);
+            change = 1;
+        }
+#else
         int num = pointer_convert_num(data, len);
         if (ptr->value.n != num)
         {
             ptr->value.n = num;
             change = 1;
         }
+#endif
     }
     else if (LINK_VALUE_TYPE_STRING == ptr->value_type)
     {
-        if (ptr->value.p == NULL)
+        if (ptr->value == NULL)
         {
-            ptr->value.p = malloc(len + 1);
-            memcpy(ptr->value.p, data, len);
-            ptr->value.p[len] = 0;
+            ptr->value = malloc(len + 1);
+            memcpy(ptr->value, data, len);
+            ptr->value[len] = 0;
             change = 1;
         }
         else
         {
-            int str_len = strlen(ptr->value.p);
-            if (str_len != len || memcmp(ptr->value.p, data, len))
+            int str_len = strlen(ptr->value);
+            if (str_len != len || memcmp(ptr->value, data, len))
             {
                 if (str_len != len)
                 {
-                    free(ptr->value.p);
-                    ptr->value.p = malloc(len + 1);
+                    free(ptr->value);
+                    ptr->value = malloc(len + 1);
                 }
-                memcpy(ptr->value.p, data, len);
-                ptr->value.p[len] = 0;
+                memcpy(ptr->value, data, len);
+                ptr->value[len] = 0;
                 change = 1;
             }
         }
@@ -192,34 +186,47 @@ static void lv_dev_set_value(unsigned char *data, unsigned char len, dev_attr_t 
     if (property_change_cb != NULL && change > 0)
         property_change_cb(ptr->key, ptr);
 }
-static int lv_dev_recv_event(void *value, int value_len)
+static int roki_dev_recv_uds(void *value, int value_len)
 {
-    int i, j;
+    int i, j, index = 0;
     dev_state_t *dev_state = g_dev_state;
     dev_attr_t *attr = dev_state->attr;
     dev_attr_t *ptr = NULL;
 
-    pthread_mutex_lock(&g_mutex);
+    pthread_mutex_lock(&g_lvgl_mutex);
     unsigned char *data = (unsigned char *)value;
-    unsigned char cmd_key = data[0];
-    unsigned char cmd_id = data[1];
-    unsigned char event = data[2];
-    unsigned char attr_count = data[3];
+    unsigned char cmd_key = data[index++];
+    unsigned char cmd_id = data[index++];
+    unsigned char event = 0, attr_count = 0;
+    if (ROKI_CMD_ID_QUERY_RESPONSE == cmd_id)
+    {
+    }
+    else if (ROKI_CMD_ID_EVENT == cmd_id)
+    {
+        event = data[index++];
+    }
+    else
+    {
+        LOGE("%s,unknown cmd_id", __func__);
+        goto fail;
+    }
+    attr_count = data[index++];
+
     LOGI("%s,cmd_key:%d cmd_id:%d event:%d attr_count:%d", __func__, cmd_key, cmd_id, event, attr_count);
-    data += 4;
-    for (i = 0; i < value_len - 1; ++i)
+    for (i = index; i < value_len - 2; ++i)
     {
         for (j = 0; j < dev_state->attr_len; ++j)
         {
             ptr = &attr[j];
             if (data[i] == ptr->cmd)
             {
-                lv_dev_set_value(&data[i + 2], data[i + 1], ptr);
+                roki_dev_set_value(&data[i + 2], data[i + 1], ptr);
             }
         }
         i += data[i + 1] + 1;
     }
-    pthread_mutex_unlock(&g_mutex);
+fail:
+    pthread_mutex_unlock(&g_lvgl_mutex);
     return 0;
 }
 void set_devattr_num(dev_attr_t *attr, int value)
@@ -285,18 +292,7 @@ void get_toServer(const char *key)
     }
     get_devattr(attr);
 }
-void connectWiFi(const char *ssid, const char *psk, int encryp)
-{
-    wifi_connecting = 1;
-    wifi_connecting_change(wifi_connecting);
 
-    strcpy(g_wifi_info.ssid, ssid);
-    strcpy(g_wifi_info.psk, psk);
-    g_wifi_info.encryp = encryp;
-}
-void set_stoveTiming_toServer(const int index, const int time)
-{
-}
 void set_cook_toServer(steamoven_t *steamoven)
 {
     cJSON *root = cJSON_CreateObject();
@@ -420,7 +416,7 @@ static void *profile_parse_json(void *input, const char *str) // 启动时解析
     }
     memset(dev_state->attr, 0, sizeof(dev_attr_t) * dev_state->attr_len);
 
-    cJSON *arraySub, *cloudKey, *valueType, *uartByteLen;
+    cJSON *arraySub, *cloudKey, *valueType, *funType, *uartByteLen;
     for (i = 0; i < arraySize; i++)
     {
         arraySub = cJSON_GetArrayItem(attr, i);
@@ -434,22 +430,29 @@ static void *profile_parse_json(void *input, const char *str) // 启动时解析
         }
         valueType = cJSON_GetObjectItem(arraySub, "valueType");
         dev_state->attr[i].value_type = valueType->valueint;
-        LV_LOG_USER("cloudKey:%s\n", dev_state->attr[i].key);
-        // if (cJSON_HasObjectItem(arraySub, "uartByteLen"))
-        // {
-        //     uartByteLen = cJSON_GetObjectItem(arraySub, "uartByteLen");
-        //     dev_state->attr[i].value_len = uartByteLen->valueint;
-        // }
-        // if (dev_state->attr[i].value_len > 0)
-        // {
-        //     dev_state->attr[i].value = (char *)malloc(dev_state->attr[i].value_len);
-        //     if (dev_state->attr[i].value == NULL)
-        //     {
-        //         LOGE("malloc error\n");
-        //         goto fail;
-        //     }
-        //     memset(dev_state->attr[i].value, 0, dev_state->attr[i].value_len);
-        // }
+
+        if (cJSON_HasObjectItem(arraySub, "funType"))
+        {
+            funType = cJSON_GetObjectItem(arraySub, "funType");
+            dev_state->attr[i].fun_type = funType->valueint;
+        }
+#ifndef ATTR_UNION
+        if (cJSON_HasObjectItem(arraySub, "uartByteLen"))
+        {
+            uartByteLen = cJSON_GetObjectItem(arraySub, "uartByteLen");
+            dev_state->attr[i].value_len = uartByteLen->valueint;
+        }
+        if (dev_state->attr[i].value_len > 0)
+        {
+            dev_state->attr[i].value = (char *)malloc(dev_state->attr[i].value_len);
+            if (dev_state->attr[i].value == NULL)
+            {
+                LOGE("malloc error\n");
+                goto fail;
+            }
+            memset(dev_state->attr[i].value, 0, dev_state->attr[i].value_len);
+        }
+#endif
     }
     cJSON_Delete(root);
     return dev_state;
@@ -530,31 +533,9 @@ fail:
     return NULL;
 }
 
-static void save_settings_init(void)
-{
-    int len = 1;
-    H_Kv_Get("firstStartup", &g_save_settings.firstStartup, &len);
-    H_Kv_Get("sleepSwitch", &g_save_settings.sleepSwitch, &len);
-    H_Kv_Get("sleepTime", &g_save_settings.sleepTime, &len);
-    H_Kv_Get("screenSaverIndex", &g_save_settings.screenSaverIndex, &len);
-    H_Kv_Get("brightness", &g_save_settings.brightness, &len);
-    H_Kv_Get("wifiEnable", &g_save_settings.wifiEnable, &len);
-    H_Kv_Get("themesIndex", &g_save_settings.themesIndex, &len);
-
-    if (g_save_settings.brightness == 0)
-    {
-        g_save_settings.brightness = 6;
-        H_Kv_Set("brightness", &g_save_settings.brightness, 1, 0);
-    }
-    backlightSet(g_save_settings.brightness);
-}
-
-int lv_dev_init(void) // 初始化
+int roki_dev_init(void) // 初始化
 {
     pthread_mutex_init(&mutex, NULL);
-
-    backlightEnable();
-    save_settings_init();
 
     g_dev_state = get_dev_profile(".", NULL, PROFILE_NAME, profile_parse_json);
     if (g_dev_state == NULL)
@@ -564,20 +545,23 @@ int lv_dev_init(void) // 初始化
     }
     get_dev_profile(".", NULL, "RecipesDetails.json", recipes_parse_json);
 
-    register_uds_recv_cb(lv_dev_recv_event);
+    register_uds_recv_cb(roki_dev_recv_uds);
     uds_protocol_init();
 
     return 0;
 }
 
-void lv_dev_deinit(void) // 反初始化
+void roki_dev_deinit(void) // 反初始化
 {
     for (int i = 0; i < g_dev_state->attr_len; ++i)
     {
-        // if (g_dev_state->attr[i].value_len > 0)
-        //     free(g_dev_state->attr[i].value);
+#ifndef ATTR_UNION
+        if (g_dev_state->attr[i].value_len > 0)
+            free(g_dev_state->attr[i].value);
+#else
         if (g_dev_state->attr[i].value.p != NULL)
             free(g_dev_state->attr[i].value.p);
+#endif
     }
     free(g_dev_state->attr);
     free(g_dev_state);

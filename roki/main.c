@@ -36,6 +36,8 @@ int main(int argc, char **argv)
     sigaction(SIGSEGV, &act, NULL);
     sigaction(SIGABRT, &act, NULL);
 #endif
+    mlog_init();
+
     lvgl_roki_main();
     return 0;
 }

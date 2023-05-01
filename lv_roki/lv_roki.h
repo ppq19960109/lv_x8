@@ -14,7 +14,6 @@ extern "C"
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
-#include <sys/reboot.h>
 #include <pthread.h>
 #include <errno.h>
 #include <sys/select.h>
@@ -23,24 +22,15 @@ extern "C"
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/time.h>
-#include <sys/socket.h>
-#include <netinet/ip.h>
-#include <arpa/inet.h>
-#include <sys/un.h>
-
-#include "curl/curl.h"
 
 #include "cJSON.h"
 #include "cmd_run.h"
 #include "commonFunc.h"
 #include "POSIXTimer.h"
 
-#include "main.h"
+#include "lv_roki_ext.h"
 //---------------------------------------
 #include "lvgl/lvgl.h"
-
-#include "lv_100ask_pinyin_ime/lv_100ask_pinyin_ime.h"
-#include "lv_100ask_page_manager/lv_100ask_page_manager.h"
 
 #include "custom_item/lv_custom_item.h"
 #include "custom_item/lv_cycle_scroll.h"
@@ -96,6 +86,17 @@ extern "C"
     } wifi_info_t;
     extern wifi_info_t g_wifi_info;
 
+    typedef struct
+    {
+        char firstStartup;
+        char sleepSwitch;
+        char sleepTime;
+        char screenSaverIndex;
+        unsigned char brightness;
+        char wifiEnable;
+        unsigned char themesIndex;
+    } save_settings_t;
+
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_20);
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_24);
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_26);
@@ -107,11 +108,11 @@ extern "C"
     extern lv_style_t slider_style_main, slider_style_indicator, slider_style_knob;
     extern lv_style_t switch_style_indicator, switch_style_indicator_check, switch_style_knob;
     extern int g_wifi_state;
-    extern pthread_mutex_t g_mutex;
     extern lv_obj_t *manual_scr, *main_scr;
     extern char scan_count;
     extern char g_versionCheckState;
     extern char g_wifiPageStatus;
+    extern save_settings_t g_save_settings;
     /**********************
      * GLOBAL PROTOTYPES
      **********************/

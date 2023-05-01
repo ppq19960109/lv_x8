@@ -9,7 +9,7 @@ extern "C"
     /*********************
      *      INCLUDES
      *********************/
-
+#include "lv_roki/lv_roki.h"
     /*********************
      *      DEFINES
      *********************/
@@ -21,7 +21,6 @@ extern "C"
     /**********************
      * GLOBAL PROTOTYPES
      **********************/
-    int lv_custom_isSteam(steamoven_t *steamoven);
     lv_obj_t *lv_custom_image_button_create(lv_obj_t *parent, const void *img_src, lv_coord_t x, lv_coord_t y);
     lv_obj_t *lv_rotate_anim(lv_obj_t *obj, const int run);
     lv_obj_t *lv_custom_text_btn_create(lv_obj_t *parent, const char *text);

@@ -1,9 +1,10 @@
 #ifndef _ROKI_DEV_STATE_H_
 #define _ROKI_DEV_STATE_H_
 
-#include "cJSON.h"
-
-#define PROFILE_NAME "LvDevProfile.json"
+#define PROFILE_NAME "ROKIDevProfile.json"
+#define ETH_NAME "wlan0"
+#define SOFTER_VER "0.0.1"
+// #define ATTR_UNION
 
 typedef enum
 {
@@ -21,10 +22,18 @@ typedef enum
 enum LINK_VALUE_TYPE
 {
     LINK_VALUE_TYPE_NUM = 0x00,
-    LINK_VALUE_TYPE_STRING_NUM,
     LINK_VALUE_TYPE_STRING,
+    LINK_VALUE_TYPE_STRING_NUM,
     LINK_VALUE_TYPE_STRUCT,
     LINK_VALUE_TYPE_ARRAY,
+};
+enum LINK_FUN_TYPE
+{
+    LINK_FUN_TYPE_ATTR_REPORT_CTRL = 0x00,
+    LINK_FUN_TYPE_ATTR_REPORT,
+    LINK_FUN_TYPE_ATTR_CTRL,
+    LINK_FUN_TYPE_EVENT,
+    LINK_FUN_TYPE_SERVICE,
 };
 enum COOK_POS_ENUM
 {
@@ -40,22 +49,23 @@ enum MULTI_MODE_ENUM
 };
 enum WORK_OPERATION_ENUM
 {
-    WORK_OPERATION_START = 0x00,
+    WORK_OPERATION_STOP= 0x00,
+    WORK_OPERATION_START ,
     WORK_OPERATION_PAUSE,
-    WORK_OPERATION_CANCEL,
-    WORK_OPERATION_CONFIRM,
-    WORK_OPERATION_RUN_NOW,
+    WORK_OPERATION_RESERVE,
+    WORK_OPERATION_CONTINUE,
+    WORK_OPERATION_SELF_TEST,
 };
 enum WORK_STATE_ENUM
 {
     WORK_STATE_STOP = 0x00,
     WORK_STATE_RESERVE,
     WORK_STATE_PREHEAT,
+    WORK_STATE_PAUSE_PREHEAT,
     WORK_STATE_RUN,
-    WORK_STATE_FINISH,
     WORK_STATE_PAUSE,
-    WORK_STATE_PAUSE_RESERVE,
-    WORK_STATE_PREHEAT_RESERVE,
+    WORK_STATE_FINISH,
+    WORK_STATE_SELF_TEST,
 };
 enum TIMING_OPERATION_ENUM
 {
@@ -81,23 +91,41 @@ enum OTA_STATE_ENUM
     OTA_STATE_INSTALL_FAIL,
     OTA_STATE_INSTALL_SUCCESS,
 };
+enum ROKI_CMD_ID_ENUM
+{
+    ROKI_CMD_ID_QUERY = 190,
+    ROKI_CMD_ID_QUERY_RESPONSE,
+    ROKI_CMD_ID_SET,
+    ROKI_CMD_ID_SET_RESPONSE,
+    ROKI_CMD_ID_EVENT,
+    ROKI_CMD_ID_ERROR,
+    ROKI_CMD_ID_HISTORY_ERROR,
+};
 typedef struct
 {
     char key[18];
-    enum LINK_VALUE_TYPE value_type;
     unsigned char dev_type;
     unsigned char cmd;
     unsigned char value_len;
-    // char *value;
+    enum LINK_VALUE_TYPE value_type;
+    enum LINK_FUN_TYPE fun_type;
+#ifndef ATTR_UNION
+    char *value;
+#else
     union
     {
         char *p;
         int n;
     } value;
+#endif
 } dev_attr_t;
 
 typedef struct
 {
+    char device_category[33];
+    char device_model[16];
+    char mac[16];
+    char software_ver[6];
     dev_attr_t *attr;
     int attr_len;
 } dev_state_t;
@@ -146,37 +174,24 @@ typedef struct
     int temp;
 } recipe_t;
 
-typedef struct
-{
-    char firstStartup;
-    char sleepSwitch;
-    char sleepTime;
-    char screenSaverIndex;
-    unsigned char brightness;
-    char wifiEnable;
-    unsigned char themesIndex;
-} save_settings_t;
-
 extern recipe_t g_recipes[];
 extern const char *workStateChineseEnum[];
 extern char wifi_connecting;
-extern save_settings_t g_save_settings;
 
 void register_property_change_cb(void (*cb)(const char *key, void *value));
 
-int lv_dev_init(void);
-void lv_dev_deinit(void);
+int roki_dev_init(void);
+void roki_dev_deinit(void);
 dev_state_t *get_dev_state(void);
 dev_attr_t *get_attr_ptr(const char *name);
 int get_attr_value_int(const char *name);
 int get_value_int(dev_attr_t *attr);
 char *get_attr_value_string(const char *name);
 char *get_value_string(dev_attr_t *attr);
-const char *workModeName(const char mode);
 
 void set_num_toServer(const char *key, int value);
 void get_toServer(const char *key);
-void set_stoveTiming_toServer(const int index, const int time);
 void set_cook_toServer(steamoven_t *steamoven);
-void connectWiFi(const char *ssid, const char *psk, int encryp);
+
+const char *workModeName(const int mode);
 #endif

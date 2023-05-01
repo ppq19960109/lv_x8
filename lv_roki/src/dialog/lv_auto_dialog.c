@@ -177,7 +177,7 @@ void lv_auto_upgrade_dialog5(const char *title)
     lv_obj_set_style_bg_color(bg, lv_color_hex(themesPopupWindowColor), 0);
 
     lv_obj_t *label = lv_label_create(bg);
-    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_50, 0);
+    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_34, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(themesTextColor), 0);
     char buf[40];
     sprintf(buf, "%s升级中,请勿断电!", title);
@@ -200,7 +200,7 @@ void lv_auto_upgrade_dialog5(const char *title)
     lv_anim_start(&a);
 
     label = lv_label_create(bg);
-    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_40, 0);
+    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_34, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), 0);
     lv_label_set_text(label, "0%%");
     lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 320);

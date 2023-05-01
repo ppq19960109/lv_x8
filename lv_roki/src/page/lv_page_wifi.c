@@ -62,11 +62,11 @@ wifi_list_item(void *arg)
 }
 // static void *wifi_update_task(void *arg)
 // {
-//     pthread_mutex_lock(&g_mutex);
+//     pthread_mutex_lock(&g_lvgl_mutex);
 //     bssid = get_attr_value_string("bssid");
 //     lv_wifi_list_clean();
 //     wifi_list_each(wifi_list_item);
-//     pthread_mutex_unlock(&g_mutex);
+//     pthread_mutex_unlock(&g_lvgl_mutex);
 // }
 static void wifi_update()
 {
@@ -279,7 +279,7 @@ static void wifi_input_event_handler(lv_event_t *e)
         {
             lv_label_set_text(target, "连接中");
             // lv_obj_set_style_text_color(target, lv_color_hex(themesTextColor2), 0);
-            connectWiFi(cur_ssid, ta_text, cur_flags);
+            // connectWiFi(cur_ssid, ta_text, cur_flags);
             wifi_update();
         }
     }

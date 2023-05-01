@@ -143,12 +143,12 @@ static void page_update_StOvState(const int index, void *ptr)
             btn_text[btn_count++] = "辅助烹饪";
         }
     }
-    else if (value == WORK_STATE_PAUSE || value == WORK_STATE_PREHEAT_RESERVE)
+    else if (value == WORK_STATE_PAUSE || value == WORK_STATE_PAUSE_PREHEAT)
     {
         btn_text[btn_count++] = "继续";
         btn_text[btn_count++] = "取消";
     }
-    else if (value == WORK_STATE_PAUSE_RESERVE)
+    else if (value == WORK_STATE_PAUSE)
     {
         btn_text[btn_count++] = "继续";
         btn_text[btn_count++] = "取消";
@@ -174,7 +174,7 @@ static void page_update_StOvState(const int index, void *ptr)
 
 static void page_update_StOvRealTemp(const int index, void *ptr)
 {
-    if (work_state[index] != WORK_STATE_PREHEAT && work_state[index] != WORK_STATE_PREHEAT_RESERVE)
+    if (work_state[index] != WORK_STATE_PREHEAT && work_state[index] != WORK_STATE_PAUSE_PREHEAT)
         return;
     int value;
     lv_obj_t **child;
@@ -229,7 +229,7 @@ static void page_update_StOvSetTimerLeft(const int index, void *ptr)
 }
 static void page_update_StOvOrderTimerLeft(const int index, void *ptr)
 {
-    if (work_state[index] != WORK_STATE_RESERVE && work_state[index] != WORK_STATE_PAUSE_RESERVE)
+    if (work_state[index] != WORK_STATE_RESERVE && work_state[index] != WORK_STATE_PAUSE)
         return;
     int value;
     float setTime_value;
@@ -418,11 +418,11 @@ static void finish_back_event_cb(lv_event_t *e)
     long user_data = (long)lv_event_get_user_data(e);
     if (user_data == 0)
     {
-        set_num_toServer("LStOvOperation", WORK_OPERATION_CONFIRM);
+        set_num_toServer("LStOvOperation", WORK_OPERATION_RESERVE);
     }
     else
     {
-        set_num_toServer("RStOvOperation", WORK_OPERATION_CONFIRM);
+        set_num_toServer("RStOvOperation", WORK_OPERATION_RESERVE);
     }
 }
 static lv_obj_t *lv_steam_item_create(lv_obj_t *parent, const int index, lv_cooking_t *cooking)
@@ -541,7 +541,7 @@ static void left_dialog1_event_cb(lv_event_t *e)
     case 1:
         break;
     case 2:
-        set_num_toServer("LStOvOperation", WORK_OPERATION_CANCEL);
+        set_num_toServer("LStOvOperation", WORK_OPERATION_STOP);
         break;
     }
     clean_manual_layer();
@@ -555,7 +555,7 @@ static void right_dialog1_event_cb(lv_event_t *e)
     case 1:
         break;
     case 2:
-        set_num_toServer("RStOvOperation", WORK_OPERATION_CANCEL);
+        set_num_toServer("RStOvOperation", WORK_OPERATION_STOP);
         break;
     }
     clean_manual_layer();
@@ -590,7 +590,7 @@ static void right_btn_event_cb(lv_event_t *e)
         {
             lv_100ask_page_manager_set_open_page(NULL, "page_steam_right");
         }
-        else if (work_state[1] == WORK_STATE_PAUSE || work_state[1] == WORK_STATE_PAUSE_RESERVE || work_state[1] == WORK_STATE_PREHEAT_RESERVE)
+        else if (work_state[1] == WORK_STATE_PAUSE || work_state[1] == WORK_STATE_PAUSE || work_state[1] == WORK_STATE_PAUSE_PREHEAT)
         {
             set_num_toServer("RStOvOperation", WORK_OPERATION_START);
         }
@@ -614,7 +614,7 @@ static void right_btn_event_cb(lv_event_t *e)
         }
         else
         {
-            set_num_toServer("RStOvOperation", WORK_OPERATION_RUN_NOW);
+            set_num_toServer("RStOvOperation", WORK_OPERATION_CONTINUE);
         }
         break;
     }

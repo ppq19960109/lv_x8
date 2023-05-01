@@ -155,7 +155,7 @@ static void *uds_protocol_task(void *arg)
 void mlog_init(void)
 {
     hlog_set_handler(mlogger);
-    hlog_set_file("LVGL.log");
+    hlog_set_file("LV_ROKI.log");
     hlog_set_max_filesize(1024 * 100);
     hlog_set_format(DEFAULT_LOG_FORMAT);
     hlog_set_level(LOG_LEVEL_DEBUG);

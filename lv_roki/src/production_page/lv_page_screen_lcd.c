@@ -52,7 +52,7 @@ void lv_page_screen_lcd_init(lv_obj_t *page)
     lv_obj_t *obj = lv_img_create(tv_tab);
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_t *label = lv_label_create(obj);
-    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_40, 0);
+    lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_34, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), 0);
     lv_label_set_text(label, "滑动屏幕,观察测试过程显示的一些图像上是否有黑点和亮点");
     lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);

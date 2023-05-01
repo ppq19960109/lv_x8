@@ -303,7 +303,7 @@ void lv_page_update_create(lv_obj_t *page)
     lv_obj_align(btn, LV_ALIGN_TOP_MID, 0, 140);
 
     label_version = lv_label_create(btn);
-    lv_obj_set_style_text_font(label_version, &lv_font_SiYuanHeiTi_Normal_40, 0);
+    lv_obj_set_style_text_font(label_version, &lv_font_SiYuanHeiTi_Normal_34, 0);
     lv_obj_set_style_text_color(label_version, lv_color_hex(0xffffff), 0);
     lv_label_set_text(label_version, "当前版本 1.0.1");
     lv_obj_align(label_version, LV_ALIGN_CENTER, -10, 0);

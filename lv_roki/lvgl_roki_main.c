@@ -6,7 +6,7 @@
 #include "lv_roki/lv_roki.h"
 
 #define DISP_BUF_SIZE (480 * 854)
-pthread_mutex_t g_mutex;
+pthread_mutex_t g_lvgl_mutex;
 
 static void feedback_cb(struct _lv_indev_drv_t *lv_indev_drv, uint8_t event_code)
 {
@@ -19,8 +19,6 @@ static void feedback_cb(struct _lv_indev_drv_t *lv_indev_drv, uint8_t event_code
 
 int lvgl_roki_main(void)
 {
-    mlog_init();
-
     /*LittlevGL init*/
     lv_init();
 
@@ -64,17 +62,17 @@ int lvgl_roki_main(void)
     // lv_indev_set_cursor(mouse_indev, cursor_obj);        /*Connect the image  object to the driver*/
 
     /*Handle LitlevGL tasks (tickless mode)*/
-    pthread_mutex_init(&g_mutex, NULL);
-    lv_dev_init();
+    pthread_mutex_init(&g_lvgl_mutex, NULL);
+    roki_dev_init();
     lv_roki_widgets();
     while (1)
     {
-        pthread_mutex_lock(&g_mutex);
+        pthread_mutex_lock(&g_lvgl_mutex);
         lv_timer_handler();
-        pthread_mutex_unlock(&g_mutex);
+        pthread_mutex_unlock(&g_lvgl_mutex);
         usleep(3000);
     }
-    pthread_mutex_destroy(&g_mutex);
+    pthread_mutex_destroy(&g_lvgl_mutex);
     return 0;
 }
 /*Set in lv_conf.h as `LV_TICK_CUSTOM_SYS_TIME_EXPR`*/
