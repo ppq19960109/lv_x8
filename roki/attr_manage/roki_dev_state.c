@@ -221,7 +221,12 @@ static int roki_dev_recv_uds(void *value, int value_len)
             if (data[i] == ptr->cmd)
             {
                 roki_dev_set_value(&data[i + 2], data[i + 1], ptr);
+                break;
             }
+        }
+        if (j == dev_state->attr_len)
+        {
+            LOGW("%s,unknown attr key:%d", __func__, data[i]);
         }
         i += data[i + 1] + 1;
     }
