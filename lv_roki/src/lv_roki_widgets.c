@@ -248,7 +248,6 @@ static void property_change_cb(const char *key, void *value)
         else
         {
             wifi_connecting = 0;
-            wifi_connecting_change(wifi_connecting);
             // if (g_wifi_state == RK_WIFI_State_CONNECTED)
             // {
             //     lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_half_connect.png");
@@ -261,32 +260,6 @@ static void property_change_cb(const char *key, void *value)
             // {
             //     lv_img_set_src(icon_wifi, themesImagesPath "icon_wifi_disconnect.png");
             // }
-            if (g_wifiPageStatus == 0)
-            {
-                get_toServer("WifiCurConnected");
-            }
-        }
-    }
-    else if (strcmp("ssid", key) == 0)
-    {
-        if (g_wifi_state >= RK_WIFI_State_CONNECTED && strlen(g_wifi_info.ssid) > 0)
-        {
-            char *data = get_value_string(value);
-            if (strcmp(g_wifi_info.ssid, data) == 0)
-            {
-                char buf[200];
-                sprintf(buf,
-                        "(wpa_cli list_networks | tail -n +3 | grep \'%s\' | grep -v 'CURRENT' | awk "
-                        "'{system(\"wpa_cli remove_network \" $1)}' && wpa_cli save_config) &",
-                        data);
-                LV_LOG_USER("ssid:%s buf:%s\n", data, buf);
-                systemRun(buf);
-            }
-        }
-        if (g_wifiPageStatus == 0)
-        {
-            if (strlen(g_wifi_info.ssid) > 0)
-                memset(g_wifi_info.ssid, 0, sizeof(g_wifi_info.ssid));
         }
     }
     else if (strcmp("NtpTimestamp", key) == 0)

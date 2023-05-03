@@ -1,7 +1,6 @@
 #ifndef LV_ROKI_EXT_H
 #define LV_ROKI_EXT_H
 
-#include "lv_100ask_pinyin_ime/lv_100ask_pinyin_ime.h"
 #include "lv_100ask_page_manager/lv_100ask_page_manager.h"
 
 #include "general/KV_linux.h"

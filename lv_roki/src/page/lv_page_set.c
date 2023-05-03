@@ -16,13 +16,13 @@ static lv_obj_t *tabview;
 void lv_page_set_tabview_set(int index)
 {
     lv_tabview_set_act(tabview, index, LV_ANIM_ON);
-    if (index == 1)
-        lv_page_wifi_visible(1);
+    // if (index == 1)
+    //     lv_page_wifi_visible(1);
 }
 static void property_change_cb(const char *key, void *value)
 {
     LV_LOG_USER("lv_page_set,key:%s\n", key);
-    lv_wifi_property_change_cb(key, value);
+    // lv_wifi_property_change_cb(key, value);
     lv_update_property_change_cb(key, value);
 }
 static void page_update_cb(void *arg)
@@ -30,11 +30,11 @@ static void page_update_cb(void *arg)
     unsigned short index = lv_tabview_get_tab_act(tabview);
     LV_LOG_USER("lv_page_set,%s index:%d\n", __func__, index);
     // lv_tabview_set_act(tabview, 2, LV_ANIM_ON);
-    scan_count = 0;
+    // scan_count = 0;
     if (index == 0)
         lv_page_local_set_visible(1);
-    else if (index == 1)
-        lv_page_wifi_visible(1);
+    // else if (index == 1)
+    //     lv_page_wifi_visible(1);
 }
 static void tabview_event_cb(lv_event_t *e)
 {
@@ -50,15 +50,15 @@ static void tabview_event_cb(lv_event_t *e)
     else if (index == 3)
         lv_page_update_visible(1);
 
-    if (index == 1)
-        lv_page_wifi_visible(1);
-    else
-        lv_page_wifi_visible(0);
+    // if (index == 1)
+    //     lv_page_wifi_visible(1);
+    // else
+    //     lv_page_wifi_visible(0);
 }
 
 static void page_close_cb(void *arg)
 {
-    lv_page_wifi_visible(0);
+    // lv_page_wifi_visible(0);
 }
 void lv_page_set_init(lv_obj_t *page)
 {
@@ -98,7 +98,7 @@ void lv_page_set_init(lv_obj_t *page)
 
     /*Add content to the tabs*/
     lv_page_local_set_create(tab1);
-    lv_page_wifi_create(tab2);
+    // lv_page_wifi_create(tab2);
     lv_page_about_create(tab3);
     lv_page_update_create(tab4);
     lv_page_reset_create(tab5);

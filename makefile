@@ -84,4 +84,4 @@ clean :
 	
 distclean :
 	make clean
-	make -C liblvgl M=$(PWD) clean
+	make -C liblvgl clean

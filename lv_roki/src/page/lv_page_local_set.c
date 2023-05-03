@@ -19,7 +19,7 @@ void lv_page_local_set_visible(const int visible)
     LV_LOG_USER("%s,brightness:%d\n", __func__, g_save_settings.brightness);
     if (visible)
     {
-        switch_value_state(sw, g_save_settings.sleepSwitch);
+        // switch_value_state(sw, g_save_settings.sleepSwitch);
         if (g_save_settings.sleepSwitch)
             lv_obj_clear_flag(sleep_obj, LV_OBJ_FLAG_HIDDEN);
         else
@@ -75,7 +75,7 @@ static void switch_event_handler(lv_event_t *e)
             g_save_settings.sleepSwitch = 0;
             lv_obj_add_flag(user_data, LV_OBJ_FLAG_HIDDEN);
         }
-        switch_value_state(sw, g_save_settings.sleepSwitch);
+        // switch_value_state(sw, g_save_settings.sleepSwitch);
         H_Kv_Set("sleepSwitch", &g_save_settings.sleepSwitch, 1, 0);
     }
 }

@@ -15,6 +15,7 @@ include $(LVGL_DIR)/lv_drivers/lv_drivers.mk
 
 CSRCS +=$(LVGL_DIR)/mouse_cursor_icon.c
 CSRCS +=$(wildcard lv_font_SiYuanHeiTi_Normal_*.c) 
+CSRCS +=$(wildcard lv_100ask_page_manager/*.c) 
 OBJEXT ?= .o
 
 AOBJS = $(ASRCS:.S=$(OBJEXT))

@@ -222,11 +222,8 @@ void evdev_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
     data->point.x = map(evdev_root_x, EVDEV_HOR_MIN, EVDEV_HOR_MAX, 0, drv->disp->driver->hor_res);
     data->point.y = map(evdev_root_y, EVDEV_VER_MIN, EVDEV_VER_MAX, 0, drv->disp->driver->ver_res);
 #else
-    // printf("%s 1,rotated:%d,hor_res:%d,ver_res:%d,x:%d,y:%d\n",__func__,drv->disp->driver->rotated,drv->disp->driver->hor_res,drv->disp->driver->ver_res,evdev_root_x,evdev_root_y);
     data->point.x = evdev_root_x;
     data->point.y = evdev_root_y;
-    // data->point.x = drv->disp->driver->ver_res - evdev_root_y;
-    // data->point.y = evdev_root_x;
 #endif
 
     data->state = evdev_button;
