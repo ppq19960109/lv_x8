@@ -14,6 +14,7 @@ SRC_DIRS := $(shell find roki -maxdepth 3 -type d)
 
 LINKTOOL_PATH:=liblinktool
 LIBLVGL_PATH:=liblvgl
+MQTT_PATH:=libpaho-mqtt3
 
 ifdef DEBUG
 export MCFLAGS = -g -rdynamic -funwind-tables -ffunction-sections -lmcheck -DDEBUG
@@ -35,6 +36,7 @@ CFLAGS += -I$(LINKTOOL_PATH)/include/cJSON
 # CFLAGS += -I$(LINKTOOL_PATH)/include/md5
 CFLAGS += -I$(HV_PATH)/include/hv
 CFLAGS += -I$(LIBLVGL_PATH) -I$(LIBLVGL_PATH)/lvgl
+CFLAGS += -I$(MQTT_PATH)/include
 
 CXXFLAGS += $(CFLAGS) -std=c++11
 
@@ -42,9 +44,10 @@ LDFLAGS += -L$(LINKTOOL_PATH)/lib
 LDFLAGS += -L$(HV_PATH)/lib
 LDFLAGS += -L$(TOPDIR)
 LDFLAGS += -L$(LIBLVGL_PATH) 
+CFLAGS += -L$(MQTT_PATH)/lib
 
 LIBS += -Wl,--start-group	\
-		-Wl,-Bstatic  -lhv -llinktool -llvgl \
+		-Wl,-Bstatic  -lhv -llinktool -llvgl -lpaho-mqtt3a -lpaho-mqtt3c \
 		-Wl,-Bdynamic -lavcodec -lavformat -lavutil -lswresample -lswscale -lcurl -lfreetype -latomic -ldl -lm -lpthread -lrt \
 		-Wl,--end-group
 LIBS += -Wl,-rpath=./

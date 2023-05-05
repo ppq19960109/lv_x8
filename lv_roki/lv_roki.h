@@ -139,12 +139,13 @@ extern "C"
     void lv_page_close_heat_init(lv_obj_t *page);
     void lv_page_steamoven_init(lv_obj_t *page);
     void lv_page_smartrecipes_init(lv_obj_t *page);
-    void lv_page_steaming_init(lv_obj_t *page);
+    void lv_page_steaming_create(lv_obj_t *page);
     void lv_page_steam_mode_init(lv_obj_t *page);
     void lv_page_steam_right_init(lv_obj_t *page);
     void lv_page_steam_assist_init(lv_obj_t *page);
     void lv_page_multistage_init(lv_obj_t *page);
-    void lv_page_set_init(lv_obj_t *page);
+    void lv_page_cook_tab_init(lv_obj_t *page);
+    void lv_page_chart_create(lv_obj_t *page);
     void lv_page_cook_details_init(lv_obj_t *page);
 
     void lv_page_set_tabview_set(int index);

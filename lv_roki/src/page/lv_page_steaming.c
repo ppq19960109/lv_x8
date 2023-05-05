@@ -514,7 +514,7 @@ static lv_obj_t *lv_steam_item_create(lv_obj_t *parent, const int index, lv_cook
     lv_arc_set_rotation(arc, 270);
     lv_arc_set_bg_angles(arc, 0, 360);
     // lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
-    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    // lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_center(arc);
     lv_obj_set_style_arc_color(arc, lv_color_hex(themesTextColor), LV_PART_INDICATOR);
     lv_obj_set_style_arc_width(arc, 20, LV_PART_INDICATOR);
@@ -523,6 +523,20 @@ static lv_obj_t *lv_steam_item_create(lv_obj_t *parent, const int index, lv_cook
     lv_obj_set_style_pad_all(arc, 10, LV_PART_KNOB);
     lv_arc_set_value(arc, 30);
     cooking->arc = arc;
+
+    arc = lv_arc_create(obj);
+    lv_obj_set_size(arc, 315, 315);
+    lv_arc_set_rotation(arc, 270);
+    lv_arc_set_bg_angles(arc, 0, 360);
+    // lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
+    // lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_center(arc);
+    lv_obj_set_style_arc_color(arc, lv_color_hex(themesTextColor), LV_PART_INDICATOR);
+    lv_obj_set_style_arc_width(arc, 20, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_rounded(arc, true, LV_PART_INDICATOR);
+    lv_obj_set_style_bg_img_src(arc, publicImagesPath "knob.png", LV_PART_KNOB);
+    lv_obj_set_style_pad_all(arc, 10, LV_PART_KNOB);
+    lv_arc_set_value(arc, 30);
     //------------------------------
     // lv_obj_t *run_img = lv_img_create(obj); //
     // lv_img_set_src(run_img, themesImagesPath "icon_steam_runing.png");
@@ -623,14 +637,14 @@ static void back_bar_event_cb(lv_event_t *e)
 {
     lv_page_back_top_page();
 }
-void lv_page_steaming_init(lv_obj_t *page)
+void lv_page_steaming_create(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
-    lv_100ask_page_manager_page_t *manager_page = (lv_100ask_page_manager_page_t *)page;
-    manager_page->page_property_change_cb = property_change_cb;
-    manager_page->page_update_cb = page_update_cb;
+    // lv_100ask_page_manager_page_t *manager_page = (lv_100ask_page_manager_page_t *)page;
+    // manager_page->page_property_change_cb = property_change_cb;
+    // manager_page->page_update_cb = page_update_cb;
 
-    lv_page_back_bar_init(page, "返回", NULL, NULL);
+    // lv_page_back_bar_init(page, "返回", NULL, NULL);
 
     lv_obj_t *obj = lv_steam_item_create(page, 0, &lv_cooking);
     lv_obj_align(obj, LV_ALIGN_TOP_LEFT, 60, 80);

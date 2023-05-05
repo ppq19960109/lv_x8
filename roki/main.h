@@ -25,6 +25,8 @@ extern "C"
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <sys/un.h>
+#include <sys/ioctl.h>
+#include <linux/netlink.h>
 
 #include "cJSON.h"
 #include "base64.h"

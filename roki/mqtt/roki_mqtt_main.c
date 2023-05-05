@@ -150,6 +150,7 @@ exit:
 
 void roki_mqtt_deinit()
 {
+	int rc;
 	MQTTAsync_disconnectOptions disc_opts = MQTTAsync_disconnectOptions_initializer;
 
 	disc_opts.onSuccess = onDisconnect;

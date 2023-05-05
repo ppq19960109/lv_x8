@@ -918,7 +918,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->transition_normal, LV_PART_INDICATOR);
     }
 #endif
-
+#endif
 #if LV_USE_CHART
     else if(lv_obj_check_type(obj, &lv_chart_class)) {
         lv_obj_add_style(obj, &styles->card, 0);
@@ -932,7 +932,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->chart_series, LV_PART_CURSOR);
     }
 #endif
-
+#if 0
 #if LV_USE_ROLLER
     else if(lv_obj_check_type(obj, &lv_roller_class)) {
         lv_obj_add_style(obj, &styles->card, 0);

@@ -502,9 +502,8 @@ void lv_roki_widgets(void)
     lv_obj_t *page_hood = lv_100ask_page_manager_page_create(page_manager, "page_hood");
     lv_obj_t *page_steamoven = lv_100ask_page_manager_page_create(page_manager, "page_steamoven");
     lv_obj_t *page_smartrecipes = lv_100ask_page_manager_page_create(page_manager, "page_smartrecipes");
-    lv_obj_t *page_steaming = lv_100ask_page_manager_page_create(page_manager, "page_steaming");
     lv_obj_t *page_steam_mode = lv_100ask_page_manager_page_create(page_manager, "page_steam_mode");
-    lv_obj_t *page_set = lv_100ask_page_manager_page_create(page_manager, "page_set");
+    lv_obj_t *page_cook_tab = lv_100ask_page_manager_page_create(page_manager, "page_cook_tab");
     lv_obj_t *page_cook_details = lv_100ask_page_manager_page_create(page_manager, "page_cook_details");
     lv_obj_t *page_multistage = lv_100ask_page_manager_page_create(page_manager, "page_multistage");
     lv_obj_t *page_smart_cook = lv_100ask_page_manager_page_create(page_manager, "page_smart_cook");
@@ -523,9 +522,8 @@ void lv_roki_widgets(void)
     lv_100ask_page_manager_set_page_init(page_hood, lv_page_hood_init);
     lv_100ask_page_manager_set_page_init(page_steamoven, lv_page_steamoven_init);
     lv_100ask_page_manager_set_page_init(page_smartrecipes, lv_page_smartrecipes_init);
-    lv_100ask_page_manager_set_page_init(page_steaming, lv_page_steaming_init);
     lv_100ask_page_manager_set_page_init(page_steam_mode, lv_page_steam_mode_init);
-    lv_100ask_page_manager_set_page_init(page_set, lv_page_set_init);
+    lv_100ask_page_manager_set_page_init(page_cook_tab, lv_page_cook_tab_init);
     lv_100ask_page_manager_set_page_init(page_cook_details, lv_page_cook_details_init);
     lv_100ask_page_manager_set_page_init(page_multistage, lv_page_multistage_init);
     lv_100ask_page_manager_set_page_init(page_smart_cook, lv_page_smart_cook_init);
@@ -550,10 +548,8 @@ void lv_roki_widgets(void)
     lv_100ask_page_manager_set_close_page_anim(page_smartrecipes, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_steam_mode, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_steam_mode, close_page_anim);
-    lv_100ask_page_manager_set_open_page_anim(page_steaming, open_page_anim);
-    lv_100ask_page_manager_set_close_page_anim(page_steaming, close_page_anim);
-    lv_100ask_page_manager_set_open_page_anim(page_set, open_page_anim);
-    lv_100ask_page_manager_set_close_page_anim(page_set, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_cook_tab, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_cook_tab, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_cook_details, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_cook_details, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_multistage, open_page_anim);

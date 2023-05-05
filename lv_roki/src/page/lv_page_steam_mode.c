@@ -230,8 +230,7 @@ static void bottom_bar_event_cb(lv_event_t *e)
     }
     else
     {
-        // lv_theme_switch(1);
-        lv_100ask_page_manager_set_open_page(NULL, "page_steaming");
+        lv_100ask_page_manager_set_open_page(NULL, "page_cook_tab");
     }
 }
 void lv_page_steam_mode_init(lv_obj_t *page)
@@ -240,7 +239,7 @@ void lv_page_steam_mode_init(lv_obj_t *page)
     lv_page_bottom_bar_init(page, "预约", "开始烹饪", bottom_bar_event_cb);
 
     lv_obj_t *cont_row = lv_obj_create(page);
-    lv_obj_set_size(cont_row, 190 * 3 + 90 * 2, 242);
+    lv_obj_set_size(cont_row, 190 * 3 + 100 * 2, 242);
     lv_obj_align(cont_row, LV_ALIGN_TOP_MID, 0, 106);
     lv_obj_set_flex_flow(cont_row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(cont_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
