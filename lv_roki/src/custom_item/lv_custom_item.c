@@ -53,7 +53,6 @@ char *time_roller_options(int max_time)
     return roller_options;
 }
 
-
 lv_obj_t *lv_custom_image_button_create(lv_obj_t *parent, const void *img_src, lv_coord_t x, lv_coord_t y)
 {
     lv_obj_t *image_button = lv_obj_create(parent);
@@ -169,29 +168,67 @@ lv_obj_t *lv_divider_create(lv_obj_t *parent)
     lv_obj_set_style_bg_color(divider, lv_color_hex(0xE7E7E7), 0);
     return divider;
 }
-lv_obj_t *lv_btn_array_create(lv_obj_t *parent, const char count, lv_event_cb_t event_cb)
+
+lv_obj_t *lv_custom_temp_create(lv_obj_t *parent, int temp, const lv_font_t *font, lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
-    lv_obj_t *cont = lv_obj_create(parent);
-    lv_obj_set_size(cont, 140, 55 * count + 40);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    for (long i = 0; i < count; ++i)
-    {
-        lv_obj_t *btn = lv_btn_create(cont);
-        lv_obj_set_size(btn, 140, 50);
-        lv_obj_set_style_bg_color(btn, lv_color_hex(themesTextColor2), 0);
-        lv_obj_set_style_bg_opa(btn, LV_OPA_100, 0);
-        lv_obj_set_style_radius(btn, 25, 0);
-        lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, (void *)i);
-
-        lv_obj_t *label = lv_label_create(btn);
-        lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_30, 0);
-        lv_obj_set_style_text_color(label, lv_color_hex(0x000000), 0);
-        lv_obj_center(label);
-    }
-    return cont;
+    lv_obj_t *obj = lv_obj_create(parent);
+    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_t *label = lv_label_create(obj);
+    lv_obj_set_style_text_font(label, font, 0);
+    lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
+    char buf[8];
+    snprintf(buf, sizeof(buf), "%d", temp);
+    lv_label_set_text(label, buf);
+    lv_obj_t *label_unit = lv_label_create(obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "℃");
+    lv_obj_align_to(label_unit, label, LV_ALIGN_OUT_RIGHT_MID, x_ofs, y_ofs);
+    return obj;
 }
+
+lv_obj_t *lv_custom_temp_fix_width_create(lv_obj_t *parent, int temp, const lv_font_t *font, lv_coord_t x_ofs, lv_coord_t y_ofs, lv_coord_t w, const char *unit_before)
+{
+    lv_obj_t *obj = lv_obj_create(parent);
+    lv_obj_set_size(obj, w, LV_SIZE_CONTENT);
+    lv_obj_t *label = lv_label_create(obj);
+    lv_obj_set_style_text_font(label, font, 0);
+    lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
+    char buf[8];
+    snprintf(buf, sizeof(buf), "%d", temp);
+    lv_label_set_text(label, buf);
+    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_t *label_unit = lv_label_create(obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "℃");
+    lv_obj_align_to(label_unit, label, LV_ALIGN_OUT_RIGHT_MID, x_ofs, y_ofs);
+    label_unit = lv_label_create(obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, unit_before);
+    lv_obj_align_to(label_unit, label, LV_ALIGN_OUT_LEFT_MID, 0, -y_ofs);
+    return obj;
+}
+
+lv_obj_t *lv_custom_time_create(lv_obj_t *parent, int time, const lv_font_t *font, lv_coord_t x_ofs, lv_coord_t y_ofs)
+{
+    lv_obj_t *obj = lv_obj_create(parent);
+    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_t *label = lv_label_create(obj);
+    lv_obj_set_style_text_font(label, font, 0);
+    lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
+    char buf[8];
+    snprintf(buf, sizeof(buf), "%d", time);
+    lv_label_set_text(label, buf);
+    lv_obj_t *label_unit = lv_label_create(obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "min");
+    lv_obj_align_to(label_unit, label, LV_ALIGN_OUT_RIGHT_MID, x_ofs, y_ofs);
+    return obj;
+}
+
 lv_obj_t *lv_page_indicator_create(lv_obj_t *parent, int count)
 {
     lv_obj_t *cont_row = lv_obj_create(parent);

@@ -10,7 +10,7 @@
  *********************/
 static lv_obj_t *roller_scroll[4], *label_temp, *label_steam;
 
-static char *surging_model[] = {"小", "中", "大"};
+static char *vapour_model[] = {"小", "中", "大"};
 static steamoven_mode_t steam_mode[] = {
     {
         mode_index : 0,
@@ -38,7 +38,7 @@ static steamoven_mode_t steam_mode[] = {
         temp : 2,
         mintemp : 1,
         maxtemp : 10,
-        temp_model : surging_model,
+        temp_model : vapour_model,
         time : 60,
         maxtime : 0,
         name : "澎湃蒸"
@@ -179,26 +179,7 @@ static void btn_array_event_cb(lv_event_t *e)
         lv_manual_reserve_dialog("左腔将在", "后启动", "预约", 12, reserve_dialog_event_cb);
     }
 }
-static void scroll_event_cb(lv_event_t *e)
-{
-    lv_obj_t *target = lv_event_get_target(e);
-    lv_obj_t *user_data = lv_event_get_user_data(e);
-    if (e->code == LV_EVENT_PRESSED)
-    {
-        LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-        lv_obj_clear_flag(user_data, LV_OBJ_FLAG_HIDDEN);
-    }
-    else if (e->code == LV_EVENT_RELEASED)
-    {
-        LV_LOG_USER("%s,code:%d\n", __func__, e->code);
-        lv_obj_add_flag(user_data, LV_OBJ_FLAG_HIDDEN);
-        if (lv_obj_has_state(target, LV_STATE_CHECKED))
-        {
-            char mode_index = lv_roller_get_selected(target);
-            mode_change(mode_index);
-        }
-    }
-}
+
 static void scroll_child_select_cb(lv_obj_t *child, char select, char select_end)
 {
     lv_obj_t *child2 = lv_obj_get_child(child, 0);
@@ -239,7 +220,7 @@ void lv_page_steam_mode_init(lv_obj_t *page)
     lv_page_bottom_bar_init(page, "预约", "开始烹饪", bottom_bar_event_cb);
 
     lv_obj_t *cont_row = lv_obj_create(page);
-    lv_obj_set_size(cont_row, 190 * 3 + 100 * 2, 242);
+    lv_obj_set_size(cont_row, 190 * 3 + 90 * 2, 242);
     lv_obj_align(cont_row, LV_ALIGN_TOP_MID, 0, 106);
     lv_obj_set_flex_flow(cont_row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(cont_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -261,7 +242,6 @@ void lv_page_steam_mode_init(lv_obj_t *page)
     lv_obj_set_style_text_font(label_time, g_robam_font.FZLTHC_30.font, 0);
     lv_label_set_text(label_time, "min");
     lv_obj_align_to(label_time, cont_row, LV_ALIGN_RIGHT_MID, 25, 12);
-
     //------------------------------
     static lv_cycle_scroll_t lv_cycle_scroll = {0};
     lv_cycle_scroll.cb = scroll_child_select_cb;
@@ -285,9 +265,9 @@ void lv_page_steam_mode_init(lv_obj_t *page)
     roller_scroll[1] = lv_cycle_scroll_create(cont_row, 180, LV_PCT(100), LV_FLEX_FLOW_COLUMN, &lv_cycle_scroll);
     lv_obj_clear_flag(roller_scroll[0], LV_OBJ_FLAG_SCROLL_ELASTIC);
     roller_scroll[3] = lv_cycle_scroll_create(cont_row, 180, LV_PCT(100), LV_FLEX_FLOW_COLUMN, &lv_cycle_scroll);
-    for (i = 0; i < sizeof(surging_model) / sizeof(surging_model[0]); ++i)
+    for (i = 0; i < sizeof(vapour_model) / sizeof(vapour_model[0]); ++i)
     {
-        lv_obj_t *child = mode_roller_scroll_child_create(roller_scroll[3], surging_model[i], 0);
+        lv_obj_t *child = mode_roller_scroll_child_create(roller_scroll[3], vapour_model[i], 0);
         child->user_data = (void *)i;
     }
     //----------------------------------------------------------------------------

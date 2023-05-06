@@ -11,6 +11,7 @@
 typedef struct
 {
     unsigned char mode;
+    unsigned char vapour;
     unsigned short temp;
     unsigned short time;
 } multistage_para_t;
@@ -18,7 +19,7 @@ static multistage_para_t multistage_para[3] = {0};
 static int listLastIndex = 0;
 static int listResetIndex = -1;
 static lv_obj_t *roller1, *roller2, *roller3;
-static lv_obj_t *page_cont_row;
+static lv_obj_t *page_cont_row, *bottom_bar;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -315,7 +316,7 @@ static void btn_array_event_cb(lv_event_t *e)
     }
     else
     {
-        lv_manual_reserve_dialog("左腔将在","后启动", "预约", 12, reserve_dialog_event_cb);
+        lv_manual_reserve_dialog("左腔将在", "后启动", "预约", 12, reserve_dialog_event_cb);
     }
 }
 
@@ -323,16 +324,16 @@ static void page_update_cb(void *arg)
 {
     memset(multistage_para, 0, sizeof(multistage_para));
     listLastIndex = 0;
-    multistage_update();
+    // multistage_update();
 }
 static void add_click_event_cb(lv_event_t *e)
 {
     // lv_obj_t *target = lv_event_get_target(e);
-    long user_data = (long)lv_event_get_user_data(e);
+    int user_data = (int)lv_event_get_user_data(e);
     if (user_data == listLastIndex)
     {
         listResetIndex = -1;
-        steam_left_roller_create(lv_layer_top());
+        // steam_left_roller_create(lv_layer_top());
     }
 }
 static void btn_click_event_cb(lv_event_t *e)
@@ -355,74 +356,80 @@ static void btn_click_event_cb(lv_event_t *e)
         steam_left_roller_create(lv_layer_top());
     }
 }
+static void bottom_bar_event_cb(lv_event_t *e)
+{
+    int user_data = (int)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
+    if (user_data == 0)
+    {
+    }
+    else
+    {
+        lv_100ask_page_manager_set_open_page(NULL, "page_cook_tab");
+    }
+}
 void lv_page_multistage_init(lv_obj_t *page)
 {
     LV_LOG_USER("%s...", __func__);
-    lv_obj_t *back_bar = lv_page_back_bar_init(page, "多段烹饪(只有左腔可多段烹饪)", NULL, NULL);
     lv_100ask_page_manager_page_t *manager_page = (lv_100ask_page_manager_page_t *)page;
-    // manager_page->page_property_change_cb = property_change_cb;
     manager_page->page_update_cb = page_update_cb;
 
+    lv_page_back_bar_init(page, "返回", NULL, NULL);
+    bottom_bar = lv_page_bottom_bar_init(page, NULL, "开始烹饪", bottom_bar_event_cb);
+    lv_obj_t *label_total_time = lv_label_create(bottom_bar);
+    lv_obj_set_style_text_font(label_total_time, g_robam_font.FZLTHJW_32.font, 0);
+    lv_obj_set_style_text_color(label_total_time, getThemesFontColor1(), 0);
+    lv_label_set_text(label_total_time, "总时长");
+    lv_obj_align(label_total_time, LV_ALIGN_LEFT_MID, 40, 0);
+    label_total_time = lv_custom_time_create(bottom_bar, 332, g_robam_font.FZLTHC_48.font, 0, 5);
+    lv_obj_align(label_total_time, LV_ALIGN_LEFT_MID, 150, 0);
+
     page_cont_row = lv_obj_create(page);
-    lv_obj_set_size(page_cont_row, 300 * 3, 250);
-    lv_obj_align_to(page_cont_row, back_bar, LV_ALIGN_OUT_BOTTOM_LEFT, 20, 50);
+    lv_obj_set_size(page_cont_row, 750, 230);
+    lv_obj_align(page_cont_row, LV_ALIGN_TOP_MID, 0, 120);
     lv_obj_set_flex_flow(page_cont_row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(page_cont_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
     //------------------------------
     char buf[12];
-    for (long i = 0; i < 3; ++i)
+    for (int i = 0; i < 3; ++i)
     {
-        lv_obj_t *first_obj = lv_obj_create(page_cont_row);
-        lv_obj_set_size(first_obj, 250, LV_PCT(100));
-        lv_obj_t *img = lv_img_create(first_obj); // 0
-        lv_img_set_src(img, themesImagesPath "icon_round_checkable.png");
-        lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
-        img = lv_img_create(first_obj); // 1
-        lv_img_set_src(img, themesImagesPath "icon_cook_add_checked.png");
-        lv_obj_align(img, LV_ALIGN_TOP_MID, 0, 66);
+        if (i > 0)
+        {
+            lv_obj_t *bg_line = lv_img_create(page_cont_row);
+            lv_img_set_src(bg_line, getThemesPath("bg_line.png"));
+            lv_obj_set_size(bg_line, 2, LV_PCT(100));
+        }
+        lv_obj_t *item_obj = lv_obj_create(page_cont_row);
+        // lv_obj_set_style_bg_opa(item_obj, LV_OPA_100, 0);
+        lv_obj_set_size(item_obj, 150, LV_PCT(100));
 
-        lv_obj_t *label = lv_label_create(first_obj); // 2
-        lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_24, 0);
-        lv_obj_set_style_text_color(label, lv_color_hex(0xDF932F), 0);
-        lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 166);
-        sprintf(buf, "第%ld段", i + 1);
+        lv_obj_t *label = lv_label_create(item_obj); // 0
+        lv_obj_set_style_text_font(label, g_robam_font.FZLTHJW_48.font, 0);
+        lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
+        lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 50);
+        sprintf(buf, "第%d段", i + 1);
         lv_label_set_text(label, buf);
+
+        lv_obj_t *img = lv_img_create(item_obj); // 1
+        lv_img_set_src(img, getThemesPath("bg_multi_add.png"));
+        lv_obj_align(img, LV_ALIGN_TOP_MID, 0, 140);
         //-------------------------------------------------------
-        label = lv_label_create(first_obj); // 3
-        lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_24, 0);
-        lv_obj_set_style_text_color(label, lv_color_hex(0xFFA834), 0);
-        lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 75);
+        label = lv_label_create(item_obj); // 2
+        lv_obj_set_style_text_font(label, g_robam_font.FZLTHJW_44.font, 0);
+        lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
+        lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 0);
         lv_label_set_text(label, workModeName(4));
 
-        label = lv_label_create(first_obj); // 4
-        lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_24, 0);
-        lv_obj_set_style_text_color(label, lv_color_hex(0xFFA834), 0);
-        lv_obj_align(label, LV_ALIGN_TOP_LEFT, 40, 130);
-        lv_label_set_text(label, "180C");
+        label = lv_custom_temp_create(item_obj, 180, g_robam_font.FZLTHC_44.font, 0, -5); // 3
+        lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 90);
 
-        label = lv_label_create(first_obj); // 5
-        lv_obj_set_style_text_font(label, &lv_font_SiYuanHeiTi_Normal_24, 0);
-        lv_obj_set_style_text_color(label, lv_color_hex(0xFFA834), 0);
-        lv_obj_align(label, LV_ALIGN_TOP_RIGHT, -40, 130);
-        lv_label_set_text(label, "120分钟");
+        label = lv_custom_time_create(item_obj, 332, g_robam_font.FZLTHC_44.font, 0, 5); // 4
+        lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 160);
 
-        lv_obj_t *btn = lv_btn_create(first_obj); // 6
-        lv_obj_set_size(btn, 70, 70);
-        lv_obj_set_style_bg_img_src(btn, themesImagesPath "icon_close.png", 0);
-        lv_obj_align(btn, LV_ALIGN_BOTTOM_LEFT, 0, 0);
-        lv_obj_add_event_cb(btn, btn_click_event_cb, LV_EVENT_CLICKED, (void *)(i * 2));
-
-        btn = lv_btn_create(first_obj); // 7
-        lv_obj_set_size(btn, 70, 70);
-        lv_obj_set_style_bg_img_src(btn, themesImagesPath "icon_restart.png", 0);
-        lv_obj_align(btn, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
-        lv_obj_add_event_cb(btn, btn_click_event_cb, LV_EVENT_CLICKED, (void *)(i * 2 + 1));
-
-        lv_obj_add_event_cb(first_obj, add_click_event_cb, LV_EVENT_CLICKED, (void *)i);
+        lv_obj_add_event_cb(item_obj, add_click_event_cb, LV_EVENT_CLICKED, (void *)i);
     }
     //------------------------------
-    const char *text[] = {"启动", "预约"};
-    lv_obj_t *btn_array = lv_custom_btn_array_create(page, text, 2, btn_array_event_cb);
-    lv_obj_align_to(btn_array, back_bar, LV_ALIGN_OUT_BOTTOM_RIGHT, -60, 90);
+    // const char *text[] = {"启动", "预约"};
+    // lv_obj_t *btn_array = lv_custom_btn_array_create(page, text, 2, btn_array_event_cb);
+    // lv_obj_align_to(btn_array, back_bar, LV_ALIGN_OUT_BOTTOM_RIGHT, -60, 90);
 }

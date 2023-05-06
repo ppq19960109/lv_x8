@@ -54,6 +54,9 @@ static void mode_event_cb(lv_event_t *e)
         break;
     case 2:
         break;
+    case 4:
+        lv_100ask_page_manager_set_open_page(NULL, "page_multistage");
+        break;
     }
 }
 void lv_page_main_init(lv_obj_t *page)
@@ -94,7 +97,7 @@ void lv_page_main_init(lv_obj_t *page)
 
         lv_obj_add_event_cb(btn, mode_event_cb, LV_EVENT_CLICKED, (void *)i);
     }
-    cycle_scroll_change(cont, 0);
+    cycle_scroll_change(cont, 1);
 
     // gif = lv_gif_create(lv_scr_act());
     // lv_gif_set_src(gif, "S:/oem/boot.gif");

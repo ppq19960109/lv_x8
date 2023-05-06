@@ -34,6 +34,7 @@ extern "C"
 
 #include "custom_item/lv_custom_item.h"
 #include "custom_item/lv_cycle_scroll.h"
+#include "custom_item/lv_btn_array.h"
 #include "dialog/lv_auto_dialog.h"
 #include "dialog/lv_manual_dialog.h"
 
@@ -146,6 +147,8 @@ extern "C"
     void lv_page_multistage_init(lv_obj_t *page);
     void lv_page_cook_tab_init(lv_obj_t *page);
     void lv_page_chart_create(lv_obj_t *page);
+    void lv_page_chart_completed_cb(void *arg);
+    void lv_page_chart_destroyed_cb(void *arg);
     void lv_page_cook_details_init(lv_obj_t *page);
 
     void lv_page_set_tabview_set(int index);

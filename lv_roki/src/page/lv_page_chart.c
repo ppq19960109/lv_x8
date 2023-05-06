@@ -8,8 +8,10 @@
  *      DEFINES
  *********************/
 static lv_obj_t *chart1;
+static lv_obj_t *btn_preheat, *btn_vapour, *btn_start_stop;
 static lv_chart_series_t *ser1;
-static lv_chart_series_t *ser2;
+static lv_timer_t *chart_timer;
+static char x_time_text[6][10];
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -20,6 +22,33 @@ static void draw_event_cb(lv_event_t *e)
 
     /*Add the faded area before the lines are drawn*/
     lv_obj_draw_part_dsc_t *dsc = lv_event_get_draw_part_dsc(e);
+
+    if (dsc->id == LV_CHART_AXIS_PRIMARY_X && dsc->text)
+    {
+        int time_sec = lv_chart_get_point_count(obj) * 2 / 6;
+
+        int cur_time = 0;
+        for (int i = 1; i < 6; i++)
+        {
+            cur_time = time_sec * i;
+            if (cur_time < 60)
+            {
+                sprintf(x_time_text[i], "%ds", cur_time);
+            }
+            else
+            {
+                if (cur_time % 60 == 0)
+                {
+                    sprintf(x_time_text[i], "%dmin", cur_time / 60);
+                }
+                else
+                {
+                    sprintf(x_time_text[i], "%dmin%ds", cur_time / 60, cur_time % 60);
+                }
+            }
+        }
+        lv_snprintf(dsc->text, dsc->text_length, "%s", x_time_text[dsc->value]);
+    }
     if (dsc->part == LV_PART_ITEMS)
     {
         if (!dsc->p1 || !dsc->p2)
@@ -81,29 +110,65 @@ static void draw_event_cb(lv_event_t *e)
 
 static void add_data(lv_timer_t *timer)
 {
-    LV_UNUSED(timer);
-    static uint32_t cnt = 0;
-    lv_chart_set_next_value(chart1, ser1, lv_rand(20, 90));
+    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 250));
 
-    if (cnt % 4 == 0)
-        lv_chart_set_next_value(chart1, ser2, lv_rand(40, 60));
-
-    cnt++;
+    unsigned short point_count = lv_chart_get_point_count(chart1);
+    unsigned short x_start_point = lv_chart_get_x_start_point(chart1, ser1);
+    LV_LOG_USER("%s,point_count:%d x_start_point:%d\n", __func__, point_count, x_start_point);
+    if (point_count < 45 * 60) // * 60
+    {
+        if (point_count - 1 <= x_start_point)
+        {
+            lv_chart_set_x_start_point(chart1, ser1, 0);
+            lv_chart_set_point_count(chart1, point_count * 1.3);
+            lv_chart_set_x_start_point(chart1, ser1, x_start_point);
+        }
+    }
+    else
+    {
+        if (point_count - 1 <= x_start_point)
+        {
+            unsigned short start_point2 = point_count / 4;
+            unsigned short point_count2 = point_count - start_point2;
+            lv_chart_set_x_start_point(chart1, ser1, start_point2);
+            lv_chart_set_point_count(chart1, point_count2);
+            lv_chart_set_x_start_point(chart1, ser1, point_count2 - 2);
+        }
+    }
 }
-
+// static void btn_img_array_event_cb(int start_index, char *text[], const int count)
+// {
+//     lv_obj_t *child;
+//     for (int i = start_index; i < count; ++i)
+//     {
+//         child = lv_obj_get_child(btn_img_array, i);
+//         // lv_obj_set_ext_click_area(child, 10);
+//         lv_img_set_src(lv_obj_get_child(child, 0), getThemesPath(text[i]));
+//     }
+// }
 static void btn_event_cb(lv_event_t *e)
 {
     LV_LOG_USER("%s,code:%d\n", __func__, e->code);
     // lv_obj_t *target = lv_event_get_target(e);
-    long user_data = (long)lv_event_get_user_data(e);
+    int user_data = (int)lv_event_get_user_data(e);
     switch (user_data)
     {
     case 0:
         break;
     case 1:
-
-        break;
+    {
     }
+    break;
+    }
+}
+void lv_page_chart_completed_cb(void *arg)
+{
+    lv_timer_resume(chart_timer);
+    lv_timer_ready(chart_timer);
+}
+void lv_page_chart_destroyed_cb(void *arg)
+{
+    lv_timer_pause(chart_timer);
 }
 void lv_page_chart_create(lv_obj_t *page)
 {
@@ -114,26 +179,62 @@ void lv_page_chart_create(lv_obj_t *page)
     lv_obj_set_style_radius(chart1, 0, 0);
     lv_obj_set_style_bg_opa(chart1, LV_OPA_0, 0);
     lv_obj_set_style_border_opa(chart1, LV_OPA_0, 0);
+    // lv_obj_set_style_line_color(chart1, lv_palette_main(LV_PALETTE_ORANGE), LV_PART_TICKS);
 
     lv_chart_set_type(chart1, LV_CHART_TYPE_LINE);
     lv_obj_align(chart1, LV_ALIGN_TOP_LEFT, 110, 120);
     lv_chart_set_div_line_count(chart1, 6, 0);
     lv_chart_set_update_mode(chart1, LV_CHART_UPDATE_MODE_CIRCULAR);
 
-    lv_chart_set_range(chart1, LV_CHART_AXIS_PRIMARY_X, 0, 100);
+    lv_obj_set_style_width(chart1, 0, LV_PART_INDICATOR);
+    lv_obj_set_style_height(chart1, 0, LV_PART_INDICATOR);
+
+    lv_chart_set_range(chart1, LV_CHART_AXIS_PRIMARY_X, 0, 250);
     lv_chart_set_range(chart1, LV_CHART_AXIS_PRIMARY_Y, 0, 250);
-    lv_chart_set_point_count(chart1, 10);
+    lv_chart_set_point_count(chart1, 6);
 
-    lv_chart_set_axis_tick(chart1, LV_CHART_AXIS_PRIMARY_X, 10, 5, 10, 3, true, 50);
-    lv_chart_set_axis_tick(chart1, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 6, 4, true, 60);
+    lv_chart_set_axis_tick(chart1, LV_CHART_AXIS_PRIMARY_X, 10, 5, 6, 2, true, 50);
+    lv_chart_set_axis_tick(chart1, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 6, 2, true, 60);
 
-    lv_chart_series_t *ser1 = lv_chart_add_series(chart1, lv_color_hex(0xffffff), LV_CHART_AXIS_PRIMARY_Y);
+    ser1 = lv_chart_add_series(chart1, lv_color_hex(0xffffff), LV_CHART_AXIS_PRIMARY_Y);
 
     lv_obj_add_event_cb(chart1, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
+    // lv_chart_set_zoom_x(chart1, LV_IMG_ZOOM_NONE / 2);
 
-    lv_chart_set_next_value(chart1, ser1, 0);
-    lv_chart_set_next_value(chart1, ser1, 100);
-    lv_chart_set_next_value(chart1, ser1, 200);
-    lv_chart_set_next_value(chart1, ser1, 200);
-    lv_chart_set_next_value(chart1, ser1, 210);
+    // lv_chart_set_next_value(chart1, ser1, 0);
+    // lv_chart_set_next_value(chart1, ser1, 100);
+    // lv_chart_set_next_value(chart1, ser1, 200);
+    // lv_chart_set_next_value(chart1, ser1, 200);
+
+    lv_chart_refresh(chart1);
+
+    if (chart_timer == NULL)
+        chart_timer = lv_timer_create(add_data, 2000, NULL);
+
+    //----------------------------------------------------------------
+    lv_obj_t *img = lv_img_create(page);
+    lv_img_set_src(img, getThemesPath("bg_stop.png"));
+    lv_obj_align(img, LV_ALIGN_TOP_RIGHT, -45, 300);
+    lv_obj_add_flag(img, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(img, btn_event_cb, LV_EVENT_CLICKED, (void *)0);
+    lv_obj_set_ext_click_area(img, 5);
+    btn_start_stop = img;
+
+    img = lv_img_create(page);
+    lv_img_set_src(img, getThemesPath("bg_preheat.png"));
+    lv_obj_align(img, LV_ALIGN_TOP_RIGHT, -45, 170);
+    lv_obj_add_flag(img, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(img, btn_event_cb, LV_EVENT_CLICKED, (void *)1);
+    lv_obj_set_ext_click_area(img, 5);
+    btn_preheat = img;
+
+    img = lv_img_create(page);
+    lv_img_set_src(img, getThemesPath("bg_vapour.png"));
+    lv_obj_align(img, LV_ALIGN_TOP_RIGHT, -45, 170);
+    lv_obj_add_flag(img, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(img, btn_event_cb, LV_EVENT_CLICKED, (void *)2);
+    lv_obj_set_ext_click_area(img, 5);
+    btn_vapour = img;
+
+    lv_obj_add_flag(btn_preheat, LV_OBJ_FLAG_HIDDEN);
 }

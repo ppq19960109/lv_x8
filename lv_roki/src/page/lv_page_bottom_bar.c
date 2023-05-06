@@ -33,7 +33,7 @@ lv_obj_t *lv_page_bottom_bar_init(lv_obj_t *parent, const char *left_btn_text, c
     lv_img_set_src(back_bar, publicImagesPath "bottom_bg.png");
     // lv_obj_set_size(back_bar, LV_PCT(100), 96);
     lv_obj_set_align(back_bar, LV_ALIGN_BOTTOM_MID);
-    
+
     if (left_btn_text != NULL)
     {
         lv_obj_t *left_button = lv_bottom_btn_create(back_bar, left_btn_text);

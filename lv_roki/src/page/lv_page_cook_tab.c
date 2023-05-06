@@ -26,6 +26,11 @@ static void page_update_cb(void *arg)
 {
     unsigned short index = lv_tabview_get_tab_act(tabview);
     LV_LOG_USER("lv_page_set,%s index:%d\n", __func__, index);
+    lv_page_chart_completed_cb(arg);
+}
+static void page_close_cb(void *arg)
+{
+    lv_page_chart_destroyed_cb(arg);
 }
 static void tabview_event_cb(lv_event_t *e)
 {
@@ -35,10 +40,10 @@ static void tabview_event_cb(lv_event_t *e)
     unsigned short index = lv_tabview_get_tab_act(current_target);
     LV_LOG_USER("%s,index:%d\n", __func__, index);
 }
-
-static void page_close_cb(void *arg)
+static void back_event_cb(lv_event_t *e)
 {
-    // lv_page_wifi_visible(0);
+    // LV_LOG_USER("%s,code:%d\n", __func__, e->code);
+    lv_page_back_previous_page();
 }
 void lv_page_cook_tab_init(lv_obj_t *page)
 {
@@ -61,5 +66,5 @@ void lv_page_cook_tab_init(lv_obj_t *page)
 
     lv_obj_clear_flag(lv_tabview_get_content(tabview), LV_OBJ_FLAG_SCROLL_ELASTIC);
     // lv_obj_clear_flag(lv_tabview_get_content(tabview), LV_OBJ_FLAG_SCROLLABLE);
-    lv_page_back_bar_init(page, "返回", NULL, NULL);
+    lv_page_back_bar_init(page, "返回", NULL, back_event_cb);
 }
