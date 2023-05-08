@@ -51,6 +51,7 @@ static void mode_event_cb(lv_event_t *e)
         lv_100ask_page_manager_set_open_page(NULL, "page_steam_mode");
         break;
     case 1:
+        lv_100ask_page_manager_set_open_page(NULL, "page_cook_bake");
         break;
     case 2:
         break;

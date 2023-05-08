@@ -49,8 +49,8 @@ enum MULTI_MODE_ENUM
 };
 enum WORK_OPERATION_ENUM
 {
-    WORK_OPERATION_STOP= 0x00,
-    WORK_OPERATION_START ,
+    WORK_OPERATION_STOP = 0x00,
+    WORK_OPERATION_START,
     WORK_OPERATION_PAUSE,
     WORK_OPERATION_RESERVE,
     WORK_OPERATION_CONTINUE,
@@ -146,19 +146,6 @@ typedef struct
     steamoven_attr_t attr[3];
     int attr_len;
 } steamoven_t;
-
-typedef struct
-{
-    unsigned char mode_index;
-    unsigned char mode;
-    unsigned short temp;
-    unsigned short mintemp;
-    unsigned short maxtemp;
-    char **temp_model;
-    unsigned short time;
-    unsigned short maxtime;
-    char name[24];
-} steamoven_mode_t;
 
 typedef struct
 {

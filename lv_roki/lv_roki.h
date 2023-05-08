@@ -35,6 +35,8 @@ extern "C"
 #include "custom_item/lv_custom_item.h"
 #include "custom_item/lv_cycle_scroll.h"
 #include "custom_item/lv_btn_array.h"
+#include "custom_item/lv_custom_mode_roller.h"
+
 #include "dialog/lv_auto_dialog.h"
 #include "dialog/lv_manual_dialog.h"
 
@@ -114,6 +116,7 @@ extern "C"
     extern char g_versionCheckState;
     extern char g_wifiPageStatus;
     extern save_settings_t g_save_settings;
+    extern char *vapour_model[3];
     /**********************
      * GLOBAL PROTOTYPES
      **********************/
@@ -142,6 +145,7 @@ extern "C"
     void lv_page_smartrecipes_init(lv_obj_t *page);
     void lv_page_steaming_create(lv_obj_t *page);
     void lv_page_steam_mode_init(lv_obj_t *page);
+    void lv_page_cook_bake_init(lv_obj_t *page);
     void lv_page_steam_right_init(lv_obj_t *page);
     void lv_page_steam_assist_init(lv_obj_t *page);
     void lv_page_multistage_init(lv_obj_t *page);

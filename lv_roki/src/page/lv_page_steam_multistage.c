@@ -13,6 +13,7 @@ typedef struct
     unsigned char mode;
     unsigned char vapour;
     unsigned short temp;
+    unsigned short lower_temp;
     unsigned short time;
 } multistage_para_t;
 static multistage_para_t multistage_para[3] = {0};
@@ -38,54 +39,62 @@ static void multistage_cook_start(const int reserve_time)
 static void multistage_update(void)
 {
     lv_obj_t *parent;
-    lv_obj_t *child[8];
-    char buf[18];
+    lv_obj_t *child[7];
+    char buf[16];
     int i, j;
     LV_LOG_USER("%s,page_cont_row:%p listLastIndex:%d\n", __func__, page_cont_row, listLastIndex);
     for (i = 0; i < 3; ++i)
     {
         parent = lv_obj_get_child(page_cont_row, i);
-        for (j = 0; j < 8; ++j)
+        for (j = 0; j < 7; ++j)
         {
             child[j] = lv_obj_get_child(parent, j);
         }
 
         if (listLastIndex > i)
         {
+            lv_obj_add_flag(child[0], LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(child[1], LV_OBJ_FLAG_HIDDEN);
-            lv_obj_add_flag(child[2], LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_flag(child[3], LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_flag(child[4], LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_flag(child[5], LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(child[2], LV_OBJ_FLAG_HIDDEN);
             lv_obj_clear_flag(child[6], LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_flag(child[7], LV_OBJ_FLAG_HIDDEN);
-            lv_img_set_src(child[0], themesImagesPath "icon_round_checked.png");
-            lv_label_set_text(child[3], workModeName(multistage_para[i].mode));
-            sprintf(buf, "%d℃", multistage_para[i].temp);
-            lv_label_set_text(child[4], buf);
-            sprintf(buf, "%d分钟", multistage_para[i].time);
-            lv_label_set_text(child[5], buf);
+
+            lv_label_set_text(child[2], workModeName(multistage_para[i].mode));
+            if (multistage_para[i].vapour == 0)
+                lv_obj_add_flag(child[3], LV_OBJ_FLAG_HIDDEN);
+            else
+            {
+                lv_obj_clear_flag(child[3], LV_OBJ_FLAG_HIDDEN);
+                lv_label_set_text(lv_obj_get_child(child[3], 0), vapour_model[multistage_para[i].vapour - 1]);
+            }
+            sprintf(buf, "%d", multistage_para[i].temp);
+            lv_label_set_text(lv_obj_get_child(child[4], 0), buf);
+            if (multistage_para[i].lower_temp == 0)
+                lv_obj_add_flag(child[5], LV_OBJ_FLAG_HIDDEN);
+            else
+            {
+                lv_obj_clear_flag(child[5], LV_OBJ_FLAG_HIDDEN);
+                sprintf(buf, "%d", multistage_para[i].lower_temp);
+                lv_label_set_text(lv_obj_get_child(child[5], 0), buf);
+            }
+            sprintf(buf, "%d", multistage_para[i].time);
+            lv_label_set_text(lv_obj_get_child(child[6], 0), buf);
         }
         else
         {
+            lv_obj_clear_flag(child[0], LV_OBJ_FLAG_HIDDEN);
             lv_obj_clear_flag(child[1], LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_flag(child[2], LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(child[2], LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(child[3], LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(child[4], LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(child[5], LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(child[6], LV_OBJ_FLAG_HIDDEN);
-            lv_obj_add_flag(child[7], LV_OBJ_FLAG_HIDDEN);
             if (listLastIndex == i)
             {
-                lv_img_set_src(child[0], themesImagesPath "icon_round_checkable.png");
-                lv_img_set_src(child[1], themesImagesPath "icon_cook_add_checked.png");
-                lv_obj_set_style_text_color(child[2], lv_color_hex(0xDF932F), 0);
+                lv_obj_set_style_opa(parent, LV_OPA_100, 0);
             }
             else
             {
-                lv_img_set_src(child[0], themesImagesPath "icon_round.png");
-                lv_img_set_src(child[1], themesImagesPath "icon_cook_add.png");
-                lv_obj_set_style_text_color(child[2], lv_color_hex(0x878787), 0);
+                lv_obj_set_style_opa(parent, LV_OPA_40, 0);
             }
         }
     }
@@ -333,7 +342,7 @@ static void add_click_event_cb(lv_event_t *e)
     if (user_data == listLastIndex)
     {
         listResetIndex = -1;
-        // steam_left_roller_create(lv_layer_top());
+        steam_left_roller_create(lv_layer_top());
     }
 }
 static void btn_click_event_cb(lv_event_t *e)
@@ -390,7 +399,7 @@ void lv_page_multistage_init(lv_obj_t *page)
     lv_obj_set_flex_flow(page_cont_row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(page_cont_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     //------------------------------
-    char buf[12];
+    char buf[10];
     for (int i = 0; i < 3; ++i)
     {
         if (i > 0)
@@ -400,36 +409,31 @@ void lv_page_multistage_init(lv_obj_t *page)
             lv_obj_set_size(bg_line, 2, LV_PCT(100));
         }
         lv_obj_t *item_obj = lv_obj_create(page_cont_row);
+        lv_obj_set_flex_flow(item_obj, LV_FLEX_FLOW_COLUMN);
+        lv_obj_set_flex_align(item_obj, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
         // lv_obj_set_style_bg_opa(item_obj, LV_OPA_100, 0);
         lv_obj_set_size(item_obj, 150, LV_PCT(100));
 
         lv_obj_t *label = lv_label_create(item_obj); // 0
         lv_obj_set_style_text_font(label, g_robam_font.FZLTHJW_48.font, 0);
         lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
-        lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 50);
         sprintf(buf, "第%d段", i + 1);
         lv_label_set_text(label, buf);
 
         lv_obj_t *img = lv_img_create(item_obj); // 1
         lv_img_set_src(img, getThemesPath("bg_multi_add.png"));
-        lv_obj_align(img, LV_ALIGN_TOP_MID, 0, 140);
         //-------------------------------------------------------
         label = lv_label_create(item_obj); // 2
         lv_obj_set_style_text_font(label, g_robam_font.FZLTHJW_44.font, 0);
         lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
-        lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 0);
         lv_label_set_text(label, workModeName(4));
 
-        label = lv_custom_temp_create(item_obj, 180, g_robam_font.FZLTHC_44.font, 0, -5); // 3
-        lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 90);
+        label = lv_custom_vapour_create(item_obj, 2, g_robam_font.FZLTHC_44.font, 0, 5);  // 3
+        label = lv_custom_temp_create(item_obj, 180, g_robam_font.FZLTHC_44.font, 0, -5); // 4
+        label = lv_custom_temp_create(item_obj, 280, g_robam_font.FZLTHC_44.font, 0, -5); // 5
 
-        label = lv_custom_time_create(item_obj, 332, g_robam_font.FZLTHC_44.font, 0, 5); // 4
-        lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 160);
+        label = lv_custom_time_create(item_obj, 332, g_robam_font.FZLTHC_44.font, 0, 5); // 6
 
         lv_obj_add_event_cb(item_obj, add_click_event_cb, LV_EVENT_CLICKED, (void *)i);
     }
-    //------------------------------
-    // const char *text[] = {"启动", "预约"};
-    // lv_obj_t *btn_array = lv_custom_btn_array_create(page, text, 2, btn_array_event_cb);
-    // lv_obj_align_to(btn_array, back_bar, LV_ALIGN_OUT_BOTTOM_RIGHT, -60, 90);
 }

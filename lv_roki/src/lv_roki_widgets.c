@@ -508,7 +508,7 @@ void lv_roki_widgets(void)
     lv_obj_t *page_multistage = lv_100ask_page_manager_page_create(page_manager, "page_multistage");
     lv_obj_t *page_smart_cook = lv_100ask_page_manager_page_create(page_manager, "page_smart_cook");
     lv_obj_t *page_steam_right = lv_100ask_page_manager_page_create(page_manager, "page_steam_right");
-    lv_obj_t *page_steam_assist = lv_100ask_page_manager_page_create(page_manager, "page_steam_assist");
+    lv_obj_t *page_cook_bake = lv_100ask_page_manager_page_create(page_manager, "page_cook_bake");
     lv_obj_t *page_production_main = lv_100ask_page_manager_page_create(page_manager, "page_production_main");
     lv_obj_t *page_screen_main = lv_100ask_page_manager_page_create(page_manager, "page_screen_main");
     lv_obj_t *page_screen_line = lv_100ask_page_manager_page_create(page_manager, "page_screen_line");
@@ -528,7 +528,7 @@ void lv_roki_widgets(void)
     lv_100ask_page_manager_set_page_init(page_multistage, lv_page_multistage_init);
     lv_100ask_page_manager_set_page_init(page_smart_cook, lv_page_smart_cook_init);
     lv_100ask_page_manager_set_page_init(page_steam_right, lv_page_steam_right_init);
-    lv_100ask_page_manager_set_page_init(page_steam_assist, lv_page_steam_assist_init);
+    lv_100ask_page_manager_set_page_init(page_cook_bake, lv_page_cook_bake_init);
     lv_100ask_page_manager_set_page_init(page_production_main, lv_page_production_main_init);
     lv_100ask_page_manager_set_page_init(page_screen_main, lv_page_screen_main_init);
     lv_100ask_page_manager_set_page_init(page_screen_line, lv_page_screen_line_init);
@@ -558,8 +558,8 @@ void lv_roki_widgets(void)
     lv_100ask_page_manager_set_close_page_anim(page_smart_cook, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_steam_right, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_steam_right, close_page_anim);
-    lv_100ask_page_manager_set_open_page_anim(page_steam_assist, open_page_anim);
-    lv_100ask_page_manager_set_close_page_anim(page_steam_assist, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_cook_bake, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_cook_bake, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_screen_line, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_screen_line, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_production_main, open_page_anim);

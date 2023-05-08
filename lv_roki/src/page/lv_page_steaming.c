@@ -604,19 +604,20 @@ void lv_page_steaming_create(lv_obj_t *page)
     lv_label_set_text(label, "焙烤");
     lv_cooking.label_mode = label;
 
-    lv_obj_t *steam_obj = lv_obj_create(cont);
-    lv_obj_set_size(steam_obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    label = lv_label_create(steam_obj);
-    lv_obj_set_style_text_font(label, g_robam_font.FZLTHC_66.font, 0);
-    lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
-    lv_label_set_text(label, "中");
-    lv_obj_t *label_unit = lv_label_create(steam_obj);
-    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
-    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
-    lv_label_set_text(label_unit, "蒸汽");
-    lv_obj_align_to(label_unit, label, LV_ALIGN_OUT_RIGHT_MID, 5, 15);
-    lv_cooking.label_steam = label;
-    lv_obj_add_flag(lv_obj_get_parent(lv_cooking.label_steam), LV_OBJ_FLAG_HIDDEN);
+    // lv_obj_t *steam_obj = lv_obj_create(cont);
+    // lv_obj_set_size(steam_obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    // label = lv_label_create(steam_obj);
+    // lv_obj_set_style_text_font(label, g_robam_font.FZLTHC_66.font, 0);
+    // lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
+    // lv_label_set_text(label, "中");
+    // lv_obj_t *label_unit = lv_label_create(steam_obj);
+    // lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    // lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    // lv_label_set_text(label_unit, "蒸汽");
+    // lv_obj_align_to(label_unit, label, LV_ALIGN_OUT_RIGHT_MID, 5, 15);
+    lv_obj_t *vapour_obj =lv_custom_vapour_create(cont, 1, g_robam_font.FZLTHC_60.font, 0, 10);
+    lv_cooking.label_steam =lv_obj_get_child(vapour_obj, 0);
+    // lv_obj_add_flag(lv_obj_get_parent(lv_cooking.label_steam), LV_OBJ_FLAG_HIDDEN);
 
     lv_obj_t *time_obj = lv_custom_time_create(cont, 332, g_robam_font.FZLTHC_60.font, 0, 10);
     lv_cooking.label_time = lv_obj_get_child(time_obj, 0);

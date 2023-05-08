@@ -65,7 +65,7 @@ extern "C" {
 
 typedef struct {
     const char * fmt;
-    va_list * va;
+    va_list * vapour_rollerva;
 } lv_vaformat_t;
 
 /**

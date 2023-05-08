@@ -169,6 +169,23 @@ lv_obj_t *lv_divider_create(lv_obj_t *parent)
     return divider;
 }
 
+lv_obj_t *lv_custom_vapour_create(lv_obj_t *parent, int vapour, const lv_font_t *font, lv_coord_t x_ofs, lv_coord_t y_ofs)
+{
+    lv_obj_t *obj = lv_obj_create(parent);
+    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_t *label = lv_label_create(obj);
+    lv_obj_set_style_text_font(label, font, 0);
+    lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
+
+    lv_label_set_text(label, vapour_model[vapour]);
+    lv_obj_t *label_unit = lv_label_create(obj);
+    lv_obj_set_style_text_color(label_unit, getThemesFontColor1(), 0);
+    lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
+    lv_label_set_text(label_unit, "蒸汽");
+    lv_obj_align_to(label_unit, label, LV_ALIGN_OUT_RIGHT_MID, x_ofs, y_ofs);
+    return obj;
+}
+
 lv_obj_t *lv_custom_temp_create(lv_obj_t *parent, int temp, const lv_font_t *font, lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     lv_obj_t *obj = lv_obj_create(parent);

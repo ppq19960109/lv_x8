@@ -320,6 +320,47 @@ lv_obj_t *lv_cycle_scroll_create(lv_obj_t *parent, int width, int height, lv_fle
     return cont;
 }
 /**********************************************************************
+**函数名称: lv_cycle_scroll_unit_create
+**函数说明: 循环滚轮创建
+**输入参数: parent：父对象 width：宽 height：高 flow：布局方向 cycle_scroll_child_cb：子对象选中和不选中的回调
+**输出参数: none
+**返 回 值: 循环滚轮对象
+************************************************************************/
+lv_obj_t *lv_cycle_scroll_unit_create(lv_obj_t *parent, int width, int height, lv_flex_flow_t flow, lv_cycle_scroll_t *lv_cycle_scroll)
+{
+    lv_obj_t *obj = lv_obj_create(parent);
+    lv_obj_set_size(obj, width, height);
+    lv_obj_t *cont = lv_obj_create(obj); // 在屏幕上创建一个container
+    cont->user_data = lv_cycle_scroll;
+    lv_obj_set_size(cont, width, height); // 设置cont的尺寸
+    lv_obj_set_flex_flow(cont, flow);     // 设置cont的子级的layout: 弹性布局
+    // lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    // 1.添加事件
+    if (LV_FLEX_FLOW_COLUMN == (flow & 0x01))
+    {
+        lv_obj_add_event_cb(cont, scroll_y_event, LV_EVENT_ALL, NULL); // 给cont添加event，事件的回调函数
+        lv_obj_set_scroll_dir(cont, LV_DIR_VER);                       // 设置Scroll的允许方向direction：垂直方向
+        lv_obj_set_scroll_snap_y(cont, LV_SCROLL_SNAP_CENTER);         // 捕捉Cont Y方向的子对象，将他们与Container中心对齐
+    }
+    else
+    {
+        lv_obj_add_event_cb(cont, scroll_x_event, LV_EVENT_ALL, NULL);
+        lv_obj_set_scroll_dir(cont, LV_DIR_HOR);               // 设置Scroll的允许方向direction：垂直方向
+        lv_obj_set_scroll_snap_x(cont, LV_SCROLL_SNAP_CENTER); // 捕捉Cont Y方向的子对象，将他们与Container中心对齐
+    }
+    // 2.设置样式
+    lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF); // 隐藏scrollbar
+
+    // lv_obj_set_style_bg_opa(cont, LV_OPA_100, 0);
+    // lv_obj_set_style_bg_color(cont, lv_color_hex(0xffffff), 0);
+    lv_obj_set_style_pad_all(cont, 5, 0);
+    lv_obj_set_style_pad_row(cont, 10, 0);
+    lv_obj_set_style_pad_column(cont, 10, 0);
+    // lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    // lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    return cont;
+}
+/**********************************************************************
 **函数名称: lv_cycle_scroll_get_selected_index
 **函数说明: 获取循环滚轮中心索引
 **输入参数: cycle_scroll：循环滚轮对象
