@@ -186,8 +186,9 @@ void lv_page_chart_create(lv_obj_t *page)
     lv_chart_set_div_line_count(chart1, 6, 0);
     lv_chart_set_update_mode(chart1, LV_CHART_UPDATE_MODE_CIRCULAR);
 
-    lv_obj_set_style_width(chart1, 0, LV_PART_INDICATOR);
-    lv_obj_set_style_height(chart1, 0, LV_PART_INDICATOR);
+    lv_obj_set_style_size(chart1, 0, LV_PART_INDICATOR);
+    // lv_obj_set_style_bg_img_src(chart1, publicImagesPath "knob.png", LV_PART_INDICATOR);
+    // lv_obj_set_style_pad_all(chart1, 30, LV_PART_INDICATOR);
 
     lv_chart_set_range(chart1, LV_CHART_AXIS_PRIMARY_X, 0, 250);
     lv_chart_set_range(chart1, LV_CHART_AXIS_PRIMARY_Y, 0, 250);

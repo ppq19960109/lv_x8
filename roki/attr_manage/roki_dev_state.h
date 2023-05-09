@@ -23,7 +23,6 @@ enum LINK_VALUE_TYPE
 {
     LINK_VALUE_TYPE_NUM = 0x00,
     LINK_VALUE_TYPE_STRING,
-    LINK_VALUE_TYPE_STRING_NUM,
     LINK_VALUE_TYPE_STRUCT,
     LINK_VALUE_TYPE_ARRAY,
 };
@@ -133,7 +132,9 @@ typedef struct
 typedef struct
 {
     unsigned char mode;
+    unsigned char vapour;
     unsigned short temp;
+    unsigned short lowertemp;
     unsigned short time;
 } steamoven_attr_t;
 

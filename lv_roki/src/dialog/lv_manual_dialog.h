@@ -17,6 +17,7 @@ extern "C"
     {
         MANUAL_INDEX_GENERAL = 0x01,
         MANUAL_INDEX_RESERVE,
+        MANUAL_INDEX_MULTISTAGE,
     };
     /**********************
      *      TYPEDEFS
@@ -32,6 +33,7 @@ extern "C"
     lv_obj_t *lv_manual_dialog1(const char *content, const char *cancel, const char *confirm, lv_event_cb_t event_cb);
     lv_obj_t *lv_manual_reserve_dialog(const char *text_before, const char *text_after, const char *text_confirm, const int hour, lv_event_cb_t event_cb);
     int lv_get_reserve_dialog_time(void);
+
     /**********************
      *      MACROS
      **********************/

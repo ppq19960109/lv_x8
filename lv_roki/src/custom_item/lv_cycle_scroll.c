@@ -332,8 +332,8 @@ lv_obj_t *lv_cycle_scroll_unit_create(lv_obj_t *parent, int width, int height, l
     lv_obj_set_size(obj, width, height);
     lv_obj_t *cont = lv_obj_create(obj); // 在屏幕上创建一个container
     cont->user_data = lv_cycle_scroll;
-    lv_obj_set_size(cont, width, height); // 设置cont的尺寸
-    lv_obj_set_flex_flow(cont, flow);     // 设置cont的子级的layout: 弹性布局
+    lv_obj_set_size(cont, LV_PCT(75), height); // 设置cont的尺寸
+    lv_obj_set_flex_flow(cont, flow);          // 设置cont的子级的layout: 弹性布局
     // lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     // 1.添加事件
     if (LV_FLEX_FLOW_COLUMN == (flow & 0x01))
@@ -370,7 +370,7 @@ lv_obj_t *lv_cycle_scroll_unit_create(lv_obj_t *parent, int width, int height, l
 int lv_cycle_scroll_get_selected_index(lv_obj_t *cycle_scroll)
 {
     lv_cycle_scroll_t *lv_cycle_scroll = (lv_cycle_scroll_t *)cycle_scroll->user_data;
-    if (lv_cycle_scroll->cycle_flag > 0)
+    if (lv_cycle_scroll->cycle_flag == 0)
         return lv_cycle_scroll->selected_index;
     lv_coord_t child_cnt = lv_obj_get_child_cnt(cycle_scroll); // 获取子界面的数量
     return (child_cnt - 1) / 2;                                // 中间界面的位置
@@ -384,7 +384,14 @@ int lv_cycle_scroll_get_selected_index(lv_obj_t *cycle_scroll)
 ************************************************************************/
 lv_obj_t *lv_cycle_scroll_get_selected(lv_obj_t *cycle_scroll)
 {
-    return lv_obj_get_child(cycle_scroll, lv_cycle_scroll_get_selected_index(cycle_scroll));
+    if (lv_obj_get_child_cnt(cycle_scroll) == 0)
+    {
+        LV_LOG_USER("%s,cycle_scroll parent is NULL\n", __func__);
+        return NULL;
+    }
+    int selected_index = lv_cycle_scroll_get_selected_index(cycle_scroll);
+    // printf("%s,selected_index:%d\n", __func__, selected_index);
+    return lv_obj_get_child(cycle_scroll, selected_index);
 }
 #if 1
 static void child_select_test(lv_obj_t *child, char select, char select_end)

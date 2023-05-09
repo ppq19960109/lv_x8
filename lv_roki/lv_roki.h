@@ -33,8 +33,8 @@ extern "C"
 #include "lvgl/lvgl.h"
 
 #include "custom_item/lv_custom_item.h"
-#include "custom_item/lv_cycle_scroll.h"
 #include "custom_item/lv_btn_array.h"
+#include "custom_item/lv_cycle_scroll.h"
 #include "custom_item/lv_custom_mode_roller.h"
 
 #include "dialog/lv_auto_dialog.h"
@@ -99,6 +99,14 @@ extern "C"
         char wifiEnable;
         unsigned char themesIndex;
     } save_settings_t;
+    typedef struct
+    {
+        unsigned char mode;
+        unsigned char vapour;
+        unsigned short temp;
+        unsigned short lowertemp;
+        unsigned short time;
+    } multistage_para_t;
 
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_20);
     LV_FONT_DECLARE(lv_font_SiYuanHeiTi_Normal_24);
@@ -149,6 +157,8 @@ extern "C"
     void lv_page_steam_right_init(lv_obj_t *page);
     void lv_page_steam_assist_init(lv_obj_t *page);
     void lv_page_multistage_init(lv_obj_t *page);
+    void lv_multistage_dialog(multistage_para_t *multistage_para);
+
     void lv_page_cook_tab_init(lv_obj_t *page);
     void lv_page_chart_create(lv_obj_t *page);
     void lv_page_chart_completed_cb(void *arg);
@@ -173,7 +183,6 @@ extern "C"
 
     // void switch_value_state(lv_obj_t *sw, const char state);
     void recipe_cook_start(recipe_t *recipe, const int reserve_time);
-    steamoven_mode_t *get_steamoven_mode(unsigned char mode_index);
     void production_mode(const char state);
 
     void lv_page_production_main_init(lv_obj_t *page);

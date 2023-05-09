@@ -56,16 +56,19 @@ static void bottom_bar_event_cb(lv_event_t *e)
         cook_start(0);
     }
 }
-void lv_page_cook_bake_init(lv_obj_t *page)
+void lv_multistage_dialog(multistage_para_t *multistage_para)
 {
-    lv_page_back_bar_init(page, "返回", NULL, NULL);
-    lv_page_bottom_bar_init(page, "预约", "开始烹饪", bottom_bar_event_cb);
+    lv_obj_t *layer = get_manual_layer();
+    layer->user_data = (void *)MANUAL_INDEX_MULTISTAGE;
+
+    lv_page_back_bar_init(layer, "返回", NULL, NULL);
+    lv_page_bottom_bar_init(layer, "", "确认", bottom_bar_event_cb);
 
     lv_cycle_scroll.cb = scroll_child_select_cb;
     lv_cycle_scroll.cycle_flag = 1;
     lv_cycle_scroll.mask_flag = 1;
 
-    steamoven_roller.cooktype = COOK_TYPE_BAKE;
-    lv_obj_t *cont_row = lv_custom_mode_roller_create(page, &steamoven_roller, &lv_cycle_scroll);
+    steamoven_roller.cooktype = COOK_TYPE_MULTISTAGE;
+    lv_obj_t *cont_row = lv_custom_mode_roller_create(layer, &steamoven_roller, &lv_cycle_scroll);
     lv_obj_align(cont_row, LV_ALIGN_TOP_MID, 0, 106);
 }

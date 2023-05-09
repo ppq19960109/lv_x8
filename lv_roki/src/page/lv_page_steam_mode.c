@@ -37,7 +37,6 @@ static steamoven_mode_t steam_mode[] = {
         temp : 2,
         mintemp : 1,
         maxtemp : 10,
-        vapourmodel : vapour_model,
         time : 60,
         maxtime : 0,
         name : "澎湃蒸"
