@@ -434,19 +434,19 @@ static lv_obj_t *lv_steam_item_create(lv_obj_t *parent, const int index, lv_cook
     lv_img_set_src(img, getThemesPath("bg_work_arc_bg.png"));
     // lv_obj_align_to(img, obj, LV_ALIGN_CENTER, 0, 0);
     //------------------------------
-    lv_obj_t *temp_obj = lv_custom_temp_create(obj, 180, g_robam_font.FZLTHC_80.font, 0, -15);
+    lv_obj_t *temp_obj = lv_custom_temp_create(obj, 180, g_robam_font.FZLTHC_80.font);
     lv_obj_align(temp_obj, LV_ALIGN_TOP_MID, 0, 140);
     cooking->arc_label_temp = lv_obj_get_child(temp_obj, 0);
 
-    temp_obj = lv_custom_temp_fix_width_create(obj, 150, g_robam_font.FZLTHC_66.font, 0, -10, 300, "上温");
-    lv_obj_align(temp_obj, LV_ALIGN_TOP_MID, 0, 90);
+    temp_obj = lv_custom_temp_unit_create(obj, 150, g_robam_font.FZLTHC_66.font, 70, "上温");
+    lv_obj_align(temp_obj, LV_ALIGN_TOP_MID, 0, 100);
     cooking->arc_label_top_temp = lv_obj_get_child(temp_obj, 0);
 
-    temp_obj = lv_custom_temp_fix_width_create(obj, 250, g_robam_font.FZLTHC_66.font, 0, -10, 300, "下温");
-    lv_obj_align(temp_obj, LV_ALIGN_TOP_MID, 0, 170);
+    temp_obj = lv_custom_temp_unit_create(obj, 250, g_robam_font.FZLTHC_66.font, 70, "下温");
+    lv_obj_align(temp_obj, LV_ALIGN_TOP_MID, 0, 180);
     cooking->arc_label_bottom_temp = lv_obj_get_child(temp_obj, 0);
 
-    lv_obj_t *time_obj = lv_custom_time_create(obj, 332, g_robam_font.FZLTHC_80.font, 0, 15);
+    lv_obj_t *time_obj = lv_custom_time_create(obj, 332, g_robam_font.FZLTHC_80.font);
     lv_obj_align(time_obj, LV_ALIGN_TOP_MID, 0, 140);
     cooking->arc_label_time = lv_obj_get_child(time_obj, 0);
 
@@ -615,22 +615,22 @@ void lv_page_steaming_create(lv_obj_t *page)
     // lv_obj_set_style_text_font(label_unit, g_robam_font.FZLTHC_30.font, 0);
     // lv_label_set_text(label_unit, "蒸汽");
     // lv_obj_align_to(label_unit, label, LV_ALIGN_OUT_RIGHT_MID, 5, 15);
-    lv_obj_t *vapour_obj =lv_custom_vapour_create(cont, 1, g_robam_font.FZLTHC_60.font, 0, 10);
-    lv_cooking.label_steam =lv_obj_get_child(vapour_obj, 0);
+    lv_obj_t *vapour_obj = lv_custom_vapour_create(cont, 1, g_robam_font.FZLTHC_60.font);
+    lv_cooking.label_steam = lv_obj_get_child(vapour_obj, 0);
     // lv_obj_add_flag(lv_obj_get_parent(lv_cooking.label_steam), LV_OBJ_FLAG_HIDDEN);
 
-    lv_obj_t *time_obj = lv_custom_time_create(cont, 332, g_robam_font.FZLTHC_60.font, 0, 10);
+    lv_obj_t *time_obj = lv_custom_time_create(cont, 332, g_robam_font.FZLTHC_60.font);
     lv_cooking.label_time = lv_obj_get_child(time_obj, 0);
     lv_obj_add_flag(lv_obj_get_parent(lv_cooking.label_time), LV_OBJ_FLAG_HIDDEN);
 
-    lv_obj_t *temp_obj = lv_custom_temp_create(cont, 180, g_robam_font.FZLTHC_60.font, 0, -10);
+    lv_obj_t *temp_obj = lv_custom_temp_create(cont, 180, g_robam_font.FZLTHC_60.font);
     lv_cooking.label_temp = lv_obj_get_child(temp_obj, 0);
     lv_obj_add_flag(lv_obj_get_parent(lv_cooking.label_temp), LV_OBJ_FLAG_HIDDEN);
 
-    temp_obj = lv_custom_temp_fix_width_create(cont, 150, g_robam_font.FZLTHC_66.font, 0, -10, LV_PCT(100), "上温");
+    temp_obj = lv_custom_temp_unit_create(cont, 150, g_robam_font.FZLTHC_66.font, 70, "上温");
     lv_cooking.label_top_temp = lv_obj_get_child(temp_obj, 0);
 
-    temp_obj = lv_custom_temp_fix_width_create(cont, 250, g_robam_font.FZLTHC_66.font, 0, -10, LV_PCT(100), "下温");
+    temp_obj = lv_custom_temp_unit_create(cont, 250, g_robam_font.FZLTHC_66.font, 70, "下温");
     lv_cooking.label_bottom_temp = lv_obj_get_child(temp_obj, 0);
     //----------------------------------------------------------------
     lv_obj_t *img = lv_img_create(page);

@@ -371,6 +371,8 @@ void lv_custom_mode_change(steamoven_roller_t *steamoven_roller, int mode_index)
         child->user_data = (void *)i;
     }
     cycle_scroll_change(steamoven_roller->time_roller, steamoven_mode->time - 1);
+
+    steamoven_roller->steamoven_mode = steamoven_mode;
 }
 
 lv_obj_t *lv_custom_mode_roller_create(lv_obj_t *parent, steamoven_roller_t *steamoven_roller, lv_cycle_scroll_t *lv_cycle_scroll)

@@ -157,7 +157,8 @@ extern "C"
     void lv_page_steam_right_init(lv_obj_t *page);
     void lv_page_steam_assist_init(lv_obj_t *page);
     void lv_page_multistage_init(lv_obj_t *page);
-    void lv_multistage_dialog(multistage_para_t *multistage_para);
+    void lv_page_multistage_select_init(lv_obj_t *page);
+    void multistage_update_from_select(steamoven_t *steamoven);
 
     void lv_page_cook_tab_init(lv_obj_t *page);
     void lv_page_chart_create(lv_obj_t *page);

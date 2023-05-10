@@ -20,6 +20,8 @@ void cycle_scroll_change(lv_obj_t *cycle_scroll, const unsigned int cur_index)
     int mid_btn_index = (child_cnt - 1) / 2;                 // 如果界面为偶数，将中间数向下取整的界面设置为中间界面
 
     int roll_direction = cur_index - mid_btn_index; // 确定滚动方向
+    // if (roll_direction == 0)
+    //     return;
     /* 通过循环将指定界面移到中心位置 */
     for (int i = 0; i < LV_ABS(roll_direction); ++i)
     {
@@ -34,6 +36,34 @@ void cycle_scroll_change(lv_obj_t *cycle_scroll, const unsigned int cur_index)
     }
     /*当按钮数为偶数时，确保按钮居中*/
     lv_obj_scroll_to_view(lv_obj_get_child(cycle_scroll, mid_btn_index), LV_ANIM_OFF);
+}
+/**********************************************************************
+**函数名称: cycle_scroll_to_userdata
+**函数说明: 循环滚轮修改中心索引
+**输入参数: cycle_scroll：循环滚轮对象 cur_index：目标中心索引
+**输出参数: none
+**返 回 值: none
+************************************************************************/
+void cycle_scroll_to_userdata(lv_obj_t *cycle_scroll, const unsigned int value)
+{
+    lv_cycle_scroll_t *lv_cycle_scroll = (lv_cycle_scroll_t *)cycle_scroll->user_data;
+    if (lv_cycle_scroll->cycle_flag == 0)
+    {
+        lv_obj_scroll_to_view(lv_obj_get_child(cycle_scroll, value), LV_ANIM_OFF);
+        lv_cycle_scroll->selected_index = value;
+        return;
+    }
+    int i = 0;
+    lv_obj_t *child;
+    uint32_t child_cnt = lv_obj_get_child_cnt(cycle_scroll); // 获取子界面的数量
+    for (i = 0; i < child_cnt; ++i)
+    {
+        child = lv_obj_get_child(cycle_scroll, i);
+        if ((int)child->user_data == value)
+            break;
+    }
+    LV_LOG_USER("%s,value:%d index:%d\n", __func__, value, i);
+    cycle_scroll_change(cycle_scroll, i);
 }
 static void mask_event_cb(lv_event_t *e)
 {
@@ -104,11 +134,11 @@ static void scroll_y_event(lv_event_t *e)
 
     /* 获取事件的事件代码 */
     /* 判断是否在滚动中 */
-    if (lv_obj_is_scrolling(cont) && e->code == LV_EVENT_SCROLL_END)
-    {
-        // LV_LOG_USER("%s,lv_obj_is_scrolling code:%d\n", __func__, e->code);
-        return;
-    }
+    // if (lv_obj_is_scrolling(cont) && e->code == LV_EVENT_SCROLL_END)
+    // {
+    //     LV_LOG_USER("%s,lv_obj_is_scrolling code:%d\n", __func__, e->code);
+    //     return;
+    // }
     // LV_LOG_USER("%s,code:%d enter\n", __func__, e->code);
 
     lv_coord_t child_cnt = lv_obj_get_child_cnt(cont); // 获取子界面的数量

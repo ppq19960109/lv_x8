@@ -29,10 +29,10 @@ extern "C"
     lv_obj_t *radiobutton_create(lv_obj_t *parent, const char *txt);
     lv_obj_t *lv_divider_create(lv_obj_t *parent);
 
-    lv_obj_t *lv_custom_vapour_create(lv_obj_t *parent, int vapour, const lv_font_t *font, lv_coord_t x_ofs, lv_coord_t y_ofs);
-    lv_obj_t *lv_custom_temp_create(lv_obj_t *parent, int temp, const lv_font_t *font, lv_coord_t x_ofs, lv_coord_t y_ofs);
-    lv_obj_t *lv_custom_temp_fix_width_create(lv_obj_t *parent, int temp, const lv_font_t *font, lv_coord_t x_ofs, lv_coord_t y_ofs, lv_coord_t w, const char *unit_before);
-    lv_obj_t *lv_custom_time_create(lv_obj_t *parent, int time, const lv_font_t *font, lv_coord_t x_ofs, lv_coord_t y_ofs);
+    lv_obj_t *lv_custom_vapour_create(lv_obj_t *parent, int vapour, const lv_font_t *font);
+    lv_obj_t *lv_custom_temp_create(lv_obj_t *parent, int temp, const lv_font_t *font);
+    lv_obj_t *lv_custom_temp_unit_create(lv_obj_t *parent, int temp, const lv_font_t *font, lv_coord_t h, const char *unit_before);
+    lv_obj_t *lv_custom_time_create(lv_obj_t *parent, int time, const lv_font_t *font);
 
     lv_obj_t *lv_page_indicator_create(lv_obj_t *parent, int count);
     void lv_page_indicator_check(lv_obj_t *page_indicator, int index);

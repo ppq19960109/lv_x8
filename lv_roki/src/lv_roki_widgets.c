@@ -506,6 +506,7 @@ void lv_roki_widgets(void)
     lv_obj_t *page_cook_tab = lv_100ask_page_manager_page_create(page_manager, "page_cook_tab");
     lv_obj_t *page_cook_details = lv_100ask_page_manager_page_create(page_manager, "page_cook_details");
     lv_obj_t *page_multistage = lv_100ask_page_manager_page_create(page_manager, "page_multistage");
+    lv_obj_t *page_multistage_select = lv_100ask_page_manager_page_create(page_manager, "page_multistage_select");
     lv_obj_t *page_smart_cook = lv_100ask_page_manager_page_create(page_manager, "page_smart_cook");
     lv_obj_t *page_steam_right = lv_100ask_page_manager_page_create(page_manager, "page_steam_right");
     lv_obj_t *page_cook_bake = lv_100ask_page_manager_page_create(page_manager, "page_cook_bake");
@@ -526,6 +527,7 @@ void lv_roki_widgets(void)
     lv_100ask_page_manager_set_page_init(page_cook_tab, lv_page_cook_tab_init);
     lv_100ask_page_manager_set_page_init(page_cook_details, lv_page_cook_details_init);
     lv_100ask_page_manager_set_page_init(page_multistage, lv_page_multistage_init);
+    lv_100ask_page_manager_set_page_init(page_multistage_select, lv_page_multistage_select_init);
     lv_100ask_page_manager_set_page_init(page_smart_cook, lv_page_smart_cook_init);
     lv_100ask_page_manager_set_page_init(page_steam_right, lv_page_steam_right_init);
     lv_100ask_page_manager_set_page_init(page_cook_bake, lv_page_cook_bake_init);
@@ -553,6 +555,8 @@ void lv_roki_widgets(void)
     lv_100ask_page_manager_set_open_page_anim(page_cook_details, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_cook_details, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_multistage, open_page_anim);
+    lv_100ask_page_manager_set_close_page_anim(page_multistage_select, close_page_anim);
+    lv_100ask_page_manager_set_open_page_anim(page_multistage_select, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_multistage, close_page_anim);
     lv_100ask_page_manager_set_open_page_anim(page_smart_cook, open_page_anim);
     lv_100ask_page_manager_set_close_page_anim(page_smart_cook, close_page_anim);

@@ -13,15 +13,6 @@ static steamoven_roller_t steamoven_roller;
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static void cook_start(const int reserve_time)
-{
-    steamoven_t steamoven = {0};
-    lv_custom_get_roller_attr(&steamoven_roller, &steamoven);
-    steamoven.orderTime = reserve_time;
-    LV_LOG_USER("%s,mode:%d,temp:%d,lowertemp:%d,time:%d,vapour:%d\n", __func__, steamoven.attr[0].mode, steamoven.attr[0].temp, steamoven.attr[0].lowertemp, steamoven.attr[0].time, steamoven.attr[0].vapour);
-}
-
 static void scroll_child_select_cb(lv_obj_t *child, char select, char select_end)
 {
     lv_obj_t *child2 = lv_obj_get_child(child, 0);
@@ -53,22 +44,23 @@ static void bottom_bar_event_cb(lv_event_t *e)
     }
     else
     {
-        cook_start(0);
+        steamoven_t steamoven = {0};
+        lv_custom_get_roller_attr(&steamoven_roller, &steamoven);
+        LV_LOG_USER("%s,mode:%d,temp:%d,lowertemp:%d,time:%d,vapour:%d\n", __func__, steamoven.attr[0].mode, steamoven.attr[0].temp, steamoven.attr[0].lowertemp, steamoven.attr[0].time, steamoven.attr[0].vapour);
+        multistage_update_from_select(&steamoven);
+        lv_page_back_previous_page();
     }
 }
-void lv_multistage_dialog(multistage_para_t *multistage_para)
+void lv_page_multistage_select_init(lv_obj_t *page)
 {
-    lv_obj_t *layer = get_manual_layer();
-    layer->user_data = (void *)MANUAL_INDEX_MULTISTAGE;
-
-    lv_page_back_bar_init(layer, "返回", NULL, NULL);
-    lv_page_bottom_bar_init(layer, "", "确认", bottom_bar_event_cb);
+    lv_page_back_bar_init(page, "返回", NULL, NULL);
+    lv_page_bottom_bar_init(page, NULL, "确认", bottom_bar_event_cb);
 
     lv_cycle_scroll.cb = scroll_child_select_cb;
     lv_cycle_scroll.cycle_flag = 1;
     lv_cycle_scroll.mask_flag = 1;
 
     steamoven_roller.cooktype = COOK_TYPE_MULTISTAGE;
-    lv_obj_t *cont_row = lv_custom_mode_roller_create(layer, &steamoven_roller, &lv_cycle_scroll);
+    lv_obj_t *cont_row = lv_custom_mode_roller_create(page, &steamoven_roller, &lv_cycle_scroll);
     lv_obj_align(cont_row, LV_ALIGN_TOP_MID, 0, 106);
 }

@@ -33,16 +33,6 @@ extern "C"
      **********************/
     typedef struct
     {
-        unsigned char cooktype;
-        lv_obj_t *mode_roller;
-        lv_obj_t *temp_roller;
-        lv_obj_t *lower_temp_roller;
-        lv_obj_t *vapour_roller;
-        lv_obj_t *time_roller;
-    } steamoven_roller_t;
-
-    typedef struct
-    {
         char name[18];
         unsigned char cooktype;
         unsigned char mode;
@@ -57,6 +47,16 @@ extern "C"
         unsigned short maxlowertemp;
         int mode_index;
     } steamoven_mode_t;
+    typedef struct
+    {
+        unsigned char cooktype;
+        steamoven_mode_t *steamoven_mode;
+        lv_obj_t *mode_roller;
+        lv_obj_t *temp_roller;
+        lv_obj_t *lower_temp_roller;
+        lv_obj_t *vapour_roller;
+        lv_obj_t *time_roller;
+    } steamoven_roller_t;
     /**********************
      * GLOBAL PROTOTYPES
      **********************/

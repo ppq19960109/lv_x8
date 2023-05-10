@@ -38,9 +38,9 @@ static void multistage_update(void)
     char buf[16];
     int i, j;
     LV_LOG_USER("%s,page_cont_row:%p listLastIndex:%d\n", __func__, page_cont_row, listLastIndex);
-    for (i = 0; i < 5; i += 2)
+    for (i = 0; i < 3; ++i)
     {
-        parent = lv_obj_get_child(page_cont_row, i);
+        parent = lv_obj_get_child(page_cont_row, i * 2);
         for (j = 0; j < 7; ++j)
         {
             child[j] = lv_obj_get_child(parent, j);
@@ -48,13 +48,14 @@ static void multistage_update(void)
 
         if (listLastIndex > i)
         {
-            lv_obj_set_style_opa(parent, LV_OPA_100, 0);
             lv_obj_add_flag(child[0], LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(child[1], LV_OBJ_FLAG_HIDDEN);
             lv_obj_clear_flag(child[2], LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(child[4], LV_OBJ_FLAG_HIDDEN);
             lv_obj_clear_flag(child[6], LV_OBJ_FLAG_HIDDEN);
 
             lv_label_set_text(child[2], workModeName(multistage_para[i].mode));
+
             if (multistage_para[i].vapour == 0)
                 lv_obj_add_flag(child[3], LV_OBJ_FLAG_HIDDEN);
             else
@@ -62,8 +63,10 @@ static void multistage_update(void)
                 lv_obj_clear_flag(child[3], LV_OBJ_FLAG_HIDDEN);
                 lv_label_set_text(lv_obj_get_child(child[3], 0), vapour_model[multistage_para[i].vapour - 1]);
             }
+
             sprintf(buf, "%d", multistage_para[i].temp);
             lv_label_set_text(lv_obj_get_child(child[4], 0), buf);
+
             if (multistage_para[i].lowertemp == 0)
                 lv_obj_add_flag(child[5], LV_OBJ_FLAG_HIDDEN);
             else
@@ -72,6 +75,7 @@ static void multistage_update(void)
                 sprintf(buf, "%d", multistage_para[i].lowertemp);
                 lv_label_set_text(lv_obj_get_child(child[5], 0), buf);
             }
+
             sprintf(buf, "%d", multistage_para[i].time);
             lv_label_set_text(lv_obj_get_child(child[6], 0), buf);
         }
@@ -84,19 +88,19 @@ static void multistage_update(void)
             lv_obj_add_flag(child[4], LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(child[5], LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(child[6], LV_OBJ_FLAG_HIDDEN);
-            if (listLastIndex == i)
-            {
-                lv_obj_set_style_opa(parent, LV_OPA_100, 0);
-            }
-            else
-            {
-                lv_obj_set_style_opa(parent, LV_OPA_40, 0);
-            }
+        }
+        if (listLastIndex >= i)
+        {
+            lv_obj_set_style_opa(parent, LV_OPA_100, 0);
+        }
+        else
+        {
+            lv_obj_set_style_opa(parent, LV_OPA_40, 0);
         }
     }
 }
 
-void multistage_update_from_dialog(steamoven_t *steamoven)
+void multistage_update_from_select(steamoven_t *steamoven)
 {
     if (listResetIndex >= 0)
     {
@@ -120,19 +124,21 @@ void multistage_update_from_dialog(steamoven_t *steamoven)
 
 static void page_update_cb(void *arg)
 {
-    memset(multistage_para, 0, sizeof(multistage_para));
-    listLastIndex = 0;
-    multistage_update();
 }
 static void add_click_event_cb(lv_event_t *e)
 {
     // lv_obj_t *target = lv_event_get_target(e);
     int user_data = (int)lv_event_get_user_data(e);
+    LV_LOG_USER("%s,code:%d user_data:%d\n", __func__, e->code, user_data);
     if (user_data == listLastIndex)
     {
         listResetIndex = -1;
-        lv_multistage_dialog(NULL);
     }
+    else
+    {
+        listResetIndex = user_data;
+    }
+    lv_100ask_page_manager_set_open_page(NULL, "page_multistage_select");
 }
 static void btn_click_event_cb(lv_event_t *e)
 {
@@ -150,8 +156,6 @@ static void btn_click_event_cb(lv_event_t *e)
     }
     else
     {
-        listResetIndex = index;
-        lv_multistage_dialog(NULL);
     }
 }
 static void bottom_bar_event_cb(lv_event_t *e)
@@ -180,11 +184,11 @@ void lv_page_multistage_init(lv_obj_t *page)
     lv_obj_set_style_text_color(label_total_time, getThemesFontColor1(), 0);
     lv_label_set_text(label_total_time, "总时长");
     lv_obj_align(label_total_time, LV_ALIGN_LEFT_MID, 40, 0);
-    label_total_time = lv_custom_time_create(bottom_bar, 332, g_robam_font.FZLTHC_48.font, 0, 5);
+    label_total_time = lv_custom_time_create(bottom_bar, 332, g_robam_font.FZLTHC_48.font);
     lv_obj_align(label_total_time, LV_ALIGN_LEFT_MID, 150, 0);
 
     page_cont_row = lv_obj_create(page);
-    lv_obj_set_size(page_cont_row, 750, 230);
+    lv_obj_set_size(page_cont_row, 750, 250);
     lv_obj_align(page_cont_row, LV_ALIGN_TOP_MID, 0, 120);
     lv_obj_set_flex_flow(page_cont_row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(page_cont_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -202,7 +206,9 @@ void lv_page_multistage_init(lv_obj_t *page)
         lv_obj_set_flex_flow(item_obj, LV_FLEX_FLOW_COLUMN);
         lv_obj_set_flex_align(item_obj, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
         // lv_obj_set_style_bg_opa(item_obj, LV_OPA_100, 0);
-        lv_obj_set_size(item_obj, 150, LV_PCT(100));
+        lv_obj_set_size(item_obj, 200, LV_PCT(100));
+        // lv_obj_set_style_bg_color(item_obj, lv_color_hex(0xff0000), 0);
+        // lv_obj_set_style_bg_opa(item_obj, LV_OPA_100, 0);
 
         lv_obj_t *label = lv_label_create(item_obj); // 0
         lv_obj_set_style_text_font(label, g_robam_font.FZLTHJW_48.font, 0);
@@ -218,12 +224,16 @@ void lv_page_multistage_init(lv_obj_t *page)
         lv_obj_set_style_text_color(label, getThemesFontColor1(), 0);
         lv_label_set_text(label, workModeName(4));
 
-        label = lv_custom_vapour_create(item_obj, 2, g_robam_font.FZLTHC_44.font, 0, 5);  // 3
-        label = lv_custom_temp_create(item_obj, 180, g_robam_font.FZLTHC_44.font, 0, -5); // 4
-        label = lv_custom_temp_create(item_obj, 280, g_robam_font.FZLTHC_44.font, 0, -5); // 5
+        label = lv_custom_vapour_create(item_obj, 2, g_robam_font.FZLTHC_44.font); // 3
+        label = lv_custom_temp_create(item_obj, 180, g_robam_font.FZLTHC_44.font); // 4 temp
+        label = lv_custom_temp_create(item_obj, 280, g_robam_font.FZLTHC_44.font); // 5 lowertemp
 
-        label = lv_custom_time_create(item_obj, 332, g_robam_font.FZLTHC_44.font, 0, 5); // 6
+        label = lv_custom_time_create(item_obj, 333, g_robam_font.FZLTHC_44.font); // 6
 
         lv_obj_add_event_cb(item_obj, add_click_event_cb, LV_EVENT_CLICKED, (void *)i);
     }
+    //------------------------------------------------------------------
+    memset(multistage_para, 0, sizeof(multistage_para));
+    listLastIndex = 0;
+    multistage_update();
 }
