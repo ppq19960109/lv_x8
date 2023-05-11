@@ -45,7 +45,7 @@ static void bottom_bar_event_cb(lv_event_t *e)
     else
     {
         steamoven_t steamoven = {0};
-        lv_custom_get_roller_attr(&steamoven_roller, &steamoven);
+        lv_custom_mode_roller_get_state(&steamoven_roller, &steamoven);
         LV_LOG_USER("%s,mode:%d,temp:%d,lowertemp:%d,time:%d,vapour:%d\n", __func__, steamoven.attr[0].mode, steamoven.attr[0].temp, steamoven.attr[0].lowertemp, steamoven.attr[0].time, steamoven.attr[0].vapour);
         multistage_update_from_select(&steamoven);
         lv_page_back_previous_page();

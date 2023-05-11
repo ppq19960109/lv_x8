@@ -31,8 +31,8 @@ extern "C"
      ***********************/
     lv_obj_t *lv_cycle_scroll_create(lv_obj_t *parent, int width, int height, lv_flex_flow_t flow, lv_cycle_scroll_t *lv_cycle_scroll);
     lv_obj_t *lv_cycle_scroll_unit_create(lv_obj_t *parent, int width, int height, lv_flex_flow_t flow, lv_cycle_scroll_t *lv_cycle_scroll);
-    void cycle_scroll_change(lv_obj_t *cycle_scroll, const unsigned int cur_index);
-    void cycle_scroll_to_userdata(lv_obj_t *cycle_scroll, const unsigned int value);
+    void cycle_scroll_change(lv_obj_t *cycle_scroll, const unsigned int cur_index, const int event_scroll);
+    void cycle_scroll_to_userdata(lv_obj_t *cycle_scroll, const unsigned int value, const int event_scroll);
     lv_obj_t *lv_cycle_scroll_get_selected(lv_obj_t *cycle_scroll);
     /**********************
      *      MACROS

@@ -25,7 +25,7 @@ static void handle_sig(int sig)
 int main(int argc, char **argv)
 {
 #ifdef DEBUG
-    LOGI("debug app main start");
+    printf("debug app main start");
     setenv("MALLOC_TRACE", "./memleak.log", 1);
     mtrace();
 

@@ -64,7 +64,8 @@ extern "C"
     lv_obj_t *mode_roller_scroll_child_create(lv_obj_t *parent, const char *text, const int num);
     lv_obj_t *lv_custom_mode_roller_create(lv_obj_t *parent, steamoven_roller_t *steamoven_roller, lv_cycle_scroll_t *lv_cycle_scroll);
     void lv_custom_mode_change(steamoven_roller_t *steamoven_roller, int mode_index);
-    void lv_custom_get_roller_attr(steamoven_roller_t *steamoven_roller, steamoven_t *steamoven);
+    void lv_custom_mode_roller_get_state(steamoven_roller_t *steamoven_roller, steamoven_t *steamoven);
+    void lv_custom_mode_roller_select_end(lv_obj_t *child, steamoven_roller_t *steamoven_roller);
     /**********************
      *      MACROS
      **********************/

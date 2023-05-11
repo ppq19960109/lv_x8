@@ -98,7 +98,7 @@ void lv_page_main_init(lv_obj_t *page)
 
         lv_obj_add_event_cb(btn, mode_event_cb, LV_EVENT_CLICKED, (void *)i);
     }
-    cycle_scroll_change(cont, 1);
+    cycle_scroll_change(cont, 1, 0);
 
     // gif = lv_gif_create(lv_scr_act());
     // lv_gif_set_src(gif, "S:/oem/boot.gif");

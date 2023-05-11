@@ -261,7 +261,7 @@ lv_obj_t *mode_roller_scroll_child_create(lv_obj_t *parent, const char *text, co
     return btn;
 }
 #if 1
-void lv_custom_get_roller_attr(steamoven_roller_t *steamoven_roller, steamoven_t *steamoven)
+void lv_custom_mode_roller_get_state(steamoven_roller_t *steamoven_roller, steamoven_t *steamoven)
 {
     int mode_index = (int)lv_cycle_scroll_get_selected(steamoven_roller->mode_roller)->user_data;
     int time = (int)lv_cycle_scroll_get_selected(steamoven_roller->time_roller)->user_data;
@@ -299,23 +299,70 @@ void lv_custom_get_roller_attr(steamoven_roller_t *steamoven_roller, steamoven_t
         steamoven->attr[0].vapour = vapour + 1;
     }
 }
-
+void lv_custom_mode_roller_select_end(lv_obj_t *child, steamoven_roller_t *steamoven_roller)
+{
+    lv_obj_t *roller_parent = lv_obj_get_parent(child);
+    if (roller_parent == steamoven_roller->mode_roller)
+    {
+        // LV_LOG_USER("%s,mode_roller select_end\n", __func__);
+        lv_custom_mode_change(steamoven_roller, (int)child->user_data);
+    }
+    else if (steamoven_roller->steamoven_mode != NULL && steamoven_roller->steamoven_mode->maxlowertemp > 0)
+    {
+        int temp = 0, lowertemp = 0;
+        if (roller_parent == steamoven_roller->temp_roller)
+        {
+            temp = (int)lv_cycle_scroll_get_selected(steamoven_roller->temp_roller)->user_data;
+            lowertemp = (int)lv_cycle_scroll_get_selected(steamoven_roller->lower_temp_roller)->user_data;
+            if (temp > lowertemp + 20)
+            {
+                cycle_scroll_to_userdata(steamoven_roller->lower_temp_roller, temp - 20, 1);
+            }
+            else if (lowertemp > temp + 20)
+            {
+                cycle_scroll_to_userdata(steamoven_roller->lower_temp_roller, temp + 20, 1);
+            }
+            LV_LOG_USER("%s,temp_roller select_end:%d,%d\n", __func__, temp, lowertemp);
+        }
+        else if (roller_parent == steamoven_roller->lower_temp_roller)
+        {
+            temp = (int)lv_cycle_scroll_get_selected(steamoven_roller->temp_roller)->user_data;
+            lowertemp = (int)lv_cycle_scroll_get_selected(steamoven_roller->lower_temp_roller)->user_data;
+            if (lowertemp > temp + 20)
+            {
+                cycle_scroll_to_userdata(steamoven_roller->temp_roller, lowertemp - 20, 1);
+            }
+            else if (temp > lowertemp + 20)
+            {
+                cycle_scroll_to_userdata(steamoven_roller->temp_roller, lowertemp + 20, 1);
+            }
+            // LV_LOG_USER("%s,lower_temp_roller select_end:%d,%d\n", __func__, temp, lowertemp);
+        }
+    }
+}
 void lv_custom_mode_change(steamoven_roller_t *steamoven_roller, int mode_index)
 {
     steamoven_mode_t *steamoven_mode = get_steamoven_mode(mode_index);
+
+    steamoven_mode_t *last_steamoven_mode = steamoven_roller->steamoven_mode;
     int i;
     lv_obj_t *child, *roller_parent;
     LV_LOG_USER("%s,%d,%d,%d\n", __func__, steamoven_mode->maxtemp, steamoven_mode->maxlowertemp, steamoven_mode->vapour);
     roller_parent = lv_obj_get_parent(steamoven_roller->temp_roller);
+
     if (steamoven_mode->maxtemp != 0)
     {
+        // if (last_steamoven_mode != NULL && lv_obj_get_child_cnt(steamoven_roller->temp_roller) > 0 && last_steamoven_mode->maxtemp == steamoven_mode->maxtemp && last_steamoven_mode->mintemp == steamoven_mode->mintemp)
+        // {
+        // }
         lv_obj_clean(steamoven_roller->temp_roller);
         for (i = steamoven_mode->mintemp; i <= steamoven_mode->maxtemp; ++i)
         {
             child = mode_roller_scroll_child_create(steamoven_roller->temp_roller, NULL, i);
             child->user_data = (void *)i;
         }
-        cycle_scroll_change(steamoven_roller->temp_roller, steamoven_mode->temp - steamoven_mode->mintemp);
+
+        cycle_scroll_change(steamoven_roller->temp_roller, steamoven_mode->temp - steamoven_mode->mintemp, 0);
         lv_obj_clear_flag(roller_parent, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(roller_parent->user_data, LV_OBJ_FLAG_HIDDEN);
     }
@@ -334,7 +381,7 @@ void lv_custom_mode_change(steamoven_roller_t *steamoven_roller, int mode_index)
             child = mode_roller_scroll_child_create(steamoven_roller->lower_temp_roller, NULL, i);
             child->user_data = (void *)i;
         }
-        cycle_scroll_change(steamoven_roller->lower_temp_roller, steamoven_mode->lowertemp - steamoven_mode->minlowertemp);
+        cycle_scroll_change(steamoven_roller->lower_temp_roller, steamoven_mode->lowertemp - steamoven_mode->minlowertemp, 0);
         lv_obj_clear_flag(roller_parent, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(roller_parent->user_data, LV_OBJ_FLAG_HIDDEN);
     }
@@ -353,7 +400,7 @@ void lv_custom_mode_change(steamoven_roller_t *steamoven_roller, int mode_index)
             child = mode_roller_scroll_child_create(steamoven_roller->vapour_roller, vapour_model[i], 0);
             child->user_data = (void *)i;
         }
-        cycle_scroll_change(steamoven_roller->vapour_roller, steamoven_mode->vapour - 1);
+        cycle_scroll_change(steamoven_roller->vapour_roller, steamoven_mode->vapour - 1, 0);
         lv_obj_clear_flag(roller_parent, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(roller_parent->user_data, LV_OBJ_FLAG_HIDDEN);
     }
@@ -370,7 +417,7 @@ void lv_custom_mode_change(steamoven_roller_t *steamoven_roller, int mode_index)
         child = mode_roller_scroll_child_create(steamoven_roller->time_roller, NULL, i);
         child->user_data = (void *)i;
     }
-    cycle_scroll_change(steamoven_roller->time_roller, steamoven_mode->time - 1);
+    cycle_scroll_change(steamoven_roller->time_roller, steamoven_mode->time - 1, 0);
 
     steamoven_roller->steamoven_mode = steamoven_mode;
 }
@@ -451,7 +498,7 @@ lv_obj_t *lv_custom_mode_roller_create(lv_obj_t *parent, steamoven_roller_t *ste
     lv_obj_align(label_unit, LV_ALIGN_CENTER, 65, 10);
     // lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_MOMENTUM);
     //---------------------------------------------------------------------
-    cycle_scroll_change(steamoven_roller->mode_roller, 0);
+    cycle_scroll_change(steamoven_roller->mode_roller, 0, 0);
 
     return cont_row;
 }

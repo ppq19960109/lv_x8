@@ -80,7 +80,7 @@ static void mode_change(char mode_index)
             child = mode_roller_scroll_child_create(roller_scroll[1], NULL, i);
             child->user_data = (void *)i;
         }
-        cycle_scroll_change(roller_scroll[1], steamoven_mode->temp - steamoven_mode->mintemp);
+        cycle_scroll_change(roller_scroll[1], steamoven_mode->temp - steamoven_mode->mintemp, 0);
 
         lv_obj_add_flag(roller_scroll[3], LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(roller_scroll[1], LV_OBJ_FLAG_HIDDEN);
@@ -104,7 +104,7 @@ static void mode_change(char mode_index)
         child = mode_roller_scroll_child_create(roller_scroll[2], NULL, i);
         child->user_data = (void *)i;
     }
-    cycle_scroll_change(roller_scroll[2], steamoven_mode->time - 1);
+    cycle_scroll_change(roller_scroll[2], steamoven_mode->time - 1, 0);
 }
 
 static void reserve_dialog_event_cb(lv_event_t *e)
@@ -225,5 +225,5 @@ void lv_page_steam_mode_init(lv_obj_t *page)
     roller_scroll[2] = lv_cycle_scroll_create(cont_row, 180, LV_PCT(100), LV_FLEX_FLOW_COLUMN, &lv_cycle_scroll);
     // lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_MOMENTUM);
 
-    cycle_scroll_change(roller_scroll[0], 0);
+    cycle_scroll_change(roller_scroll[0], 0, 0);
 }
